@@ -9,6 +9,8 @@ _State = TypeVar('_State')
 _Result = TypeVar('_Result')
 _AdapterState = TypeVar('_AdapterState')
 _AdapterResult = TypeVar('_AdapterResult')
+_ConverterResult = TypeVar('_ConverterResult')
+_AdapterConverterResult = TypeVar('_AdapterConverterResult')    
 
 
 @dataclass(frozen=True,kw_only=True)
@@ -17,7 +19,7 @@ class StateError(Generic[_State], Error):
 
 @dataclass(frozen=True,kw_only=True)
 class RuleError(Generic[_State, _Result], Error):
-    rule: '_AbstractRule[_State,_Result]'
+    rule: 'Rule[_State,_Result]'
 
 @dataclass(frozen=True,kw_only=True)
 class ProcessorError(
@@ -29,10 +31,10 @@ class ProcessorError(
     ...
 
 @dataclass(frozen=True)
-class Scope(Generic[_State,_Result], Mapping[str,'_AbstractRule[_State,_Result]']):
-    _rules: Mapping[str,'_AbstractRule[_State,_Result]'] = field(default_factory=dict[str,'_AbstractRule[_State,_Result]'])
+class Scope(Generic[_State,_Result], Mapping[str,'Rule[_State,_Result]']):
+    _rules: Mapping[str,'Rule[_State,_Result]'] = field(default_factory=dict[str,'Rule[_State,_Result]'])
 
-    def __getitem__(self, key: str)->'_AbstractRule[_State,_Result]':
+    def __getitem__(self, key: str)->'Rule[_State,_Result]':
         if key not in self._rules:
             raise Error(msg=f'unknown rule {key}')
         return self._rules[key]
@@ -42,13 +44,22 @@ class Scope(Generic[_State,_Result], Mapping[str,'_AbstractRule[_State,_Result]'
     
     def __iter__(self)->Iterator[str]:
         return iter(self._rules)
+    
+class Converter(ABC, Generic[_State, _Result, _ConverterResult]):
+    @abstractmethod
+    def __call__(self, result: _Result)->_ConverterResult:
+        ...
+
+    @abstractmethod
+    def scope(self)->Scope[_State,_Result]:
+        ...
 
 @dataclass(frozen=True)
 class _AbstractStateAndResult(ABC, Generic[_State,_Result]):
     state: _State
 
     @abstractmethod
-    def no(self)->'StateAndNoResult[_State,_Result]':
+    def no(self)->'_StateAndNoResult[_State,_Result]':
         ...
 
     @abstractmethod
@@ -63,9 +74,13 @@ class _AbstractStateAndResult(ABC, Generic[_State,_Result]):
     def multiple(self)->'_StateAndMultipleResult[_State,_Result]':
         ...
 
+    @abstractmethod
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'_AbstractStateAndResult[_State,_ConverterResult]':
+        ...
+
 @dataclass(frozen=True)
-class StateAndNoResult(_AbstractStateAndResult[_State,_Result]):
-    def no(self)->'StateAndNoResult[_State,_Result]':
+class _StateAndNoResult(_AbstractStateAndResult[_State,_Result]):
+    def no(self)->'_StateAndNoResult[_State,_Result]':
         return self
     
     def single(self)->'_StateAndSingleResult[_State,_Result]':
@@ -76,13 +91,16 @@ class StateAndNoResult(_AbstractStateAndResult[_State,_Result]):
     
     def multiple(self)->'_StateAndMultipleResult[_State,_Result]':
         return _StateAndMultipleResult[_State,_Result](self.state)
+    
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'_StateAndNoResult[_State,_ConverterResult]':
+        return _StateAndNoResult[_State,_ConverterResult](self.state)
 
 @dataclass(frozen=True)
 class _StateAndSingleResult(_AbstractStateAndResult[_State,_Result]):
     result: _Result
 
-    def no(self)->StateAndNoResult[_State,_Result]:
-        return StateAndNoResult[_State,_Result](self.state)
+    def no(self)->_StateAndNoResult[_State,_Result]:
+        return _StateAndNoResult[_State,_Result](self.state)
     
     def single(self)->'_StateAndSingleResult[_State,_Result]':
         return self
@@ -93,13 +111,16 @@ class _StateAndSingleResult(_AbstractStateAndResult[_State,_Result]):
     def multiple(self)->'_StateAndMultipleResult[_State,_Result]':
         return _StateAndMultipleResult[_State,_Result](self.state,[self.result])
 
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'_StateAndSingleResult[_State,_ConverterResult]':
+        return _StateAndSingleResult[_State,_ConverterResult](self.state,converter(self.result))
+
 
 @dataclass(frozen=True)
 class _StateAndOptionalResult(_AbstractStateAndResult[_State,_Result]):
     result: Optional[_Result] = None
 
-    def no(self)->StateAndNoResult[_State,_Result]:
-        return StateAndNoResult[_State,_Result](self.state)
+    def no(self)->_StateAndNoResult[_State,_Result]:
+        return _StateAndNoResult[_State,_Result](self.state)
     
     def single(self)->_StateAndSingleResult[_State,_Result]:
         if self.result is None:
@@ -115,12 +136,19 @@ class _StateAndOptionalResult(_AbstractStateAndResult[_State,_Result]):
         else:
             return _StateAndMultipleResult[_State,_Result](self.state)
 
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'_StateAndOptionalResult[_State,_ConverterResult]':
+        if self.result is None:
+            return _StateAndOptionalResult[_State,_ConverterResult](self.state)
+        else:
+            return _StateAndOptionalResult[_State,_ConverterResult](self.state,converter(self.result))
+
+
 @dataclass(frozen=True)
 class _StateAndMultipleResult(_AbstractStateAndResult[_State,_Result]):
     results: Sequence[_Result] = field(default_factory=list[_Result])
 
-    def no(self)->StateAndNoResult[_State,_Result]:
-        return StateAndNoResult[_State,_Result](self.state)
+    def no(self)->_StateAndNoResult[_State,_Result]:
+        return _StateAndNoResult[_State,_Result](self.state)
     
     def single(self)->_StateAndSingleResult[_State,_Result]:
         if len(self.results) != 1:
@@ -138,6 +166,10 @@ class _StateAndMultipleResult(_AbstractStateAndResult[_State,_Result]):
     def multiple(self)->'_StateAndMultipleResult[_State,_Result]':
         return self
 
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'_StateAndMultipleResult[_State,_ConverterResult]':
+        return _StateAndMultipleResult[_State,_ConverterResult](self.state,[converter(result) for result in self.results])
+
+
 _AndArgs = Union[
     'NoResultRule[_State,_Result]',
     'SingleResultRule[_State,_Result]',
@@ -145,7 +177,7 @@ _AndArgs = Union[
     'MultipleResultRule[_State,_Result]',
 ]
 
-class _AbstractRule(ABC, Generic[_State,_Result]):
+class Rule(ABC, Generic[_State,_Result]):
     @abstractmethod
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_AbstractStateAndResult[_State,_Result]:
         ...
@@ -166,39 +198,43 @@ class _AbstractRule(ABC, Generic[_State,_Result]):
     def multiple(self)->'MultipleResultRule[_State,_Result]':
         ...
 
-    @overload
     @abstractmethod
-    def __and__(self, rhs: 'NoResultRule[_State,_Result]')->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def convert(self, converter: Converter[_State,_Result,_AdapterResult])->'Rule[_State,_AdapterResult]':
         ...
 
     @overload
     @abstractmethod
-    def __and__(self, rhs: 'SingleResultRule[_State,_Result]')->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def __and__(self, rhs: 'NoResultRule[_State,_Result]')->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
         ...
 
     @overload
     @abstractmethod
-    def __and__(self, rhs: 'OptionalResultRule[_State,_Result]')->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def __and__(self, rhs: 'SingleResultRule[_State,_Result]')->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
         ...
 
     @overload
     @abstractmethod
-    def __and__(self, rhs: 'MultipleResultRule[_State,_Result]')->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def __and__(self, rhs: 'OptionalResultRule[_State,_Result]')->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(self, rhs: 'MultipleResultRule[_State,_Result]')->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
         ...
 
     @abstractmethod
-    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
         ...
 
-_ChildRuleType = TypeVar('_ChildRuleType',bound=_AbstractRule,covariant=True)
+_ChildRuleType = TypeVar('_ChildRuleType',bound=Rule,covariant=True)
 
 @dataclass(frozen=True)
 class _UnaryRule(Generic[_ChildRuleType]):
     child: _ChildRuleType
 
-class NoResultRule(_AbstractRule[_State,_Result]):
+class NoResultRule(Rule[_State,_Result]):
     @abstractmethod
-    def __call__(self, state: _State, scope: Scope[_State,_Result])->'StateAndNoResult[_State,_Result]':
+    def __call__(self, state: _State, scope: Scope[_State,_Result])->'_StateAndNoResult[_State,_Result]':
         ...
 
     @overload
@@ -217,7 +253,7 @@ class NoResultRule(_AbstractRule[_State,_Result]):
     def __and__(self, rhs: 'MultipleResultRule[_State,_Result]')->'_MultipleResultAnd[_State,_Result]':
         ...
 
-    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
         if isinstance(rhs, NoResultRule):
             return _NoResultAnd[_State,_Result]([self,rhs])
         elif isinstance(rhs, SingleResultRule):
@@ -236,24 +272,38 @@ class NoResultRule(_AbstractRule[_State,_Result]):
         raise RuleError[_State,_Result](rule=self, msg=f'unable to convert NoResultRule to SingleResultRule')
     
     def optional(self)->'OptionalResultRule[_State,_Result]':
-        class _Adapter(
+        class Adapter(
             OptionalResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[NoResultRule[_AdapterState,_AdapterResult]],
         ):
             def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndOptionalResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).optional()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
     
     def multiple(self)->'MultipleResultRule[_State,_Result]':
-        class _Adapter(
+        class Adapter(
             MultipleResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[NoResultRule[_AdapterState,_AdapterResult]],
         ):
             def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndMultipleResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).multiple()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
     
-class SingleResultRule(_AbstractRule[_State,_Result]):
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'NoResultRule[_State,_ConverterResult]':
+        @dataclass(frozen=True)
+        class Adapter(
+            Generic[_AdapterState,_AdapterResult,_AdapterConverterResult],
+            NoResultRule[_AdapterState,_AdapterConverterResult],
+            _UnaryRule[NoResultRule[_AdapterState,_AdapterResult]],
+        ):
+            converter: Converter[_AdapterState,_AdapterResult,_AdapterConverterResult]
+
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterConverterResult])->_StateAndNoResult[_AdapterState,_AdapterConverterResult]:
+                return self.child(state,self.converter.scope()).convert(self.converter)
+                
+        return Adapter[_State,_Result,_ConverterResult](self,converter)
+    
+class SingleResultRule(Rule[_State,_Result]):
     @abstractmethod
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndSingleResult[_State,_Result]:
         ...
@@ -274,7 +324,7 @@ class SingleResultRule(_AbstractRule[_State,_Result]):
     def __and__(self, rhs: 'MultipleResultRule[_State,_Result]')->'_MultipleResultAnd[_State,_Result]':
         ...
 
-    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
         if isinstance(rhs, NoResultRule):
             return _SingleResultAnd[_State,_Result]([self,rhs])
         elif isinstance(rhs, SingleResultRule):
@@ -287,37 +337,50 @@ class SingleResultRule(_AbstractRule[_State,_Result]):
             raise TypeError(type(rhs))
 
     def no(self)->NoResultRule[_State,_Result]:
-        class _Adapter(
+        class Adapter(
             NoResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[SingleResultRule[_AdapterState,_AdapterResult]],
             ):
-            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->StateAndNoResult[_AdapterState,_AdapterResult]:
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndNoResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).no()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
 
     def single(self)->'SingleResultRule[_State,_Result]':
         return self
     
     def optional(self)->'OptionalResultRule[_State,_Result]':
-        class _Adapter(
+        class Adapter(
             OptionalResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[SingleResultRule[_AdapterState,_AdapterResult]],
             ):
             def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndOptionalResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).optional()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
 
     def multiple(self)->'MultipleResultRule[_State,_Result]':
-        class _Adapter(
+        class Adapter(
             MultipleResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[SingleResultRule[_AdapterState,_AdapterResult]],
         ):
             def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndMultipleResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).multiple()
-        return _Adapter[_State,_Result](self)
-    
+        return Adapter[_State,_Result](self)
 
-class OptionalResultRule(_AbstractRule[_State,_Result]):
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'SingleResultRule[_State,_ConverterResult]':
+        @dataclass(frozen=True)
+        class Adapter(
+            Generic[_AdapterState,_AdapterResult,_AdapterConverterResult],
+            SingleResultRule[_AdapterState,_AdapterConverterResult],
+            _UnaryRule[SingleResultRule[_AdapterState,_AdapterResult]],
+        ):
+            converter: Converter[_AdapterState,_AdapterResult,_AdapterConverterResult]
+
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterConverterResult])->_StateAndSingleResult[_AdapterState,_AdapterConverterResult]:
+                return self.child(state,self.converter.scope()).convert(self.converter)
+                
+        return Adapter[_State,_Result,_ConverterResult](self,converter)
+
+class OptionalResultRule(Rule[_State,_Result]):
     @abstractmethod
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndOptionalResult[_State,_Result]:
         ...
@@ -338,7 +401,7 @@ class OptionalResultRule(_AbstractRule[_State,_Result]):
     def __and__(self, rhs: 'MultipleResultRule[_State,_Result]')->'_MultipleResultAnd[_State,_Result]':
         ...
 
-    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
         if isinstance(rhs, NoResultRule):
             return _OptionalResultAnd[_State,_Result]([self,rhs])
         elif isinstance(rhs, SingleResultRule):
@@ -351,36 +414,50 @@ class OptionalResultRule(_AbstractRule[_State,_Result]):
             raise TypeError(type(rhs))
 
     def no(self)->NoResultRule[_State,_Result]:
-        class _Adapter(
+        class Adapter(
             NoResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[OptionalResultRule[_AdapterState,_AdapterResult]],
             ):
-            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->StateAndNoResult[_AdapterState,_AdapterResult]:
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndNoResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).no()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
     
     def single(self)->SingleResultRule[_State,_Result]:
-        class _Adapter(
+        class Adapter(
             SingleResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[OptionalResultRule[_AdapterState,_AdapterResult]],
             ):
             def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndSingleResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).single()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
 
     def optional(self)->'OptionalResultRule[_State,_Result]':
         return self
 
     def multiple(self)->'MultipleResultRule[_State,_Result]':
-        class _Adapter(
+        class Adapter(
             MultipleResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[OptionalResultRule[_AdapterState,_AdapterResult]],
         ):
             def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndMultipleResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).multiple()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
 
-class MultipleResultRule(_AbstractRule[_State,_Result]):
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'OptionalResultRule[_State,_ConverterResult]':
+        @dataclass(frozen=True)
+        class Adapter(
+            Generic[_AdapterState,_AdapterResult,_AdapterConverterResult],
+            OptionalResultRule[_AdapterState,_AdapterConverterResult],
+            _UnaryRule[OptionalResultRule[_AdapterState,_AdapterResult]],
+        ):
+            converter: Converter[_AdapterState,_AdapterResult,_AdapterConverterResult]
+
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterConverterResult])->_StateAndOptionalResult[_AdapterState,_AdapterConverterResult]:
+                return self.child(state,self.converter.scope()).convert(self.converter)
+                
+        return Adapter[_State,_Result,_ConverterResult](self,converter)
+    
+class MultipleResultRule(Rule[_State,_Result]):
     @abstractmethod
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndMultipleResult[_State,_Result]:
         ...
@@ -401,7 +478,7 @@ class MultipleResultRule(_AbstractRule[_State,_Result]):
     def __and__(self, rhs: 'MultipleResultRule[_State,_Result]')->'_MultipleResultAnd[_State,_Result]':
         ...
 
-    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]]':
+    def __and__(self, rhs: _AndArgs)->'_AbstractAnd[_State,_Result,Rule[_State,_Result]]':
         if isinstance(rhs, NoResultRule):
             return _MultipleResultAnd[_State,_Result]([self,rhs])
         elif isinstance(rhs, SingleResultRule):
@@ -415,39 +492,53 @@ class MultipleResultRule(_AbstractRule[_State,_Result]):
 
 
     def no(self)->NoResultRule[_State,_Result]:
-        class _Adapter(
+        class Adapter(
             NoResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[MultipleResultRule[_AdapterState,_AdapterResult]],
             ):
-            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->StateAndNoResult[_AdapterState,_AdapterResult]:
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndNoResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).no()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
     
     def single(self)->SingleResultRule[_State,_Result]:
-        class _Adapter(
+        class Adapter(
             SingleResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[MultipleResultRule[_AdapterState,_AdapterResult]],
             ):
             def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndSingleResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).single()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
 
     def optional(self)->OptionalResultRule[_State,_Result]:
-        class _Adapter(
+        class Adapter(
             OptionalResultRule[_AdapterState,_AdapterResult],
             _UnaryRule[MultipleResultRule[_AdapterState,_AdapterResult]],
             ):
             def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterResult])->_StateAndOptionalResult[_AdapterState,_AdapterResult]:
                 return self.child(state,scope).optional()
-        return _Adapter[_State,_Result](self)
+        return Adapter[_State,_Result](self)
 
     def multiple(self) -> 'MultipleResultRule[_State, _Result]':
         return self
 
+    def convert(self, converter: Converter[_State,_Result,_ConverterResult])->'MultipleResultRule[_State,_ConverterResult]':
+        @dataclass(frozen=True)
+        class Adapter(
+            Generic[_AdapterState,_AdapterResult,_AdapterConverterResult],
+            MultipleResultRule[_AdapterState,_AdapterConverterResult],
+            _UnaryRule[MultipleResultRule[_AdapterState,_AdapterResult]],
+        ):
+            converter: Converter[_AdapterState,_AdapterResult,_AdapterConverterResult]
+
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState,_AdapterConverterResult])->_StateAndMultipleResult[_AdapterState,_AdapterConverterResult]:
+                return self.child(state,self.converter.scope()).convert(self.converter)
+                
+        return Adapter[_State,_Result,_ConverterResult](self,converter)
+    
 @dataclass(frozen=True)
 class _NaryRule(
     Generic[_State,_Result,_ChildRuleType],
-    _AbstractRule[_State,_Result],
+    Rule[_State,_Result],
     Sized,
     Iterable[_ChildRuleType],
     ):
@@ -475,13 +566,12 @@ class _NaryRule(
 class _AbstractAnd(_NaryRule[_State,_Result,_ChildRuleType]):
     ...
 
-
 @dataclass(frozen=True)
 class _NoResultAnd(NoResultRule[_State,_Result],_AbstractAnd[_State,_Result,NoResultRule[_State,_Result]]):
-    def __call__(self, state: _State, scope: Scope[_State,_Result])->StateAndNoResult[_State,_Result]:
+    def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndNoResult[_State,_Result]:
         for rule in self:
             state = rule(state,scope).state
-        return StateAndNoResult[_State,_Result](state)
+        return _StateAndNoResult[_State,_Result](state)
 
 @dataclass(frozen=True)
 class _SingleResultAnd(
@@ -530,7 +620,7 @@ class _OptionalResultAnd(
 @dataclass(frozen=True)
 class _MultipleResultAnd(
     MultipleResultRule[_State,_Result],
-    _AbstractAnd[_State,_Result,_AbstractRule[_State,_Result]],
+    _AbstractAnd[_State,_Result,Rule[_State,_Result]],
     ):
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndMultipleResult[_State,_Result]:
         results: MutableSequence[_Result] = []

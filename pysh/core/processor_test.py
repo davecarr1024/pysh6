@@ -7,7 +7,7 @@ import unittest
 _State = stream_test.IntStream
 _Result = int
 _Scope = processor.Scope[_State,_Result]
-_StateAndNoResult = processor.StateAndNoResult[_State,_Result]
+_StateAndNoResult = processor._StateAndNoResult[_State,_Result]
 
 @dataclass(frozen=True)
 class _Eq(processor.NoResultRule[_State,_Result]):
