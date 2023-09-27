@@ -379,6 +379,57 @@ class SingleResultRule(Rule[_State,_Result]):
                 return self.child(state,self.converter.scope()).convert(self.converter)
                 
         return Adapter[_State,_Result,_ConverterResult](self,converter)
+    
+    def zero_or_one(self)->'OptionalResultRule[_State,_Result]':
+        @dataclass(frozen=True)
+        class Adapter(
+            OptionalResultRule[_AdapterState,_AdapterResult],
+            _UnaryRule[SingleResultRule[_AdapterState,_AdapterResult]],
+        ):
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState, _AdapterResult])->_StateAndOptionalResult[_AdapterState,_AdapterResult]:
+                try:
+                    return self.child(state,scope).optional()
+                except Error:
+                    return _StateAndOptionalResult[_AdapterState,_AdapterResult](state)        
+        return Adapter[_State,_Result](self)
+
+    def zero_or_more(self)->'MultipleResultRule[_State,_Result]':
+        @dataclass(frozen=True)
+        class Adapter(
+            MultipleResultRule[_AdapterState,_AdapterResult],
+            _UnaryRule[SingleResultRule[_AdapterState,_AdapterResult]],
+        ):
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState, _AdapterResult])->_StateAndMultipleResult[_AdapterState,_AdapterResult]:
+                results: MutableSequence[_AdapterResult] = []
+                while True:
+                    try:
+                        state_and_result = self.child(state,scope)
+                    except Error:
+                        return _StateAndMultipleResult[_AdapterState,_AdapterResult](state,results)
+                    state = state_and_result.state
+                    results.append(state_and_result.result)
+        return Adapter[_State,_Result](self)
+
+    def one_or_more(self)->'MultipleResultRule[_State,_Result]':
+        @dataclass(frozen=True)
+        class Adapter(
+            MultipleResultRule[_AdapterState,_AdapterResult],
+            _UnaryRule[SingleResultRule[_AdapterState,_AdapterResult]],
+        ):
+            def __call__(self, state: _AdapterState, scope: Scope[_AdapterState, _AdapterResult])->_StateAndMultipleResult[_AdapterState,_AdapterResult]:
+                results: MutableSequence[_AdapterResult] = []
+                try:
+                    state_and_result = self.child(state,scope)
+                except Error as error:
+                    raise ProcessorError(rule=self,state=state,children=[error])
+                while True:
+                    try:
+                        state_and_result = self.child(state,scope)
+                    except Error:
+                        return _StateAndMultipleResult[_AdapterState,_AdapterResult](state,results)
+                    state = state_and_result.state
+                    results.append(state_and_result.result)
+        return Adapter[_State,_Result](self)
 
 class OptionalResultRule(Rule[_State,_Result]):
     @abstractmethod
@@ -567,10 +618,16 @@ class _AbstractAnd(_NaryRule[_State,_Result,_ChildRuleType]):
     ...
 
 @dataclass(frozen=True)
-class _NoResultAnd(NoResultRule[_State,_Result],_AbstractAnd[_State,_Result,NoResultRule[_State,_Result]]):
+class _NoResultAnd(
+    NoResultRule[_State,_Result],
+    _AbstractAnd[_State,_Result,NoResultRule[_State,_Result]],
+    ):
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndNoResult[_State,_Result]:
         for rule in self:
-            state = rule(state,scope).state
+            try:
+                state = rule(state,scope).state
+            except Error as error:
+                raise ProcessorError(rule=self,state=state,children=[error])
         return _StateAndNoResult[_State,_Result](state)
 
 @dataclass(frozen=True)
@@ -584,7 +641,10 @@ class _SingleResultAnd(
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndSingleResult[_State,_Result]:
         result: Optional[_Result] = None
         for rule in self:
-            state_and_result: _AbstractStateAndResult[_State,_Result] = rule(state,scope)
+            try:
+                state_and_result: _AbstractStateAndResult[_State,_Result] = rule(state,scope)
+            except Error as error:
+                raise ProcessorError(rule=self,state=state,children=[error])
             state = state_and_result.state
             new_result = state_and_result.optional().result
             if new_result is not None:
@@ -607,7 +667,10 @@ class _OptionalResultAnd(
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndOptionalResult[_State,_Result]:
         result: Optional[_Result] = None
         for rule in self:
-            state_and_result: _AbstractStateAndResult[_State,_Result] = rule(state,scope)
+            try:
+                state_and_result: _AbstractStateAndResult[_State,_Result] = rule(state,scope)
+            except Error as error:
+                raise ProcessorError(rule=self,state=state,children=[error])
             state = state_and_result.state
             new_result = state_and_result.optional().result
             if new_result is not None:
@@ -625,7 +688,11 @@ class _MultipleResultAnd(
     def __call__(self, state: _State, scope: Scope[_State,_Result])->_StateAndMultipleResult[_State,_Result]:
         results: MutableSequence[_Result] = []
         for rule in self:
-            state_and_result: _AbstractStateAndResult[_State,_Result] = rule(state,scope)
+            try:
+                state_and_result: _AbstractStateAndResult[_State,_Result] = rule(state,scope)
+            except Error as error:
+                raise ProcessorError(rule=self,state=state,children=[error])
             state = state_and_result.state
             results += state_and_result.multiple().results
         return _StateAndMultipleResult[_State,_Result](state,results)
+
