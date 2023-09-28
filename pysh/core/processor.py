@@ -97,7 +97,9 @@ class _AbstractStateAndResult(ABC, Generic[_State, _Result]):
         ...
 
     @abstractmethod
-    def named(self) -> "_StateAndNamedResults[_State,_Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "_StateAndNamedResults[_State,_Result]":
         ...
 
     @abstractmethod
@@ -124,7 +126,9 @@ class _StateAndNoResult(_AbstractStateAndResult[_State, _Result]):
     def multiple(self) -> "_StateAndMultipleResults[_State,_Result]":
         return _StateAndMultipleResults[_State, _Result](self.state)
 
-    def named(self) -> "_StateAndNamedResults[_State,_Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "_StateAndNamedResults[_State,_Result]":
         return _StateAndNamedResults[_State, _Result](self.state)
 
     def convert(
@@ -149,9 +153,11 @@ class _StateAndSingleResult(_AbstractStateAndResult[_State, _Result]):
     def multiple(self) -> "_StateAndMultipleResults[_State,_Result]":
         return _StateAndMultipleResults[_State, _Result](self.state, [self.result])
 
-    def named(self) -> "_StateAndNamedResults[_State,_Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "_StateAndNamedResults[_State,_Result]":
         return _StateAndNamedResults[_State, _Result](
-            self.state, [_NamedResult(value=self.result)]
+            self.state, [_NamedResult(name, self.result)]
         )
 
     def convert(
@@ -186,10 +192,12 @@ class _StateAndOptionalResult(_AbstractStateAndResult[_State, _Result]):
         else:
             return _StateAndMultipleResults[_State, _Result](self.state)
 
-    def named(self) -> "_StateAndNamedResults[_State, _Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "_StateAndNamedResults[_State, _Result]":
         if self.result:
             return _StateAndNamedResults[_State, _Result](
-                self.state, [_NamedResult(value=self.result)]
+                self.state, [_NamedResult(name, self.result)]
             )
         else:
             return _StateAndNamedResults[_State, _Result](self.state)
@@ -228,9 +236,11 @@ class _StateAndMultipleResults(_AbstractStateAndResult[_State, _Result]):
     def multiple(self) -> "_StateAndMultipleResults[_State,_Result]":
         return self
 
-    def named(self) -> "_StateAndNamedResults[_State,_Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "_StateAndNamedResults[_State,_Result]":
         return _StateAndNamedResults[_State, _Result](
-            self.state, [_NamedResult(value=result) for result in self.results]
+            self.state, [_NamedResult(name, result) for result in self.results]
         )
 
     def convert(
@@ -241,9 +251,9 @@ class _StateAndMultipleResults(_AbstractStateAndResult[_State, _Result]):
         )
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True)
 class _NamedResult(Generic[_Result]):
-    name: Optional[str] = None
+    name: Optional[str]
     value: _Result
 
     def convert(
@@ -280,8 +290,16 @@ class _StateAndNamedResults(_AbstractStateAndResult[_State, _Result]):
             self.state, [result.value for result in self.results]
         )
 
-    def named(self) -> "_StateAndNamedResults[_State,_Result]":
-        return self
+    def named(
+        self, name: Optional[str] = None
+    ) -> "_StateAndNamedResults[_State,_Result]":
+        if name is None:
+            return self
+        else:
+            return _StateAndNamedResults[_State, _Result](
+                self.state,
+                [_NamedResult[_Result](name, result.value) for result in self.results],
+            )
 
     def convert(
         self, converter: Converter[_State, _Result, _ConverterResult]
@@ -324,7 +342,7 @@ class Rule(ABC, Generic[_State, _Result]):
         ...
 
     @abstractmethod
-    def named(self) -> "NamedResultsRule[_State,_Result]":
+    def named(self, name: Optional[str] = None) -> "NamedResultsRule[_State,_Result]":
         ...
 
     @abstractmethod
@@ -468,15 +486,15 @@ class NoResultRule(Rule[_State, _Result]):
 
         return Adapter[_State, _Result](self)
 
-    def named(self) -> "NamedResultsRule[_State,_Result]":
+    def named(self, name: Optional[str] = None) -> "NamedResultsRule[_State,_Result]":
         class Adapter(
-            NamedResultsRule[_AdapterState, _AdapterResult],
             _UnaryRule[NoResultRule[_AdapterState, _AdapterResult]],
+            NamedResultsRule[_AdapterState, _AdapterResult],
         ):
             def __call__(
                 self, state: _AdapterState, scope: Scope[_AdapterState, _AdapterResult]
             ) -> _StateAndNamedResults[_AdapterState, _AdapterResult]:
-                return self.child(state, scope).named()
+                return self.child(state, scope).named(name)
 
         return Adapter[_State, _Result](self)
 
@@ -532,6 +550,12 @@ class SingleResultRule(Rule[_State, _Result]):
     ) -> "_MultipleResultsAnd[_State,_Result]":
         ...
 
+    @overload
+    def __and__(
+        self, rhs: "NamedResultsRule[_State,_Result]"
+    ) -> "_NamedResultsAnd[_State,_Result]":
+        ...
+
     def __and__(
         self, rhs: _AndArgs
     ) -> "_AbstractAnd[_State,_Result,Rule[_State,_Result]]":
@@ -543,6 +567,8 @@ class SingleResultRule(Rule[_State, _Result]):
             return _MultipleResultsAnd[_State, _Result]([self, rhs])
         elif isinstance(rhs, MultipleResultsRule):
             return _MultipleResultsAnd[_State, _Result]([self, rhs])
+        elif isinstance(rhs, NamedResultsRule):
+            return _NamedResultsAnd[_State, _Result]([self, rhs])
         else:
             raise TypeError(type(rhs))
 
@@ -585,15 +611,15 @@ class SingleResultRule(Rule[_State, _Result]):
 
         return Adapter[_State, _Result](self)
 
-    def named(self) -> "NamedResultsRule[_State,_Result]":
+    def named(self, name: Optional[str] = None) -> "NamedResultsRule[_State,_Result]":
         class Adapter(
-            NamedResultsRule[_AdapterState, _AdapterResult],
             _UnaryRule[SingleResultRule[_AdapterState, _AdapterResult]],
+            NamedResultsRule[_AdapterState, _AdapterResult],
         ):
             def __call__(
                 self, state: _AdapterState, scope: Scope[_AdapterState, _AdapterResult]
             ) -> _StateAndNamedResults[_AdapterState, _AdapterResult]:
-                return self.child(state, scope).named()
+                return self.child(state, scope).named(name)
 
         return Adapter[_State, _Result](self)
 
@@ -713,6 +739,12 @@ class OptionalResultRule(Rule[_State, _Result]):
     ) -> "_MultipleResultsAnd[_State,_Result]":
         ...
 
+    @overload
+    def __and__(
+        self, rhs: "NamedResultsRule[_State,_Result]"
+    ) -> "_NamedResultsAnd[_State,_Result]":
+        ...
+
     def __and__(
         self, rhs: _AndArgs
     ) -> "_AbstractAnd[_State,_Result,Rule[_State,_Result]]":
@@ -724,6 +756,8 @@ class OptionalResultRule(Rule[_State, _Result]):
             return _MultipleResultsAnd[_State, _Result]([self, rhs])
         elif isinstance(rhs, MultipleResultsRule):
             return _MultipleResultsAnd[_State, _Result]([self, rhs])
+        elif isinstance(rhs, NamedResultsRule):
+            return _NamedResultsAnd[_State, _Result]([self, rhs])
         else:
             raise TypeError(type(rhs))
 
@@ -766,15 +800,15 @@ class OptionalResultRule(Rule[_State, _Result]):
 
         return Adapter[_State, _Result](self)
 
-    def named(self) -> "NamedResultsRule[_State,_Result]":
+    def named(self, name: Optional[str] = None) -> "NamedResultsRule[_State,_Result]":
         class Adapter(
+            _UnaryRule[OptionalResultRule[_AdapterState, _AdapterResult]],
             NamedResultsRule[_AdapterState, _AdapterResult],
-            _UnaryRule[SingleResultRule[_AdapterState, _AdapterResult]],
         ):
             def __call__(
                 self, state: _AdapterState, scope: Scope[_AdapterState, _AdapterResult]
             ) -> _StateAndNamedResults[_AdapterState, _AdapterResult]:
-                return self.child(state, scope).named()
+                return self.child(state, scope).named(name)
 
         return Adapter[_State, _Result](self)
 
@@ -830,6 +864,12 @@ class MultipleResultsRule(Rule[_State, _Result]):
     ) -> "_MultipleResultsAnd[_State,_Result]":
         ...
 
+    @overload
+    def __and__(
+        self, rhs: "NamedResultsRule[_State,_Result]"
+    ) -> "_NamedResultsAnd[_State,_Result]":
+        ...
+
     def __and__(
         self, rhs: _AndArgs
     ) -> "_AbstractAnd[_State,_Result,Rule[_State,_Result]]":
@@ -841,6 +881,8 @@ class MultipleResultsRule(Rule[_State, _Result]):
             return _MultipleResultsAnd[_State, _Result]([self, rhs])
         elif isinstance(rhs, MultipleResultsRule):
             return _MultipleResultsAnd[_State, _Result]([self, rhs])
+        elif isinstance(rhs, NamedResultsRule):
+            return _NamedResultsAnd[_State, _Result]([self, rhs])
         else:
             raise TypeError(type(rhs))
 
@@ -883,15 +925,15 @@ class MultipleResultsRule(Rule[_State, _Result]):
     def multiple(self) -> "MultipleResultsRule[_State, _Result]":
         return self
 
-    def named(self) -> "NamedResultsRule[_State,_Result]":
+    def named(self, name: Optional[str] = None) -> "NamedResultsRule[_State,_Result]":
         class Adapter(
-            NamedResultsRule[_AdapterState, _AdapterResult],
             _UnaryRule[MultipleResultsRule[_AdapterState, _AdapterResult]],
+            NamedResultsRule[_AdapterState, _AdapterResult],
         ):
             def __call__(
                 self, state: _AdapterState, scope: Scope[_AdapterState, _AdapterResult]
             ) -> _StateAndNamedResults[_AdapterState, _AdapterResult]:
-                return self.child(state, scope).named()
+                return self.child(state, scope).named(name)
 
         return Adapter[_State, _Result](self)
 
@@ -923,6 +965,52 @@ class NamedResultsRule(Rule[_State, _Result]):
         self, state: _State, scope: Scope[_State, _Result]
     ) -> _StateAndNamedResults[_State, _Result]:
         ...
+
+    @overload
+    def __and__(
+        self, rhs: "NoResultRule[_State,_Result]"
+    ) -> "_NamedResultsAnd[_State,_Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "SingleResultRule[_State,_Result]"
+    ) -> "_NamedResultsAnd[_State,_Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "OptionalResultRule[_State,_Result]"
+    ) -> "_NamedResultsAnd[_State,_Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "MultipleResultsRule[_State,_Result]"
+    ) -> "_NamedResultsAnd[_State,_Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "NamedResultsRule[_State,_Result]"
+    ) -> "_NamedResultsAnd[_State,_Result]":
+        ...
+
+    def __and__(
+        self, rhs: _AndArgs
+    ) -> "_AbstractAnd[_State,_Result,Rule[_State,_Result]]":
+        if isinstance(rhs, NoResultRule):
+            return _NamedResultsAnd[_State, _Result]([self, rhs])
+        elif isinstance(rhs, SingleResultRule):
+            return _NamedResultsAnd[_State, _Result]([self, rhs])
+        elif isinstance(rhs, OptionalResultRule):
+            return _NamedResultsAnd[_State, _Result]([self, rhs])
+        elif isinstance(rhs, MultipleResultsRule):
+            return _NamedResultsAnd[_State, _Result]([self, rhs])
+        elif isinstance(rhs, NamedResultsRule):
+            return _NamedResultsAnd[_State, _Result]([self, rhs])
+        else:
+            raise TypeError(type(rhs))
 
     def no(self) -> NoResultRule[_State, _Result]:
         class Adapter(
@@ -972,8 +1060,17 @@ class NamedResultsRule(Rule[_State, _Result]):
 
         return Adapter[_State, _Result](self)
 
-    def named(self) -> "NamedResultsRule[_State,_Result]":
-        return self
+    def named(self, name: Optional[str] = None) -> "NamedResultsRule[_State,_Result]":
+        class Adapter(
+            _UnaryRule[NamedResultsRule[_AdapterState, _AdapterResult]],
+            NamedResultsRule[_AdapterState, _AdapterResult],
+        ):
+            def __call__(
+                self, state: _AdapterState, scope: Scope[_AdapterState, _AdapterResult]
+            ) -> _StateAndNamedResults[_AdapterState, _AdapterResult]:
+                return self.child(state, scope).named(name)
+
+        return Adapter[_State, _Result](self)
 
     def convert(
         self, converter: Converter[_State, _Result, _ConverterResult]
@@ -1158,15 +1255,7 @@ class _NamedResultRule(
 @dataclass(frozen=True)
 class _NamedResultsAnd(
     NamedResultsRule[_State, _Result],
-    _AbstractAnd[
-        _State,
-        _Result,
-        Union[
-            _NamedResultRule[_State, _Result],
-            NamedResultsRule[_State, _Result],
-            NoResultRule[_State, _Result],
-        ],
-    ],
+    _AbstractAnd[_State, _Result, Rule[_State, _Result]],
 ):
     def __call__(
         self, state: _State, scope: Scope[_State, _Result]
