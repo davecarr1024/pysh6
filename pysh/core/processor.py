@@ -696,3 +696,7 @@ class _MultipleResultAnd(
             results += state_and_result.multiple().results
         return _StateAndMultipleResult[_State,_Result](state,results)
 
+@dataclass(frozen=True)
+class Combination(SingleResultRule[_State,_Result]):
+    @dataclass(frozen=True)
+    class Operand()
