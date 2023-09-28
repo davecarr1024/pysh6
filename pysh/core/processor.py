@@ -6,7 +6,6 @@ from typing import (
     Iterable,
     Iterator,
     Mapping,
-    MutableMapping,
     MutableSequence,
     Optional,
     Sequence,
@@ -1245,14 +1244,6 @@ class _MultipleResultsAnd(
 
 
 @dataclass(frozen=True)
-class _NamedResultRule(
-    NamedResultsRule[_State, _Result],
-    _UnaryRule[SingleResultRule[_State, _Result]],
-):
-    name: Optional[str] = None
-
-
-@dataclass(frozen=True)
 class _NamedResultsAnd(
     NamedResultsRule[_State, _Result],
     _AbstractAnd[_State, _Result, Rule[_State, _Result]],
@@ -1260,7 +1251,7 @@ class _NamedResultsAnd(
     def __call__(
         self, state: _State, scope: Scope[_State, _Result]
     ) -> _StateAndNamedResults[_State, _Result]:
-        results: MutableMapping[str, _Result] = {}
+        results: MutableSequence[_NamedResult[_Result]] = []
         for rule in self:
             try:
                 state_and_result: _AbstractStateAndResult[_State, _Result] = rule(
@@ -1269,15 +1260,5 @@ class _NamedResultsAnd(
             except Error as error:
                 raise ProcessorError(rule=self, state=state, children=[error])
             state = state_and_result.state
-            results |= {
-                result.name: result.value
-                for result in state_and_result.named().results
-                if result.name is not None
-            }
-        return _StateAndNamedResults[_State, _Result](
-            state,
-            [
-                _NamedResult[_Result](name=name, value=value)
-                for name, value in results.items()
-            ],
-        )
+            results += state_and_result.named().results
+        return _StateAndNamedResults[_State, _Result](state, results)
