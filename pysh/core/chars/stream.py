@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import MutableSequence, Optional
+from typing import MutableSequence, Optional, Self
 from .. import stream
+from . import unary_error
 
 
 @dataclass(frozen=True)
@@ -24,6 +25,18 @@ class Stream(stream.Stream["char.Char"]):
             chars.append(char_)
             position_ += char_
         return Stream(chars)
+
+    def head(self) -> "char.Char":
+        try:
+            return super().head()
+        except stream.Error as error_:
+            raise unary_error.UnaryError(child=error_)
+
+    def tail(self) -> Self:
+        try:
+            return super().tail()
+        except stream.Error as error_:
+            raise unary_error.UnaryError(child=error_)
 
 
 from . import char, position

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from .. import errors
+from . import error
 
 
 @dataclass(frozen=True)
@@ -9,7 +9,7 @@ class Char:
 
     def __post_init__(self):
         if len(self.value) != 1:
-            raise errors.Error(msg=f"invalid char {self}")
+            raise error.Error(msg=f"invalid char {self}")
 
 
 from . import position

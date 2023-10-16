@@ -1,7 +1,6 @@
 from typing import Optional
 import unittest
-from .. import errors
-from . import stream
+from . import error, stream
 
 IntStream = stream.Stream[int]
 
@@ -62,7 +61,7 @@ class StreamTest(unittest.TestCase):
         ):
             with self.subTest(stream=stream, expected=expected):
                 if expected is None:
-                    with self.assertRaises(errors.Error):
+                    with self.assertRaises(error.Error):
                         stream.head()
                 else:
                     self.assertEqual(stream.head(), expected)
@@ -86,7 +85,7 @@ class StreamTest(unittest.TestCase):
         ):
             with self.subTest(stream=stream, expected=expected):
                 if expected is None:
-                    with self.assertRaises(errors.Error):
+                    with self.assertRaises(error.Error):
                         stream.tail()
                 else:
                     self.assertEqual(stream.tail(), expected)

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
+
 from .. import chars, errors
-from . import regex, state_and_result, result, error
+from . import regex, state_and_result, result, error, unary_error
 
 
 @dataclass(frozen=True)
@@ -15,10 +16,14 @@ class Literal(regex.Regex):
         return self.value
 
     def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
-        if state.head().value != self.value:
-            raise error.Error(
-                regex=self,
-                state=state,
-                msg=f"expected literal {self.value} got {state.head()}",
-            )
-        return state.tail(), result.Result([state.head()])
+        try:
+            head = state.head()
+            if head.value != self.value:
+                raise error.Error(
+                    regex=self,
+                    state=state,
+                    msg=f"expected literal {self.value} got {head}",
+                )
+            return state.tail(), result.Result([head])
+        except chars.Error as error_:
+            raise unary_error.UnaryError(regex=self, state=state, child=error_)

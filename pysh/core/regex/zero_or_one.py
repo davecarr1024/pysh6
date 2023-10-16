@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from .. import chars, errors
-from . import unary_regex, state_and_result, result
+from . import unary_regex, state_and_result, result, unary_error
 
 
 @dataclass(frozen=True)
@@ -12,4 +12,4 @@ class ZeroOrOne(unary_regex.UnaryRegex):
         try:
             return self.child(state)
         except errors.Error:
-            return state.tail(), result.Result()
+            return state, result.Result()

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from .. import chars, errors
-from . import nary_regex, state_and_result, error, result
+from . import nary_regex, state_and_result, nary_error, result
 
 
 @dataclass(frozen=True)
@@ -14,6 +14,6 @@ class And(nary_regex.NaryRegex):
             try:
                 state, child_result = child(state)
             except errors.Error as error_:
-                raise error.Error(regex=self, state=state, children=[error_])
+                raise nary_error.NaryError(regex=self, state=state, children=[error_])
             result_ += child_result
         return state, result_

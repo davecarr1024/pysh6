@@ -3,7 +3,7 @@ from .. import chars, errors
 from . import regex
 
 
-@dataclass(frozen=True, kw_only=True)
-class Error(errors.NaryError):
+@dataclass(kw_only=True)
+class Error(errors.Error):
     state: chars.Stream
     regex: regex.Regex
