@@ -5,11 +5,32 @@ from ..regex import *
 
 
 class RegexTest(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.maxDiff = None
+    def test_literal(self):
+        for value, expected in list[tuple[str, Optional[Regex]]](
+            [
+                (
+                    "",
+                    And([]),
+                ),
+                (
+                    "a",
+                    Literal("a"),
+                ),
+                (
+                    "ab",
+                    And(
+                        [
+                            Literal("a"),
+                            Literal("b"),
+                        ]
+                    ),
+                ),
+            ]
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(Regex.literal(value), expected)
 
-    def test_apply(self):
+    def test_call(self):
         for regex, state, expected in list[
             tuple[Regex, chars.Stream | str, Optional[StateAndResult | str]]
         ](
