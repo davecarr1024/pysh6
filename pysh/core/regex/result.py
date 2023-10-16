@@ -1,11 +1,14 @@
 from dataclasses import dataclass, field
-from typing import Iterable, Iterator, Sequence, Sized
+from typing import Iterable, Iterator, Optional, Sequence, Sized
 from .. import chars, errors, tokens
 
 
 @dataclass(frozen=True)
 class Result(Sized, Iterable[chars.Char]):
     _chars: Sequence[chars.Char] = field(default_factory=list[chars.Char])
+
+    def __str__(self) -> str:
+        return self.value()
 
     def __bool__(self) -> bool:
         return len(self) != 0
@@ -29,3 +32,7 @@ class Result(Sized, Iterable[chars.Char]):
 
     def token(self, rule_name: str) -> tokens.Token:
         return tokens.Token(rule_name, self.value(), self.position())
+
+    @staticmethod
+    def load(value: str, position: Optional[chars.Position] = None) -> "Result":
+        return Result(list(chars.Stream.load(value, position)))
