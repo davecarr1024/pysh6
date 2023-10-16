@@ -1,6 +1,7 @@
 from typing import Optional
 import unittest
-from . import errors, stream
+from .. import errors
+from . import stream
 
 IntStream = stream.Stream[int]
 

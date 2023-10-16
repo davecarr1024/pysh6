@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Sequence
-from . import chars, errors, stream
+from .. import chars, errors
 
 
 @dataclass(frozen=True)
@@ -18,8 +18,3 @@ class Token:
         return Token(
             rule_name, "".join(char.value for char in value), value[0].position
         )
-
-
-@dataclass(frozen=True)
-class Stream(stream.Stream[Token]):
-    ...

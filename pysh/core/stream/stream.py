@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Generic, Iterable, Iterator, Self, Sequence, Sized, TypeVar
-from . import errors
+from .. import errors
 
 
 _Item = TypeVar("_Item", covariant=True)
