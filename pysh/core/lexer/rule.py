@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from .. import chars, errors, regex
-from . import rule_error, state_and_result
+from pysh.core import chars, errors, regex
+from pysh.core.lexer import rule_error, state_and_result
 
 
 @dataclass(frozen=True)

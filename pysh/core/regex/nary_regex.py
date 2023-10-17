@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Iterable, Iterator, Sequence, Sized
-from . import regex
+from pysh.core.regex import regex
 
 
 @dataclass(frozen=True)

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, MutableSequence, Sequence, Sized
-from .. import chars, errors, regex, tokens
-from . import lex_error, state_and_result
+from pysh.core import chars, errors, regex, tokens
+from pysh.core.lexer import lex_error, state_and_result
 
 
 @dataclass(frozen=True)
@@ -50,4 +50,4 @@ class Lexer(Sized, Iterable["rule.Rule"]):
         return Lexer([rule.Rule.load(value) for value in values])
 
 
-from . import rule
+from pysh.core.lexer import rule

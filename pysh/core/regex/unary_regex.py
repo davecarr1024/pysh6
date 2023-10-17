@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from . import regex
+from pysh.core.regex import regex
 
 
 @dataclass(frozen=True)

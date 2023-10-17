@@ -1,7 +1,7 @@
 from typing import Optional
 from unittest import TestCase
-from .. import chars, errors
-from .result import Result
+from pysh.core import chars, errors
+from pysh.core.regex.result import Result
 
 
 class ResultTest(TestCase):

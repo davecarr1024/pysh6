@@ -1,6 +1,6 @@
 from typing import Optional
 from unittest import TestCase
-from . import char, error
+from pysh.core.chars import char, error
 
 
 class CharTest(TestCase):

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import MutableSequence, Optional, Self
-from .. import stream
-from . import unary_error
+from pysh.core import stream
+from pysh.core.chars import unary_error
 
 
 @dataclass(frozen=True)
@@ -39,4 +39,4 @@ class Stream(stream.Stream["char.Char"]):
             raise unary_error.UnaryError(child=error_)
 
 
-from . import char, position
+from pysh.core.chars import char, position

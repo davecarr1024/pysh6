@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from .. import errors
-from . import error
+from pysh.core import errors
+from pysh.core.tokens import error
 
 
 @dataclass(kw_only=True)

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from . import error, stream
+from pysh.core.tokens import error, stream
 
 
 class StreamTest(TestCase):

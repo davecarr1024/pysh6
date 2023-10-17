@@ -1,5 +1,5 @@
 from unittest import TestCase
-from . import char, position
+from pysh.core.chars import char, position
 
 
 class PositionTest(TestCase):

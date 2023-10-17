@@ -1,7 +1,7 @@
 from typing import Optional
 from unittest import TestCase
-from .. import chars, regex, tokens
-from . import rule, rule_error, state_and_result
+from pysh.core import chars, regex, tokens
+from pysh.core.lexer import rule, rule_error, state_and_result
 
 
 class RuleTest(TestCase):

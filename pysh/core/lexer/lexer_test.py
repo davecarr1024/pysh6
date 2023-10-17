@@ -1,7 +1,7 @@
 from typing import Mapping, Optional, Sequence
 from unittest import TestCase
-from .. import chars, regex, tokens
-from . import lex_error, lexer, rule
+from pysh.core import chars, regex, tokens
+from pysh.core.lexer import lex_error, lexer, rule
 
 
 class LexerTest(TestCase):

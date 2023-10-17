@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from . import error
+from pysh.core.errors import error
 
 
 @dataclass(kw_only=True, repr=False)

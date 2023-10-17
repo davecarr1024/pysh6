@@ -1,7 +1,7 @@
 from typing import Optional, Sequence
 from unittest import TestCase
-from .. import chars
-from . import error, token
+from pysh.core import chars
+from pysh.core.tokens import error, token
 
 
 class TokenTest(TestCase):

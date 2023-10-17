@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from .. import chars, errors
-from . import regex, state_and_result, result, error, unary_error
+from pysh.core import chars, errors
+from pysh.core.regex import regex, state_and_result, result, error, unary_error
 
 
 @dataclass(frozen=True)

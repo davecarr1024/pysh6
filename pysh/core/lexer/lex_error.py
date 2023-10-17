@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .. import chars, errors
+from pysh.core import chars, errors
 
 
 @dataclass(kw_only=True)
@@ -11,4 +11,4 @@ class LexError(errors.NaryError):
         return f"LexError(lexer={self.lexer_},state={self.state},msg={self.msg})"
 
 
-from . import lexer
+from pysh.core.lexer import lexer

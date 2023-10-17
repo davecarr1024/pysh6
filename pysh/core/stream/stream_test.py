@@ -1,6 +1,6 @@
 from typing import Optional
 import unittest
-from . import error, stream
+from pysh.core.stream import error, stream
 
 IntStream = stream.Stream[int]
 

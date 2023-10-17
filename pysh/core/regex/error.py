@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from .. import chars, errors
-from . import regex
+from pysh.core import chars, errors
+from pysh.core.regex import regex
 
 
 @dataclass(kw_only=True)

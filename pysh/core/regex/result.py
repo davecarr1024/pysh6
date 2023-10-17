@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Optional, Sequence, Sized
-from .. import chars, errors, tokens
+from pysh.core import chars, errors, tokens
 
 
 @dataclass(frozen=True)

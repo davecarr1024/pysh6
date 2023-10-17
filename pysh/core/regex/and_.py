@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from .. import chars, errors
-from . import nary_regex, state_and_result, nary_error, result
+from pysh.core import chars, errors
+from pysh.core.regex import nary_regex, state_and_result, nary_error, result
 
 
 @dataclass(frozen=True)

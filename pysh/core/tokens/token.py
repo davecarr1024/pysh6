@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Sequence
-from .. import chars
-from . import error
+from pysh.core import chars
+from pysh.core.tokens import error
 
 
 @dataclass(frozen=True)

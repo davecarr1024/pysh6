@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from .. import chars
-from . import state_and_result
+from pysh.core import chars
+from pysh.core.regex import state_and_result
 
 
 class Regex(ABC):
@@ -14,7 +14,7 @@ class Regex(ABC):
 
     @staticmethod
     def literal(value: str) -> "Regex":
-        from . import and_, literal
+        from pysh.core.regex import and_, literal
 
         literals = [literal.Literal(c) for c in value]
         if len(literals) == 1:

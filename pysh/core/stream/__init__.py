@@ -1,2 +1,2 @@
-from .error import Error
-from .stream import Stream
+from pysh.core.stream.error import Error
+from pysh.core.stream.stream import Stream

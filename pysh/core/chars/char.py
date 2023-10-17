@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from . import error
+from pysh.core.chars import error
 
 
 @dataclass(frozen=True)
@@ -12,4 +12,4 @@ class Char:
             raise error.Error(msg=f"invalid char {self}")
 
 
-from . import position
+from pysh.core.chars import position

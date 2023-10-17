@@ -1,7 +1,7 @@
 from typing import Optional
 from unittest import TestCase
 
-from . import char, position, stream
+from pysh.core.chars import char, position, stream
 
 
 class StreamTest(TestCase):

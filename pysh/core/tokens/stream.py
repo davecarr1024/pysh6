@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Self
 
-from .. import stream
-from . import token, unary_error
+from pysh.core import stream
+from pysh.core.tokens import token, unary_error
 
 
 @dataclass(frozen=True)

@@ -1,2 +1,2 @@
-from .token import Token
-from .stream import Stream
+from pysh.core.tokens.token import Token
+from pysh.core.tokens.stream import Stream

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Sequence
-from . import error
+from pysh.core.errors import error
 
 
 @dataclass(kw_only=True, repr=False)

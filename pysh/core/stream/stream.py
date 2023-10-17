@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Generic, Iterable, Iterator, Self, Sequence, Sized, TypeVar
-from . import error
+from pysh.core.stream import error
 
 
 _Item = TypeVar("_Item", covariant=True)

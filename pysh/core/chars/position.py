@@ -13,4 +13,4 @@ class Position:
             return Position(self.line, self.column + 1)
 
 
-from . import char
+from pysh.core.chars import char

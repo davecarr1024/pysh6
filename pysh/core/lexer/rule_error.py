@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .. import chars, errors
+from pysh.core import chars, errors
 
 
 @dataclass
@@ -11,4 +11,4 @@ class RuleError(errors.UnaryError):
         return f"RuleError(rule={self.rule},state={self.state},msg={self.msg})"
 
 
-from . import rule
+from pysh.core.lexer import rule
