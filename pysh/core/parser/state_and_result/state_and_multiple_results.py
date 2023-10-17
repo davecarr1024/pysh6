@@ -2,11 +2,11 @@ from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Optional, Sequence, Sized
 
 from pysh.core.parser.state_and_result import (
-    abstract_state_and_result,
     result,
     state_and_named_results,
     state_and_no_result,
     state_and_optional_result,
+    state_and_result,
     state_and_result_error,
     state_and_single_result,
 )
@@ -14,7 +14,7 @@ from pysh.core.parser.state_and_result import (
 
 @dataclass(frozen=True)
 class StateAndMultipleResults(
-    abstract_state_and_result.AbstractStateAndResult[result.Result],
+    state_and_result.StateAndResult[result.Result],
     Sized,
     Iterable[result.Result],
 ):

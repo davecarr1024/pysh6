@@ -2,11 +2,11 @@ from dataclasses import dataclass
 from typing import Optional
 
 from pysh.core.parser.state_and_result import (
-    abstract_state_and_result,
     result,
     state_and_multiple_results,
     state_and_named_results,
     state_and_no_result,
+    state_and_result,
     state_and_result_error,
     state_and_single_result,
     state_and_result_error,
@@ -14,9 +14,7 @@ from pysh.core.parser.state_and_result import (
 
 
 @dataclass(frozen=True)
-class StateAndOptionalResult(
-    abstract_state_and_result.AbstractStateAndResult[result.Result]
-):
+class StateAndOptionalResult(state_and_result.StateAndResult[result.Result]):
     result_: Optional[result.Result] = None
 
     def no(self) -> state_and_no_result.StateAndNoResult[result.Result]:

@@ -2,11 +2,11 @@ from dataclasses import dataclass, field
 from typing import Iterator, Mapping
 
 from pysh.core.parser.state_and_result import (
-    abstract_state_and_result,
     result,
     state_and_multiple_results,
     state_and_no_result,
     state_and_optional_result,
+    state_and_result,
     state_and_result_error,
     state_and_single_result,
 )
@@ -14,7 +14,7 @@ from pysh.core.parser.state_and_result import (
 
 @dataclass(frozen=True)
 class StateAndNamedResults(
-    abstract_state_and_result.AbstractStateAndResult[result.Result],
+    state_and_result.StateAndResult[result.Result],
     Mapping[str, result.Result],
 ):
     _results: Mapping[str, result.Result] = field(

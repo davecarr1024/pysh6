@@ -1,19 +1,17 @@
 from dataclasses import dataclass
 
 from pysh.core.parser.state_and_result import (
-    abstract_state_and_result,
     result,
     state_and_multiple_results,
     state_and_named_results,
     state_and_no_result,
     state_and_optional_result,
+    state_and_result,
 )
 
 
 @dataclass(frozen=True)
-class StateAndSingleResult(
-    abstract_state_and_result.AbstractStateAndResult[result.Result]
-):
+class StateAndSingleResult(state_and_result.StateAndResult[result.Result]):
     result_: result.Result
 
     def no(self) -> state_and_no_result.StateAndNoResult[result.Result]:

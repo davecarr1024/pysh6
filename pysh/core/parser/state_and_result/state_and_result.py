@@ -14,7 +14,7 @@ from pysh.core.parser.state_and_result import (
 
 
 @dataclass(frozen=True)
-class AbstractStateAndResult(ABC, Generic[result.Result]):
+class StateAndResult(ABC, Generic[result.Result]):
     state: state.State
 
     @abstractmethod

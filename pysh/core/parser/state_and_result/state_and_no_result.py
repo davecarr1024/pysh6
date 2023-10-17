@@ -4,15 +4,15 @@ from pysh.core.parser.state_and_result import (
     result,
     state_and_multiple_results,
     state_and_named_results,
+    state_and_result,
     state_and_result_error,
-    abstract_state_and_result,
     state_and_optional_result,
     state_and_single_result,
 )
 
 
 @dataclass(frozen=True)
-class StateAndNoResult(abstract_state_and_result.AbstractStateAndResult[result.Result]):
+class StateAndNoResult(state_and_result.StateAndResult[result.Result]):
     def no(self) -> "StateAndNoResult[result.Result]":
         return self
 
