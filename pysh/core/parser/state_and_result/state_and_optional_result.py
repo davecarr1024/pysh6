@@ -21,7 +21,7 @@ class StateAndOptionalResult(state_and_result.StateAndResult[result.Result]):
         return state_and_no_result.StateAndNoResult[result.Result](self.state)
 
     def single(self) -> "state_and_single_result.StateAndSingleResult[result.Result]":
-        if not self.result_:
+        if self.result_ is None:
             raise state_and_result_error.StateAndResultError(
                 state_and_result=self,
                 msg="unable to convert StateAndOptionalResult to StateAndSingleResult: no state",

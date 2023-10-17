@@ -1,7 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pysh.core import tokens
 
 
 @dataclass(frozen=True)
 class State:
-    tokens: tokens.Stream
+    tokens_: tokens.Stream = field(default_factory=tokens.Stream)
