@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from pysh.core.parser.state import state_and_no_result
-from pysh.core.parser.state import state
+from pysh.core.parser.state import state_and_no_result, state
 
 _Result = TypeVar("_Result")
 

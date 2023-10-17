@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from pysh.core.parser.errors import error
+from pysh.core.parser import errors
 from pysh.core.parser.state import state
 
 
 @dataclass(kw_only=True)
-class StateError(error.Error):
+class StateError(errors.Error):
     state: state.State
