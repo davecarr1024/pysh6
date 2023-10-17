@@ -17,10 +17,10 @@ from pysh.core.parser.state_and_result import (
 class StateAndOptionalResult(state_and_result.StateAndResult[result.Result]):
     result_: Optional[result.Result] = None
 
-    def no(self) -> state_and_no_result.StateAndNoResult[result.Result]:
+    def no(self) -> "state_and_no_result.StateAndNoResult[result.Result]":
         return state_and_no_result.StateAndNoResult[result.Result](self.state)
 
-    def single(self) -> state_and_single_result.StateAndSingleResult[result.Result]:
+    def single(self) -> "state_and_single_result.StateAndSingleResult[result.Result]":
         if not self.result_:
             raise state_and_result_error.StateAndResultError(
                 state_and_result=self,
@@ -35,7 +35,7 @@ class StateAndOptionalResult(state_and_result.StateAndResult[result.Result]):
 
     def multiple(
         self,
-    ) -> state_and_multiple_results.StateAndMultipleResults[result.Result]:
+    ) -> "state_and_multiple_results.StateAndMultipleResults[result.Result]":
         if self.result_ is None:
             return state_and_multiple_results.StateAndMultipleResults[result.Result](
                 self.state, []
@@ -47,7 +47,7 @@ class StateAndOptionalResult(state_and_result.StateAndResult[result.Result]):
 
     def named(
         self, name: str
-    ) -> state_and_named_results.StateAndNamedResults[result.Result]:
+    ) -> "state_and_named_results.StateAndNamedResults[result.Result]":
         if self.result_ is None:
             return state_and_named_results.StateAndNamedResults[result.Result](
                 self.state

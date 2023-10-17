@@ -3,12 +3,8 @@ from typing import Iterator, Mapping
 
 from pysh.core.parser.state_and_result import (
     result,
-    state_and_multiple_results,
-    state_and_no_result,
-    state_and_optional_result,
     state_and_result,
     state_and_result_error,
-    state_and_single_result,
 )
 
 
@@ -34,10 +30,10 @@ class StateAndNamedResults(
     def __iter__(self) -> Iterator[str]:
         return iter(self._results)
 
-    def no(self) -> state_and_no_result.StateAndNoResult[result.Result]:
+    def no(self) -> "state_and_no_result.StateAndNoResult[result.Result]":
         return state_and_no_result.StateAndNoResult[result.Result](self.state)
 
-    def single(self) -> state_and_single_result.StateAndSingleResult[result.Result]:
+    def single(self) -> "state_and_single_result.StateAndSingleResult[result.Result]":
         if len(self) != 1:
             raise state_and_result_error.StateAndResultError(
                 state_and_result=self,
@@ -49,7 +45,7 @@ class StateAndNamedResults(
 
     def optional(
         self,
-    ) -> state_and_optional_result.StateAndOptionalResult[result.Result]:
+    ) -> "state_and_optional_result.StateAndOptionalResult[result.Result]":
         if len(self) > 1:
             raise state_and_result_error.StateAndResultError(
                 state_and_result=self,
@@ -66,10 +62,18 @@ class StateAndNamedResults(
 
     def multiple(
         self,
-    ) -> state_and_multiple_results.StateAndMultipleResults[result.Result]:
+    ) -> "state_and_multiple_results.StateAndMultipleResults[result.Result]":
         return state_and_multiple_results.StateAndMultipleResults[result.Result](
             self.state, list(self._results.values())
         )
 
     def named(self, name: str) -> "StateAndNamedResults[result.Result]":
         return self
+
+
+from pysh.core.parser.state_and_result import (
+    state_and_no_result,
+    state_and_optional_result,
+    state_and_single_result,
+    state_and_multiple_results,
+)

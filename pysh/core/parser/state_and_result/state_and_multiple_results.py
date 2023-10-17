@@ -3,12 +3,8 @@ from typing import Iterable, Iterator, Optional, Sequence, Sized
 
 from pysh.core.parser.state_and_result import (
     result,
-    state_and_named_results,
-    state_and_no_result,
-    state_and_optional_result,
     state_and_result,
     state_and_result_error,
-    state_and_single_result,
 )
 
 
@@ -26,10 +22,10 @@ class StateAndMultipleResults(
     def __iter__(self) -> Iterator[result.Result]:
         return iter(self._results)
 
-    def no(self) -> state_and_no_result.StateAndNoResult[result.Result]:
+    def no(self) -> "state_and_no_result.StateAndNoResult[result.Result]":
         return state_and_no_result.StateAndNoResult[result.Result](self.state)
 
-    def single(self) -> state_and_single_result.StateAndSingleResult[result.Result]:
+    def single(self) -> "state_and_single_result.StateAndSingleResult[result.Result]":
         if len(self._results) != 1:
             raise state_and_result_error.StateAndResultError(
                 state_and_result=self,
@@ -41,7 +37,7 @@ class StateAndMultipleResults(
 
     def optional(
         self,
-    ) -> state_and_optional_result.StateAndOptionalResult[result.Result]:
+    ) -> "state_and_optional_result.StateAndOptionalResult[result.Result]":
         if len(self._results) > 1:
             raise state_and_result_error.StateAndResultError(
                 state_and_result=self,
@@ -61,7 +57,7 @@ class StateAndMultipleResults(
 
     def named(
         self, name: str
-    ) -> state_and_named_results.StateAndNamedResults[result.Result]:
+    ) -> "state_and_named_results.StateAndNamedResults[result.Result]":
         if len(self) > 1:
             raise state_and_result_error.StateAndResultError(
                 state_and_result=self,
@@ -75,3 +71,11 @@ class StateAndMultipleResults(
             return state_and_named_results.StateAndNamedResults[result.Result](
                 self.state, {name: self._results[0]}
             )
+
+
+from pysh.core.parser.state_and_result import (
+    state_and_named_results,
+    state_and_no_result,
+    state_and_optional_result,
+    state_and_single_result,
+)

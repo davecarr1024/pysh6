@@ -14,7 +14,7 @@ from pysh.core.parser.state_and_result import (
 class StateAndSingleResult(state_and_result.StateAndResult[result.Result]):
     result_: result.Result
 
-    def no(self) -> state_and_no_result.StateAndNoResult[result.Result]:
+    def no(self) -> "state_and_no_result.StateAndNoResult[result.Result]":
         return state_and_no_result.StateAndNoResult[result.Result](self.state)
 
     def single(self) -> "StateAndSingleResult[result.Result]":
@@ -29,14 +29,14 @@ class StateAndSingleResult(state_and_result.StateAndResult[result.Result]):
 
     def multiple(
         self,
-    ) -> state_and_multiple_results.StateAndMultipleResults[result.Result]:
+    ) -> "state_and_multiple_results.StateAndMultipleResults[result.Result]":
         return state_and_multiple_results.StateAndMultipleResults[result.Result](
             self.state, [self.result_]
         )
 
     def named(
         self, name: str
-    ) -> state_and_named_results.StateAndNamedResults[result.Result]:
+    ) -> "state_and_named_results.StateAndNamedResults[result.Result]":
         return state_and_named_results.StateAndNamedResults[result.Result](
             self.state, {name: self.result_}
         )
