@@ -1,9 +1,8 @@
 from abc import ABC
-from typing import Generic, TypeVar
+from typing import Generic
+
+from pysh.core.parser.state_and_result import result
 
 
-_Result = TypeVar("_Result")
-
-
-class Rule(ABC, Generic[_Result]):
+class Rule(ABC, Generic[result.Result]):
     ...

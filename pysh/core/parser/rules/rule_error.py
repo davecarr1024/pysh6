@@ -1,13 +1,12 @@
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic
 from pysh.core.parser.errors import error
-
-_Result = TypeVar("_Result")
+from pysh.core.parser.state_and_result import result
 
 
 @dataclass(kw_only=True)
-class RuleError(error.Error, Generic[_Result]):
-    rule: "rule.Rule[_Result]"
+class RuleError(error.Error, Generic[result.Result]):
+    rule: "rule.Rule[result.Result]"
 
 
 from pysh.core.parser.rules import rule
