@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from pysh.core.parser.results import error, result as result_lib, results
+from pysh.core.processor.results import error, result as result_lib, results
 
 
 @dataclass(frozen=True)
@@ -22,5 +22,11 @@ class OptionalResult(results.Results[result_lib.Result]):
     def optional(self) -> "OptionalResult[result_lib.Result]":
         return self
 
+    def multiple(self) -> "multiple_results.MultipleResults[result_lib.Result]":
+        if self.result is None:
+            return multiple_results.MultipleResults[result_lib.Result]()
+        else:
+            return multiple_results.MultipleResults[result_lib.Result]([self.result])
 
-from pysh.core.parser.results import no_result, single_result
+
+from pysh.core.processor.results import no_result, single_result, multiple_results

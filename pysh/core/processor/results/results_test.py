@@ -1,5 +1,5 @@
 from unittest import TestCase
-from pysh.core.parser.results import *
+from pysh.core.processor.results import *
 
 
 class ResultsTest(TestCase):

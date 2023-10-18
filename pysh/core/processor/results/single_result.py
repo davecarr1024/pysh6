@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from pysh.core.parser.results import result as result_lib, results
+from pysh.core.processor.results import error, result as result_lib, results
 
 
 @dataclass(frozen=True)
@@ -16,5 +16,8 @@ class SingleResult(results.Results[result_lib.Result]):
     def optional(self) -> "optional_result.OptionalResult[result_lib.Result]":
         return optional_result.OptionalResult[result_lib.Result](self.result)
 
+    def multiple(self) -> "multiple_results.MultipleResults[result_lib.Result]":
+        return multiple_results.MultipleResults[result_lib.Result]([self.result])
 
-from pysh.core.parser.results import no_result, optional_result
+
+from pysh.core.processor.results import no_result, optional_result, multiple_results
