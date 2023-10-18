@@ -39,8 +39,22 @@ class MultipleResults(results.Results[result.Result], Sized, Iterable[result.Res
 
     def multiple(self) -> "MultipleResults[result.Result]":
         return self
-    
-    def named(self, name: str)->'NamedResults[result.Result]':
+
+    def named(self, name: str) -> "named_results.NamedResults[result.Result]":
+        if len(self) > 1:
+            raise error.Error(
+                result=self,
+                msg=f"unable to convert MultipleResults to NamedResults: invalid len {len(self)}",
+            )
+        elif len(self) == 1:
+            return named_results.NamedResults[result.Result]({name: self._results[0]})
+        else:
+            return named_results.NamedResults[result.Result]()
 
 
-from pysh.core.processor.results import no_result, single_result, optional_result
+from pysh.core.processor.results import (
+    no_result,
+    single_result,
+    optional_result,
+    named_results,
+)

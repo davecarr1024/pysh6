@@ -24,7 +24,7 @@ class Results(ABC, Generic[result.Result]):
         ...
 
     @abstractmethod
-    def named(self, name: str)->'named_results.NamedResults[result.Result]':
+    def named(self, name: str) -> "named_results.NamedResults[result.Result]":
         ...
 
 

@@ -17,5 +17,13 @@ class NoResult(results.Results[result.Result]):
     def multiple(self) -> "multiple_results.MultipleResults[result.Result]":
         return multiple_results.MultipleResults[result.Result]()
 
+    def named(self, name: str) -> "named_results.NamedResults[result.Result]":
+        return named_results.NamedResults[result.Result]()
 
-from pysh.core.processor.results import single_result, optional_result, multiple_results
+
+from pysh.core.processor.results import (
+    single_result,
+    optional_result,
+    multiple_results,
+    named_results,
+)
