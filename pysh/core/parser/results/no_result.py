@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from pysh.core.processor.results import error, result, results
+from pysh.core.parser.results import error, result, results
 
 
 @dataclass(frozen=True)
@@ -21,7 +21,7 @@ class NoResult(results.Results[result.Result]):
         return named_results.NamedResults[result.Result]()
 
 
-from pysh.core.processor.results import (
+from pysh.core.parser.results import (
     single_result,
     optional_result,
     multiple_results,

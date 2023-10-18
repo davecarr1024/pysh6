@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Sequence, Sized
 
-from pysh.core.processor.results import error, result, results
+from pysh.core.parser.results import error, result, results
 
 
 @dataclass(frozen=True)
@@ -52,7 +52,7 @@ class MultipleResults(results.Results[result.Result], Sized, Iterable[result.Res
             return named_results.NamedResults[result.Result]()
 
 
-from pysh.core.processor.results import (
+from pysh.core.parser.results import (
     no_result,
     single_result,
     optional_result,

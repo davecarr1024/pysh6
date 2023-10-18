@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Iterator, Mapping
 
-from pysh.core.processor.results import error, result, results
+from pysh.core.parser.results import error, result, results
 
 
 @dataclass(frozen=True)
@@ -57,7 +57,7 @@ class NamedResults(results.Results[result.Result], Mapping[str, result.Result]):
         return self
 
 
-from pysh.core.processor.results import (
+from pysh.core.parser.results import (
     no_result,
     single_result,
     optional_result,

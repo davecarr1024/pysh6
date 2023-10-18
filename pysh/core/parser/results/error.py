@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Generic, Type
-from pysh.core.processor import errors
-from pysh.core.processor.results import result, results
+from pysh.core.parser import errors
+from pysh.core.parser.results import result, results
 
 
 @dataclass(kw_only=True)

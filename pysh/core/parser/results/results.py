@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic
 
-from pysh.core.processor.results import result
+from pysh.core.parser.results import result
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,7 @@ class Results(ABC, Generic[result.Result]):
         ...
 
 
-from pysh.core.processor.results import (
+from pysh.core.parser.results import (
     no_result,
     single_result,
     optional_result,
