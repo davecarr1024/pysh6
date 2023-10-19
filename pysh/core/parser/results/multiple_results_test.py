@@ -3,14 +3,15 @@ from unittest import TestCase
 from pysh.core.parser import results
 
 
-class OptionalResultTest(TestCase):
+class MultipleResultTest(TestCase):
     def test_no(self):
         for result, expected in list[
-            tuple[results.OptionalResult[int], results.NoResult[int]]
+            tuple[results.MultipleResults[int], results.NoResult[int]]
         ](
             [
-                (results.OptionalResult[int](), results.NoResult[int]()),
-                (results.OptionalResult[int](1), results.NoResult[int]()),
+                (results.MultipleResults[int](), results.NoResult[int]()),
+                (results.MultipleResults[int]([1]), results.NoResult[int]()),
+                (results.MultipleResults[int]([1, 2]), results.NoResult[int]()),
             ]
         ):
             with self.subTest(results=result, expected=expected):
@@ -18,11 +19,12 @@ class OptionalResultTest(TestCase):
 
     def test_single(self):
         for result, expected in list[
-            tuple[results.OptionalResult[int], Optional[results.SingleResult[int]]]
+            tuple[results.MultipleResults[int], Optional[results.SingleResult[int]]]
         ](
             [
-                (results.OptionalResult[int](), None),
-                (results.OptionalResult[int](1), results.SingleResult[int](1)),
+                (results.MultipleResults[int](), None),
+                (results.MultipleResults[int]([1]), results.SingleResult[int](1)),
+                (results.MultipleResults[int]([1, 2]), None),
             ]
         ):
             with self.subTest(results=result, expected=expected):
@@ -34,11 +36,12 @@ class OptionalResultTest(TestCase):
 
     def test_optional(self):
         for result, expected in list[
-            tuple[results.OptionalResult[int], Optional[results.OptionalResult[int]]]
+            tuple[results.MultipleResults[int], Optional[results.OptionalResult[int]]]
         ](
             [
-                (results.OptionalResult[int](), results.OptionalResult[int]()),
-                (results.OptionalResult[int](1), results.OptionalResult[int](1)),
+                (results.MultipleResults[int](), results.OptionalResult[int]()),
+                (results.MultipleResults[int]([1]), results.OptionalResult[int](1)),
+                (results.MultipleResults[int]([1, 2]), None),
             ]
         ):
             with self.subTest(results=result, expected=expected):
@@ -50,11 +53,15 @@ class OptionalResultTest(TestCase):
 
     def test_multiple(self):
         for result, expected in list[
-            tuple[results.OptionalResult[int], Optional[results.MultipleResults[int]]]
+            tuple[results.MultipleResults[int], Optional[results.MultipleResults[int]]]
         ](
             [
-                (results.OptionalResult[int](), results.MultipleResults[int]()),
-                (results.OptionalResult[int](1), results.MultipleResults[int]([1])),
+                (results.MultipleResults[int](), results.MultipleResults[int]()),
+                (results.MultipleResults[int]([1]), results.MultipleResults[int]([1])),
+                (
+                    results.MultipleResults[int]([1, 2]),
+                    results.MultipleResults[int]([1, 2]),
+                ),
             ]
         ):
             with self.subTest(results=result, expected=expected):
@@ -66,11 +73,15 @@ class OptionalResultTest(TestCase):
 
     def test_named(self):
         for result, expected in list[
-            tuple[results.OptionalResult[int], Optional[results.NamedResults[int]]]
+            tuple[results.MultipleResults[int], Optional[results.NamedResults[int]]]
         ](
             [
-                (results.OptionalResult[int](), results.NamedResults[int]()),
-                (results.OptionalResult[int](1), results.NamedResults[int]({"a": 1})),
+                (results.MultipleResults[int](), results.NamedResults[int]()),
+                (
+                    results.MultipleResults[int]([1]),
+                    results.NamedResults[int]({"a": 1}),
+                ),
+                (results.MultipleResults[int]([1, 1]), None),
             ]
         ):
             with self.subTest(results=result, expected=expected):
@@ -82,19 +93,16 @@ class OptionalResultTest(TestCase):
 
     def test_convert(self):
         for result, expected in list[
-            tuple[results.OptionalResult[int], results.SingleResult[int]]
+            tuple[results.MultipleResults[int], results.SingleResult[int]]
         ](
             [
-                (results.OptionalResult[int](), results.SingleResult[int](-1)),
-                (results.OptionalResult[int](1), results.SingleResult[int](2)),
+                (results.MultipleResults[int](), results.SingleResult[int](0)),
+                (results.MultipleResults[int]([1]), results.SingleResult[int](1)),
+                (results.MultipleResults[int]([1, 2]), results.SingleResult[int](3)),
             ]
         ):
             with self.subTest(result=result, expected=expected):
                 self.assertEqual(
-                    result.convert(
-                        lambda r: results.SingleResult[int](r.result * 2)
-                        if r.result is not None
-                        else results.SingleResult[int](-1)
-                    ),
+                    result.convert(lambda r: results.SingleResult[int](sum(r))),
                     expected,
                 )
