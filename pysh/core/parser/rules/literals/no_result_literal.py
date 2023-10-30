@@ -11,8 +11,8 @@ class NoResultLiteral(
     literal.Literal[results.Result], no_result_rule.NoResultRule[results.Result]
 ):
     def __call__(
-        self, state: states.State, scope: scope.Scope
-    ) -> states.StateAndNoResult[results.Result]:
+        self, state: "states.State"
+    ) -> "states.StateAndNoResult[results.Result]":
         try:
             if state.tokens.head().rule_name != self.lexer_rule.name:
                 raise errors.ParseError(
@@ -29,3 +29,6 @@ class NoResultLiteral(
             raise errors.ParseError(
                 rule=self, state=state, msg=f"failed to get token: {error}"
             )
+
+
+from pysh.core.parser import states

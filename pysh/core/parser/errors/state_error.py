@@ -5,4 +5,4 @@ from pysh.core.parser.errors import error
 
 @dataclass(kw_only=True)
 class StateError(error.Error):
-    state: states.State
+    state: "states.State"

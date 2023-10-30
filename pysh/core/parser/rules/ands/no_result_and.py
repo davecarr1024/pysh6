@@ -11,11 +11,11 @@ class NoResultAnd(
     and_.And[results.Result, no_result_rule.NoResultRule[results.Result]],
 ):
     def __call__(
-        self, state: states.State, scope: scope.Scope
-    ) -> states.StateAndNoResult[results.Result]:
+        self, state: "states.State"
+    ) -> "states.StateAndNoResult[results.Result]":
         for child in self:
             try:
-                child_state_and_result = child(state, scope)
+                child_state_and_result = child(state)
             except errors.Error as child_error:
                 raise errors.ParseError(rule=self, state=state, _children=[child_error])
             state = child_state_and_result.state

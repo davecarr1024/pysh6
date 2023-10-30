@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from pysh.core.parser import results, states
+from pysh.core.parser import results
 
-from pysh.core.parser.rules import child_rule, no_result_rule, scope
+from pysh.core.parser.rules import child_rule, no_result_rule
 from pysh.core.parser.rules.unary_rules import unary_rule
 
 
@@ -11,6 +11,9 @@ class UnaryNoResultRule(
     unary_rule.UnaryRule[results.Result, child_rule.ChildRule],
 ):
     def __call__(
-        self, state: states.State, scope: scope.Scope
-    ) -> states.StateAndNoResult[results.Result]:
-        return self.child(state, scope).no()
+        self, state: "states.State"
+    ) -> "states.StateAndNoResult[results.Result]":
+        return self.child(state).no()
+
+
+from pysh.core.parser import states

@@ -86,9 +86,9 @@ class SingleResultLiteralTest(TestCase):
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state, scope.Scope[int]())
+                        rule(state)
                 else:
                     self.assertEqual(
-                        rule(state, scope.Scope[int]()),
+                        rule(state),
                         expected,
                     )

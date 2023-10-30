@@ -19,12 +19,12 @@ class OptionalResultAnd(
         self._assert_num_children_of_type(optional_result_rule.OptionalResultRule, 1)
 
     def __call__(
-        self, state: states.State, scope: scope.Scope
-    ) -> states.StateAndOptionalResult[results.Result]:
+        self, state: "states.State"
+    ) -> "states.StateAndOptionalResult[results.Result]":
         result: Optional[results.Result] = None
         for child in self:
             try:
-                child_state_and_result = child(state, scope)
+                child_state_and_result = child(state)
             except errors.Error as child_error:
                 raise errors.ParseError(rule=self, state=state, _children=[child_error])
             state = child_state_and_result.state
