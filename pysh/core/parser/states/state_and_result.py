@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generic
+from typing import Generic, Optional
 from pysh.core.parser import results as results_lib
 
 from pysh.core.parser.states import state as state_lib
@@ -39,7 +39,7 @@ class StateAndResult(Generic[results_lib.Result]):
         )
 
     def named(
-        self, name: str
+        self, name: Optional[str] = None
     ) -> "state_and_named_result.StateAndNamedResult[results_lib.Result]":
         return state_and_named_result.StateAndNamedResult[results_lib.Result](
             self.state, self.results.named(name)

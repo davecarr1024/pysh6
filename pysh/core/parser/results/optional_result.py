@@ -28,11 +28,15 @@ class OptionalResult(results.Results[result_lib.Result]):
         else:
             return multiple_result.MultipleResult[result_lib.Result]([self.result])
 
-    def named(self, name: str) -> "named_result.NamedResult[result_lib.Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "named_result.NamedResult[result_lib.Result]":
         if self.result is None:
             return named_result.NamedResult[result_lib.Result]()
         else:
-            return named_result.NamedResult[result_lib.Result]({name: self.result})
+            return named_result.NamedResult[result_lib.Result](
+                {name or "": self.result}
+            )
 
     @overload
     def __or__(
@@ -81,7 +85,7 @@ class OptionalResult(results.Results[result_lib.Result]):
         elif isinstance(rhs, multiple_result.MultipleResult):
             return multiple_result.MultipleResult(list(self.multiple()) + list(rhs))
         elif isinstance(rhs, named_result.NamedResult):
-            return named_result.NamedResult(dict(self.named("")) | dict(rhs))
+            return named_result.NamedResult(dict(self.named()) | dict(rhs))
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
 

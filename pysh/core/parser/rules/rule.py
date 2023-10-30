@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, overload
+from typing import Generic, Optional, overload
 
 from pysh.core import lexer as lexer_lib
 from pysh.core.parser import results, states
@@ -70,7 +70,9 @@ class Rule(ABC, Generic[results.Result]):
     def multiple(self) -> "multiple_result_rule.MultipleResultRule[results.Result]":
         return unary_multiple_result_rule.UnaryMultipleResultRule(self)
 
-    def named(self, name: str) -> "named_result_rule.NamedResultRule[results.Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "named_result_rule.NamedResultRule[results.Result]":
         return unary_named_result_rule.UnaryNamedResultRule(self, name)
 
 

@@ -23,5 +23,5 @@ class NamedResultAnd(
             except errors.Error as child_error:
                 raise errors.ParseError(rule=self, state=state, _children=[child_error])
             state = child_state_and_result.state
-            results_ |= child_state_and_result.results.named("")
+            results_ |= child_state_and_result.results.named()
         return states.StateAndNamedResult[results.Result](state, results_)

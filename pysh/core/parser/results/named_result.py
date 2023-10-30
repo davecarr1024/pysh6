@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Iterator, Mapping, overload
+from typing import Iterator, Mapping, Optional, overload
 
 from pysh.core.parser.results import error, result, results
 
@@ -48,7 +48,7 @@ class NamedResult(results.Results[result.Result], Mapping[str, result.Result]):
             list(self._results.values())
         )
 
-    def named(self, name: str) -> "NamedResult[result.Result]":
+    def named(self, name: Optional[str] = None) -> "NamedResult[result.Result]":
         return self
 
     @overload
@@ -86,15 +86,15 @@ class NamedResult(results.Results[result.Result], Mapping[str, result.Result]):
         if isinstance(rhs, no_result.NoResult):
             return self
         elif isinstance(rhs, single_result.SingleResult):
-            return NamedResult(dict(self) | dict(rhs.named("")))
+            return NamedResult(dict(self) | dict(rhs.named()))
         elif isinstance(rhs, optional_result.OptionalResult):
-            return NamedResult(dict(self) | dict(rhs.named("")))
+            return NamedResult(dict(self) | dict(rhs.named()))
         elif isinstance(rhs, multiple_result.MultipleResult):
-            return NamedResult(dict(self) | dict(rhs.named("")))
+            return NamedResult(dict(self) | dict(rhs.named()))
         elif isinstance(rhs, multiple_result.MultipleResult):
             return NamedResult(dict(self) | dict(rhs))
         elif isinstance(rhs, NamedResult):
-            return NamedResult(dict(self) | dict(rhs.named("")))
+            return NamedResult(dict(self) | dict(rhs.named()))
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
 

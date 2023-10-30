@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Generic, Self, overload
+from typing import Callable, Generic, Optional, Self, overload
 
 from pysh.core.parser.results import result
 
@@ -24,7 +24,9 @@ class Results(ABC, Generic[result.Result]):
         ...
 
     @abstractmethod
-    def named(self, name: str) -> "named_result.NamedResult[result.Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "named_result.NamedResult[result.Result]":
         ...
 
     def convert(

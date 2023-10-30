@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import overload
+from typing import Optional, overload
 
 from pysh.core.parser.results import error, result, results
 
@@ -18,7 +18,9 @@ class NoResult(results.Results[result.Result]):
     def multiple(self) -> "multiple_result.MultipleResult[result.Result]":
         return multiple_result.MultipleResult[result.Result]()
 
-    def named(self, name: str) -> "named_result.NamedResult[result.Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "named_result.NamedResult[result.Result]":
         return named_result.NamedResult[result.Result]()
 
     @overload

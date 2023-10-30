@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from pysh.core.parser import results, states
 
 from pysh.core.parser.rules import child_rule, named_result_rule, scope
@@ -10,7 +11,7 @@ class UnaryNamedResultRule(
     named_result_rule.NamedResultRule[results.Result],
     unary_rule.UnaryRule[results.Result, child_rule.ChildRule],
 ):
-    name: str
+    name: Optional[str] = None
 
     def __call__(
         self, state: states.State, scope: scope.Scope

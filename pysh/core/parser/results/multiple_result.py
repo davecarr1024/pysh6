@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Iterable, Iterator, Sequence, Sized, overload
+from typing import Iterable, Iterator, Optional, Sequence, Sized, overload
 
 from pysh.core.parser.results import error, result, results
 
@@ -35,9 +35,13 @@ class MultipleResult(results.Results[result.Result], Sized, Iterable[result.Resu
     def multiple(self) -> "MultipleResult[result.Result]":
         return self
 
-    def named(self, name: str) -> "named_result.NamedResult[result.Result]":
+    def named(
+        self, name: Optional[str] = None
+    ) -> "named_result.NamedResult[result.Result]":
         if len(self) > 0:
-            return named_result.NamedResult[result.Result]({name: self._results[0]})
+            return named_result.NamedResult[result.Result](
+                {name or "": self._results[0]}
+            )
         else:
             return named_result.NamedResult[result.Result]()
 
@@ -84,7 +88,7 @@ class MultipleResult(results.Results[result.Result], Sized, Iterable[result.Resu
         elif isinstance(rhs, MultipleResult):
             return MultipleResult(list(self) + list(rhs))
         elif isinstance(rhs, named_result.NamedResult):
-            return named_result.NamedResult(dict(self.named("")) | dict(rhs))
+            return named_result.NamedResult(dict(self.named()) | dict(rhs))
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
 
