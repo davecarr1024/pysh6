@@ -16,8 +16,11 @@ class SingleResultRule(rule.Rule[results.Result]):
     def no(self) -> "no_result_rule.NoResultRule[results.Result]":
         @dataclass(frozen=True)
         class _Adapter(
-            unary_rule.UnaryRule[SingleResultRule[adapter_result.AdapterResult]],
             no_result_rule.NoResultRule[adapter_result.AdapterResult],
+            unary_rule.UnaryRule[
+                adapter_result.AdapterResult,
+                SingleResultRule[adapter_result.AdapterResult],
+            ],
         ):
             def __call__(
                 self,
