@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from pysh.core.parser import results, states
 
-from pysh.core.parser.rules import child_rule, single_result_rule, scope, unary_rule
+from pysh.core.parser.rules import child_rule, single_result_rule, scope
+from pysh.core.parser.rules.unary_rules import unary_rule
 
 
 @dataclass(frozen=True)

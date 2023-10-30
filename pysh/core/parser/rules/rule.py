@@ -39,6 +39,8 @@ from pysh.core.parser.rules import (
     optional_result_rule,
     multiple_results_rule,
     named_results_rule,
+)
+from pysh.core.parser.rules.unary_rules import (
     unary_no_result_rule,
     unary_single_result_rule,
     unary_optional_result_rule,
