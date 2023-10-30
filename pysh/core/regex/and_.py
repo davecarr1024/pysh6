@@ -14,6 +14,6 @@ class And(nary_regex.NaryRegex):
             try:
                 state, child_result = child(state)
             except errors.Error as error_:
-                raise nary_error.NaryError(regex=self, state=state, children=[error_])
+                raise nary_error.NaryError(regex=self, state=state, _children=[error_])
             result_ += child_result
         return state, result_

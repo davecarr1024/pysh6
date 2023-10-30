@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from pysh.core.parser import results, states
-from pysh.core.parser.rules import rule_error, rule, scope
+from pysh.core.parser import errors, results, states
+from pysh.core.parser.rules import rule, scope
 
 
 @dataclass(frozen=True)
@@ -16,7 +16,7 @@ class NoResultRule(rule.Rule[results.Result]):
         return self
 
     def single(self) -> "single_result_rule.SingleResultRule[results.Result]":
-        raise rule_error.RuleError(
+        raise errors.RuleError(
             rule=self, msg="unable to convert NoResultRule to SingleResultRule"
         )
 

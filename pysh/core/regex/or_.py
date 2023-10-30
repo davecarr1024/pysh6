@@ -16,4 +16,4 @@ class Or(nary_regex.NaryRegex):
                 return child(state)
             except errors.Error as error_:
                 child_errors.append(error_)
-        raise nary_error.NaryError(regex=self, state=state, children=child_errors)
+        raise nary_error.NaryError(regex=self, state=state, _children=child_errors)

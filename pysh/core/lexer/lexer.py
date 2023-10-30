@@ -27,7 +27,7 @@ class Lexer(Sized, Iterable["rule.Rule"]):
                 return rule(state)
             except errors.Error as error:
                 errors_.append(error)
-        raise lex_error.LexError(lexer_=self, state=state, children=errors_)
+        raise lex_error.LexError(lexer_=self, state=state, _children=errors_)
 
     def __call__(self, state: chars.Stream | str) -> tokens.Stream:
         if isinstance(state, str):

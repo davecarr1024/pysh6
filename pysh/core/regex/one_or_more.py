@@ -12,7 +12,7 @@ class OneOrMore(unary_regex.UnaryRegex):
         try:
             state, result = self.child(state)
         except errors.Error as error_:
-            raise nary_error.NaryError(regex=self, state=state, children=[error_])
+            raise nary_error.NaryError(regex=self, state=state, _children=[error_])
         while True:
             try:
                 state, child_result = self.child(state)

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Generic
-from pysh.core.parser import results, states
+from pysh.core.parser import results
 from pysh.core.parser.errors import error
 
 
