@@ -8,6 +8,6 @@ from pysh.core.parser.errors import error, rule_error, state_error
 class ParseError(
     state_error.StateError,
     rule_error.RuleError[results.Result],
-    errors.NaryError[error.Error],
+    errors.NaryError[errors.Error],
 ):
     ...
