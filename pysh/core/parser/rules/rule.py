@@ -17,13 +17,31 @@ class Rule(ABC, Generic[results.Result]):
     def lexer(self) -> lexer_lib.Lexer:
         ...
 
-    @abstractmethod
     def no(self) -> "no_result_rule.NoResultRule[results.Result]":
-        ...
+        return unary_no_result_rule.UnaryNoResultRule(self)
 
-    @abstractmethod
     def single(self) -> "single_result_rule.SingleResultRule[results.Result]":
-        ...
+        return unary_single_result_rule.UnarySingleResultRule(self)
+
+    def optional(self) -> "optional_result_rule.OptionalResultRule[results.Result]":
+        return unary_optional_result_rule.UnaryOptionalResultRule(self)
+
+    def multiple(self) -> "multiple_results_rule.MultipleResultsRule[results.Result]":
+        return unary_multiple_results_rule.UnaryMultipleResultsRule(self)
+
+    def named(self, name: str) -> "named_results_rule.NamedResultsRule[results.Result]":
+        return unary_named_results_rule.UnaryNamedResultsRule(self, name)
 
 
-from pysh.core.parser.rules import no_result_rule, single_result_rule
+from pysh.core.parser.rules import (
+    no_result_rule,
+    single_result_rule,
+    optional_result_rule,
+    multiple_results_rule,
+    named_results_rule,
+    unary_no_result_rule,
+    unary_single_result_rule,
+    unary_optional_result_rule,
+    unary_multiple_results_rule,
+    unary_named_results_rule,
+)

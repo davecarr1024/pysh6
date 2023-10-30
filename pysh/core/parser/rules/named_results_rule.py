@@ -5,9 +5,12 @@ from pysh.core.parser.rules import rule, scope
 
 
 @dataclass(frozen=True)
-class NoResultRule(rule.Rule[results.Result]):
+class NamedResultsRule(rule.Rule[results.Result]):
     @abstractmethod
     def __call__(
         self, state: states.State, scope: scope.Scope[results.Result]
-    ) -> states.StateAndNoResult[results.Result]:
+    ) -> states.StateAndNamedResults[results.Result]:
         ...
+
+    def named(self, name: str) -> "NamedResultsRule[results.Result]":
+        return self
