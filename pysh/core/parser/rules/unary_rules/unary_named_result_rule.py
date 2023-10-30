@@ -1,16 +1,18 @@
 from dataclasses import dataclass
 from pysh.core.parser import results, states
 
-from pysh.core.parser.rules import child_rule, multiple_results_rule, scope
+from pysh.core.parser.rules import child_rule, named_result_rule, scope
 from pysh.core.parser.rules.unary_rules import unary_rule
 
 
 @dataclass(frozen=True)
-class UnaryMultipleResultsRule(
-    multiple_results_rule.MultipleResultsRule[results.Result],
+class UnaryNamedResultRule(
+    named_result_rule.NamedResultRule[results.Result],
     unary_rule.UnaryRule[results.Result, child_rule.ChildRule],
 ):
+    name: str
+
     def __call__(
         self, state: states.State, scope: scope.Scope
-    ) -> states.StateAndMultipleResults[results.Result]:
-        return self.child(state, scope).multiple()
+    ) -> states.StateAndNamedResult[results.Result]:
+        return self.child(state, scope).named(self.name)

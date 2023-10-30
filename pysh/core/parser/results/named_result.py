@@ -5,7 +5,7 @@ from pysh.core.parser.results import error, result, results
 
 
 @dataclass(frozen=True)
-class NamedResults(results.Results[result.Result], Mapping[str, result.Result]):
+class NamedResult(results.Results[result.Result], Mapping[str, result.Result]):
     _results: Mapping[str, result.Result] = field(
         default_factory=dict[str, result.Result]
     )
@@ -48,12 +48,12 @@ class NamedResults(results.Results[result.Result], Mapping[str, result.Result]):
         else:
             return optional_result.OptionalResult[result.Result]()
 
-    def multiple(self) -> "multiple_results.MultipleResults[result.Result]":
-        return multiple_results.MultipleResults[result.Result](
+    def multiple(self) -> "multiple_result.MultipleResult[result.Result]":
+        return multiple_result.MultipleResult[result.Result](
             list(self._results.values())
         )
 
-    def named(self, name: str) -> "NamedResults[result.Result]":
+    def named(self, name: str) -> "NamedResult[result.Result]":
         return self
 
 
@@ -61,5 +61,5 @@ from pysh.core.parser.results import (
     no_result,
     single_result,
     optional_result,
-    multiple_results,
+    multiple_result,
 )

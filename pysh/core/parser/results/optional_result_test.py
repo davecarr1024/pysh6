@@ -50,11 +50,11 @@ class OptionalResultTest(TestCase):
 
     def test_multiple(self):
         for result, expected in list[
-            tuple[results.OptionalResult[int], Optional[results.MultipleResults[int]]]
+            tuple[results.OptionalResult[int], Optional[results.MultipleResult[int]]]
         ](
             [
-                (results.OptionalResult[int](), results.MultipleResults[int]()),
-                (results.OptionalResult[int](1), results.MultipleResults[int]([1])),
+                (results.OptionalResult[int](), results.MultipleResult[int]()),
+                (results.OptionalResult[int](1), results.MultipleResult[int]([1])),
             ]
         ):
             with self.subTest(results=result, expected=expected):
@@ -66,11 +66,11 @@ class OptionalResultTest(TestCase):
 
     def test_named(self):
         for result, expected in list[
-            tuple[results.OptionalResult[int], Optional[results.NamedResults[int]]]
+            tuple[results.OptionalResult[int], Optional[results.NamedResult[int]]]
         ](
             [
-                (results.OptionalResult[int](), results.NamedResults[int]()),
-                (results.OptionalResult[int](1), results.NamedResults[int]({"a": 1})),
+                (results.OptionalResult[int](), results.NamedResult[int]()),
+                (results.OptionalResult[int](1), results.NamedResult[int]({"a": 1})),
             ]
         ):
             with self.subTest(results=result, expected=expected):

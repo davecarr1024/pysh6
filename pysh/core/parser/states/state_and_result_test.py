@@ -50,9 +50,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int](),
+                        results.MultipleResult[int](),
                     ),
                     states.StateAndNoResult[int](
                         states.State(),
@@ -60,9 +60,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1]),
+                        results.MultipleResult[int]([1]),
                     ),
                     states.StateAndNoResult[int](
                         states.State(),
@@ -70,9 +70,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1, 2]),
+                        results.MultipleResult[int]([1, 2]),
                     ),
                     states.StateAndNoResult[int](
                         states.State(),
@@ -80,9 +80,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int](),
+                        results.NamedResult[int](),
                     ),
                     states.StateAndNoResult[int](
                         states.State(),
@@ -90,9 +90,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1}),
+                        results.NamedResult[int]({"a": 1}),
                     ),
                     states.StateAndNoResult[int](
                         states.State(),
@@ -100,9 +100,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1, "b": 2}),
+                        results.NamedResult[int]({"a": 1, "b": 2}),
                     ),
                     states.StateAndNoResult[int](
                         states.State(),
@@ -156,16 +156,16 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int](),
+                        results.MultipleResult[int](),
                     ),
                     None,
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1]),
+                        results.MultipleResult[int]([1]),
                     ),
                     states.StateAndSingleResult[int](
                         states.State(),
@@ -173,23 +173,23 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1, 2]),
+                        results.MultipleResult[int]([1, 2]),
                     ),
                     None,
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int](),
+                        results.NamedResult[int](),
                     ),
                     None,
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1}),
+                        results.NamedResult[int]({"a": 1}),
                     ),
                     states.StateAndSingleResult[int](
                         states.State(),
@@ -197,9 +197,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1, "b": 2}),
+                        results.NamedResult[int]({"a": 1, "b": 2}),
                     ),
                     None,
                 ),
@@ -260,9 +260,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int](),
+                        results.MultipleResult[int](),
                     ),
                     states.StateAndOptionalResult[int](
                         states.State(),
@@ -270,9 +270,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1]),
+                        results.MultipleResult[int]([1]),
                     ),
                     states.StateAndOptionalResult[int](
                         states.State(),
@@ -280,16 +280,16 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1, 2]),
+                        results.MultipleResult[int]([1, 2]),
                     ),
                     None,
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int](),
+                        results.NamedResult[int](),
                     ),
                     states.StateAndOptionalResult[int](
                         states.State(),
@@ -297,9 +297,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1}),
+                        results.NamedResult[int]({"a": 1}),
                     ),
                     states.StateAndOptionalResult[int](
                         states.State(),
@@ -307,9 +307,9 @@ class StateAndResultTest(TestCase):
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1, "b": 2}),
+                        results.NamedResult[int]({"a": 1, "b": 2}),
                     ),
                     None,
                 ),
@@ -326,7 +326,7 @@ class StateAndResultTest(TestCase):
         for state_and_result, expected in list[
             tuple[
                 states.StateAndResult[int],
-                Optional[states.StateAndMultipleResults[int]],
+                Optional[states.StateAndMultipleResult[int]],
             ]
         ](
             [
@@ -335,9 +335,9 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.NoResult[int](),
                     ),
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([]),
+                        results.MultipleResult[int]([]),
                     ),
                 ),
                 (
@@ -345,9 +345,9 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.SingleResult[int](1),
                     ),
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1]),
+                        results.MultipleResult[int]([1]),
                     ),
                 ),
                 (
@@ -355,9 +355,9 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.OptionalResult[int](),
                     ),
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([]),
+                        results.MultipleResult[int]([]),
                     ),
                 ),
                 (
@@ -365,69 +365,69 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.OptionalResult[int](1),
                     ),
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1]),
+                        results.MultipleResult[int]([1]),
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int](),
+                        results.MultipleResult[int](),
                     ),
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([]),
-                    ),
-                ),
-                (
-                    states.StateAndMultipleResults[int](
-                        states.State(),
-                        results.MultipleResults[int]([1]),
-                    ),
-                    states.StateAndMultipleResults[int](
-                        states.State(),
-                        results.MultipleResults[int]([1]),
+                        results.MultipleResult[int]([]),
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1, 2]),
+                        results.MultipleResult[int]([1]),
                     ),
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1, 2]),
-                    ),
-                ),
-                (
-                    states.StateAndNamedResults[int](
-                        states.State(),
-                        results.NamedResults[int](),
-                    ),
-                    states.StateAndMultipleResults[int](
-                        states.State(),
-                        results.MultipleResults[int]([]),
+                        results.MultipleResult[int]([1]),
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1}),
+                        results.MultipleResult[int]([1, 2]),
                     ),
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1]),
+                        results.MultipleResult[int]([1, 2]),
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1, "b": 2}),
+                        results.NamedResult[int](),
                     ),
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1, 2]),
+                        results.MultipleResult[int]([]),
+                    ),
+                ),
+                (
+                    states.StateAndNamedResult[int](
+                        states.State(),
+                        results.NamedResult[int]({"a": 1}),
+                    ),
+                    states.StateAndMultipleResult[int](
+                        states.State(),
+                        results.MultipleResult[int]([1]),
+                    ),
+                ),
+                (
+                    states.StateAndNamedResult[int](
+                        states.State(),
+                        results.NamedResult[int]({"a": 1, "b": 2}),
+                    ),
+                    states.StateAndMultipleResult[int](
+                        states.State(),
+                        results.MultipleResult[int]([1, 2]),
                     ),
                 ),
             ]
@@ -441,9 +441,7 @@ class StateAndResultTest(TestCase):
 
     def test_named(self):
         for state_and_result, expected in list[
-            tuple[
-                states.StateAndResult[int], Optional[states.StateAndNamedResults[int]]
-            ]
+            tuple[states.StateAndResult[int], Optional[states.StateAndNamedResult[int]]]
         ](
             [
                 (
@@ -451,9 +449,9 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.NoResult[int](),
                     ),
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int](),
+                        results.NamedResult[int](),
                     ),
                 ),
                 (
@@ -461,9 +459,9 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.SingleResult[int](1),
                     ),
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1}),
+                        results.NamedResult[int]({"a": 1}),
                     ),
                 ),
                 (
@@ -471,9 +469,9 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.OptionalResult[int](),
                     ),
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int](),
+                        results.NamedResult[int](),
                     ),
                 ),
                 (
@@ -481,66 +479,66 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.OptionalResult[int](1),
                     ),
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1}),
+                        results.NamedResult[int]({"a": 1}),
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int](),
+                        results.MultipleResult[int](),
                     ),
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int](),
-                    ),
-                ),
-                (
-                    states.StateAndMultipleResults[int](
-                        states.State(),
-                        results.MultipleResults[int]([1]),
-                    ),
-                    states.StateAndNamedResults[int](
-                        states.State(),
-                        results.NamedResults[int]({"a": 1}),
+                        results.NamedResult[int](),
                     ),
                 ),
                 (
-                    states.StateAndMultipleResults[int](
+                    states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResults[int]([1, 2]),
+                        results.MultipleResult[int]([1]),
+                    ),
+                    states.StateAndNamedResult[int](
+                        states.State(),
+                        results.NamedResult[int]({"a": 1}),
+                    ),
+                ),
+                (
+                    states.StateAndMultipleResult[int](
+                        states.State(),
+                        results.MultipleResult[int]([1, 2]),
                     ),
                     None,
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int](),
+                        results.NamedResult[int](),
                     ),
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int](),
-                    ),
-                ),
-                (
-                    states.StateAndNamedResults[int](
-                        states.State(),
-                        results.NamedResults[int]({"a": 1}),
-                    ),
-                    states.StateAndNamedResults[int](
-                        states.State(),
-                        results.NamedResults[int]({"a": 1}),
+                        results.NamedResult[int](),
                     ),
                 ),
                 (
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1, "b": 2}),
+                        results.NamedResult[int]({"a": 1}),
                     ),
-                    states.StateAndNamedResults[int](
+                    states.StateAndNamedResult[int](
                         states.State(),
-                        results.NamedResults[int]({"a": 1, "b": 2}),
+                        results.NamedResult[int]({"a": 1}),
+                    ),
+                ),
+                (
+                    states.StateAndNamedResult[int](
+                        states.State(),
+                        results.NamedResult[int]({"a": 1, "b": 2}),
+                    ),
+                    states.StateAndNamedResult[int](
+                        states.State(),
+                        results.NamedResult[int]({"a": 1, "b": 2}),
                     ),
                 ),
             ]

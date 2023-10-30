@@ -5,7 +5,7 @@ from pysh.core.parser.results import error, result, results
 
 
 @dataclass(frozen=True)
-class MultipleResults(results.Results[result.Result], Sized, Iterable[result.Result]):
+class MultipleResult(results.Results[result.Result], Sized, Iterable[result.Result]):
     _results: Sequence[result.Result] = field(default_factory=list[result.Result])
 
     def __len__(self) -> int:
@@ -21,7 +21,7 @@ class MultipleResults(results.Results[result.Result], Sized, Iterable[result.Res
         if len(self) != 1:
             raise error.Error(
                 result=self,
-                msg=f"unable to convert MultipleResults to SingleResult: invalid len {len(self)}",
+                msg=f"unable to convert MultipleResult to SingleResult: invalid len {len(self)}",
             )
         else:
             return single_result.SingleResult[result.Result](self._results[0])
@@ -30,31 +30,31 @@ class MultipleResults(results.Results[result.Result], Sized, Iterable[result.Res
         if len(self) > 1:
             raise error.Error(
                 result=self,
-                msg=f"unable to convert MultipleResults to OptionalResult: invalid len {len(self)}",
+                msg=f"unable to convert MultipleResult to OptionalResult: invalid len {len(self)}",
             )
         elif len(self) == 0:
             return optional_result.OptionalResult[result.Result]()
         else:
             return optional_result.OptionalResult[result.Result](self._results[0])
 
-    def multiple(self) -> "MultipleResults[result.Result]":
+    def multiple(self) -> "MultipleResult[result.Result]":
         return self
 
-    def named(self, name: str) -> "named_results.NamedResults[result.Result]":
+    def named(self, name: str) -> "named_result.NamedResult[result.Result]":
         if len(self) > 1:
             raise error.Error(
                 result=self,
-                msg=f"unable to convert MultipleResults to NamedResults: invalid len {len(self)}",
+                msg=f"unable to convert MultipleResult to NamedResult: invalid len {len(self)}",
             )
         elif len(self) == 1:
-            return named_results.NamedResults[result.Result]({name: self._results[0]})
+            return named_result.NamedResult[result.Result]({name: self._results[0]})
         else:
-            return named_results.NamedResults[result.Result]()
+            return named_result.NamedResult[result.Result]()
 
 
 from pysh.core.parser.results import (
     no_result,
     single_result,
     optional_result,
-    named_results,
+    named_result,
 )

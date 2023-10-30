@@ -17,13 +17,11 @@ class NoResultTest(TestCase):
 
     def test_multiple(self):
         self.assertEqual(
-            results.NoResult[int]().multiple(), results.MultipleResults[int]()
+            results.NoResult[int]().multiple(), results.MultipleResult[int]()
         )
 
     def test_named(self):
-        self.assertEqual(
-            results.NoResult[int]().named("a"), results.NamedResults[int]()
-        )
+        self.assertEqual(results.NoResult[int]().named("a"), results.NamedResult[int]())
 
     def test_convert(self):
         self.assertEqual(

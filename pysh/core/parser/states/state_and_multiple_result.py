@@ -5,5 +5,5 @@ from pysh.core.parser.states import state_and_result
 
 
 @dataclass(frozen=True)
-class StateAndNamedResults(state_and_result.StateAndResult[results.Result]):
-    results: results.NamedResults[results.Result]
+class StateAndMultipleResult(state_and_result.StateAndResult[results.Result]):
+    results: results.MultipleResult[results.Result]

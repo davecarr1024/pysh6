@@ -20,11 +20,11 @@ class Results(ABC, Generic[result.Result]):
         ...
 
     @abstractmethod
-    def multiple(self) -> "multiple_results.MultipleResults[result.Result]":
+    def multiple(self) -> "multiple_result.MultipleResult[result.Result]":
         ...
 
     @abstractmethod
-    def named(self, name: str) -> "named_results.NamedResults[result.Result]":
+    def named(self, name: str) -> "named_result.NamedResult[result.Result]":
         ...
 
     def convert(
@@ -37,6 +37,6 @@ from pysh.core.parser.results import (
     no_result,
     single_result,
     optional_result,
-    multiple_results,
-    named_results,
+    multiple_result,
+    named_result,
 )

@@ -37,14 +37,14 @@ class Rule(ABC, Generic[results.Result]):
     @overload
     @abstractmethod
     def __and__(
-        self, rhs: "multiple_results_rule.MultipleResultsRule[results.Result]"
+        self, rhs: "multiple_result_rule.MultipleResultRule[results.Result]"
     ) -> "and_.And[results.Result, Rule[results.Result]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
-        self, rhs: "named_results_rule.NamedResultsRule[results.Result]"
+        self, rhs: "named_result_rule.NamedResultRule[results.Result]"
     ) -> "and_.And[results.Result, Rule[results.Result]]":
         ...
 
@@ -67,26 +67,26 @@ class Rule(ABC, Generic[results.Result]):
     def optional(self) -> "optional_result_rule.OptionalResultRule[results.Result]":
         return unary_optional_result_rule.UnaryOptionalResultRule(self)
 
-    def multiple(self) -> "multiple_results_rule.MultipleResultsRule[results.Result]":
-        return unary_multiple_results_rule.UnaryMultipleResultsRule(self)
+    def multiple(self) -> "multiple_result_rule.MultipleResultRule[results.Result]":
+        return unary_multiple_result_rule.UnaryMultipleResultRule(self)
 
-    def named(self, name: str) -> "named_results_rule.NamedResultsRule[results.Result]":
-        return unary_named_results_rule.UnaryNamedResultsRule(self, name)
+    def named(self, name: str) -> "named_result_rule.NamedResultRule[results.Result]":
+        return unary_named_result_rule.UnaryNamedResultRule(self, name)
 
 
 from pysh.core.parser.rules import (
     no_result_rule,
     single_result_rule,
     optional_result_rule,
-    multiple_results_rule,
-    named_results_rule,
+    multiple_result_rule,
+    named_result_rule,
 )
 from pysh.core.parser.rules.unary_rules import (
     unary_no_result_rule,
     unary_single_result_rule,
     unary_optional_result_rule,
-    unary_multiple_results_rule,
-    unary_named_results_rule,
+    unary_multiple_result_rule,
+    unary_named_result_rule,
 )
 from pysh.core.parser.rules.ands import (
     and_,

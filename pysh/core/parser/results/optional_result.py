@@ -22,22 +22,22 @@ class OptionalResult(results.Results[result_lib.Result]):
     def optional(self) -> "OptionalResult[result_lib.Result]":
         return self
 
-    def multiple(self) -> "multiple_results.MultipleResults[result_lib.Result]":
+    def multiple(self) -> "multiple_result.MultipleResult[result_lib.Result]":
         if self.result is None:
-            return multiple_results.MultipleResults[result_lib.Result]()
+            return multiple_result.MultipleResult[result_lib.Result]()
         else:
-            return multiple_results.MultipleResults[result_lib.Result]([self.result])
+            return multiple_result.MultipleResult[result_lib.Result]([self.result])
 
-    def named(self, name: str) -> "named_results.NamedResults[result_lib.Result]":
+    def named(self, name: str) -> "named_result.NamedResult[result_lib.Result]":
         if self.result is None:
-            return named_results.NamedResults[result_lib.Result]()
+            return named_result.NamedResult[result_lib.Result]()
         else:
-            return named_results.NamedResults[result_lib.Result]({name: self.result})
+            return named_result.NamedResult[result_lib.Result]({name: self.result})
 
 
 from pysh.core.parser.results import (
     no_result,
     single_result,
-    multiple_results,
-    named_results,
+    multiple_result,
+    named_result,
 )

@@ -14,16 +14,16 @@ class NoResult(results.Results[result.Result]):
     def optional(self) -> "optional_result.OptionalResult[result.Result]":
         return optional_result.OptionalResult[result.Result]()
 
-    def multiple(self) -> "multiple_results.MultipleResults[result.Result]":
-        return multiple_results.MultipleResults[result.Result]()
+    def multiple(self) -> "multiple_result.MultipleResult[result.Result]":
+        return multiple_result.MultipleResult[result.Result]()
 
-    def named(self, name: str) -> "named_results.NamedResults[result.Result]":
-        return named_results.NamedResults[result.Result]()
+    def named(self, name: str) -> "named_result.NamedResult[result.Result]":
+        return named_result.NamedResult[result.Result]()
 
 
 from pysh.core.parser.results import (
     single_result,
     optional_result,
-    multiple_results,
-    named_results,
+    multiple_result,
+    named_result,
 )

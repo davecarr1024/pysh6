@@ -18,12 +18,12 @@ class SingleResultTest(TestCase):
 
     def test_multiple(self):
         self.assertEqual(
-            results.SingleResult[int](0).multiple(), results.MultipleResults[int]([0])
+            results.SingleResult[int](0).multiple(), results.MultipleResult[int]([0])
         )
 
     def test_named(self):
         self.assertEqual(
-            results.SingleResult[int](0).named("a"), results.NamedResults[int]({"a": 0})
+            results.SingleResult[int](0).named("a"), results.NamedResult[int]({"a": 0})
         )
 
     def test_convert(self):

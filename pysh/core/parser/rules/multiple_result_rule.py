@@ -5,12 +5,12 @@ from pysh.core.parser.rules import rule, scope
 
 
 @dataclass(frozen=True)
-class MultipleResultsRule(rule.Rule[results.Result]):
+class MultipleResultRule(rule.Rule[results.Result]):
     @abstractmethod
     def __call__(
         self, state: states.State, scope: scope.Scope[results.Result]
-    ) -> states.StateAndMultipleResults[results.Result]:
+    ) -> states.StateAndMultipleResult[results.Result]:
         ...
 
-    def multiple(self) -> "MultipleResultsRule[results.Result]":
+    def multiple(self) -> "MultipleResultRule[results.Result]":
         return self
