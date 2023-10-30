@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic
+from typing import Generic, overload
 
 from pysh.core import lexer as lexer_lib
 from pysh.core.parser import results, states
@@ -11,6 +11,47 @@ class Rule(ABC, Generic[results.Result]):
     def __call__(
         self, state: states.State, scope: scope.Scope[results.Result]
     ) -> states.StateAndResult[results.Result]:
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "no_result_rule.NoResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "single_result_rule.SingleResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "optional_result_rule.OptionalResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "multiple_results_rule.MultipleResultsRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "named_results_rule.NamedResultsRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
+
+    @abstractmethod
+    def __and__(
+        self, rhs: "and_args.AndArgs"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
         ...
 
     @abstractmethod
@@ -46,4 +87,8 @@ from pysh.core.parser.rules.unary_rules import (
     unary_optional_result_rule,
     unary_multiple_results_rule,
     unary_named_results_rule,
+)
+from pysh.core.parser.rules.ands import (
+    and_,
+    and_args,
 )
