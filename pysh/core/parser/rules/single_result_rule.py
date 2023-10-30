@@ -8,7 +8,7 @@ from pysh.core.parser.rules import rule
 class SingleResultRule(rule.Rule[results.Result]):
     @abstractmethod
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndSingleResult[results.Result]":
         ...
 

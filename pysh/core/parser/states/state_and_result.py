@@ -7,7 +7,7 @@ from pysh.core.parser.states import state as state_lib
 
 @dataclass(frozen=True)
 class StateAndResult(Generic[results_lib.Result]):
-    state: state_lib.State
+    state: state_lib.State[results_lib.Result]
     results: results_lib.Results[results_lib.Result]
 
     def no(

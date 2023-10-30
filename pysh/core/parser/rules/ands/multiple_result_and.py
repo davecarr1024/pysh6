@@ -14,7 +14,7 @@ class MultipleResultAnd(
     ],
 ):
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndMultipleResult[results.Result]":
         results_ = results.MultipleResult[results.Result]()
         for child in self:

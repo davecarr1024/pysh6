@@ -19,7 +19,7 @@ class SingleResultAnd(
         self._assert_num_children_of_type(single_result_rule.SingleResultRule, 1)
 
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndSingleResult[results.Result]":
         result: Optional[results.Result] = None
         for child in self:

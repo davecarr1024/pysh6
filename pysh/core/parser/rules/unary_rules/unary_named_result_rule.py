@@ -14,7 +14,7 @@ class UnaryNamedResultRule(
     name: Optional[str] = None
 
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndNamedResult[results.Result]":
         return self.child(state).named(self.name)
 

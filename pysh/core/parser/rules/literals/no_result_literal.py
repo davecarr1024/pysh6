@@ -11,7 +11,7 @@ class NoResultLiteral(
     literal.Literal[results.Result], no_result_rule.NoResultRule[results.Result]
 ):
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndNoResult[results.Result]":
         try:
             if state.tokens.head().rule_name != self.lexer_rule.name:

@@ -11,7 +11,7 @@ class NoResultAnd(
     and_.And[results.Result, no_result_rule.NoResultRule[results.Result]],
 ):
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndNoResult[results.Result]":
         for child in self:
             try:

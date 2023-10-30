@@ -15,7 +15,7 @@ class SingleResultLiteral(
     func: Callable[[tokens.Token], results.Result]
 
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndSingleResult[results.Result]":
         try:
             if state.tokens.head().rule_name == self.lexer_rule.name:

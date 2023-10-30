@@ -9,7 +9,7 @@ from pysh.core.parser.rules import scope
 class Rule(ABC, Generic[results.Result]):
     @abstractmethod
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndResult[results.Result]":
         ...
 

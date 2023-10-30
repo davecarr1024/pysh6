@@ -11,7 +11,7 @@ class UnaryMultipleResultRule(
     unary_rule.UnaryRule[results.Result, child_rule.ChildRule],
 ):
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndMultipleResult[results.Result]":
         return self.child(state).multiple()
 

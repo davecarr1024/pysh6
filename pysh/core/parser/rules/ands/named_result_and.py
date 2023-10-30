@@ -14,7 +14,7 @@ class NamedResultAnd(
     ],
 ):
     def __call__(
-        self, state: "states.State"
+        self, state: "states.State[results.Result]"
     ) -> "states.StateAndNamedResult[results.Result]":
         results_ = results.NamedResult[results.Result]()
         for child in self:
