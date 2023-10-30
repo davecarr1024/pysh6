@@ -36,20 +36,16 @@ class MultipleResultTest(TestCase):
 
     def test_optional(self):
         for result, expected in list[
-            tuple[results.MultipleResult[int], Optional[results.OptionalResult[int]]]
+            tuple[results.MultipleResult[int], results.OptionalResult[int]]
         ](
             [
                 (results.MultipleResult[int](), results.OptionalResult[int]()),
                 (results.MultipleResult[int]([1]), results.OptionalResult[int](1)),
-                (results.MultipleResult[int]([1, 2]), None),
+                (results.MultipleResult[int]([1, 2]), results.OptionalResult[int](1)),
             ]
         ):
             with self.subTest(results=result, expected=expected):
-                if expected is None:
-                    with self.assertRaises(results.Error):
-                        result.optional()
-                else:
-                    self.assertEqual(result.optional(), expected)
+                self.assertEqual(result.optional(), expected)
 
     def test_multiple(self):
         for result, expected in list[
@@ -73,7 +69,7 @@ class MultipleResultTest(TestCase):
 
     def test_named(self):
         for result, expected in list[
-            tuple[results.MultipleResult[int], Optional[results.NamedResult[int]]]
+            tuple[results.MultipleResult[int], results.NamedResult[int]]
         ](
             [
                 (results.MultipleResult[int](), results.NamedResult[int]()),
@@ -81,15 +77,14 @@ class MultipleResultTest(TestCase):
                     results.MultipleResult[int]([1]),
                     results.NamedResult[int]({"a": 1}),
                 ),
-                (results.MultipleResult[int]([1, 1]), None),
+                (
+                    results.MultipleResult[int]([1, 2]),
+                    results.NamedResult[int]({"a": 1}),
+                ),
             ]
         ):
             with self.subTest(results=result, expected=expected):
-                if expected is None:
-                    with self.assertRaises(results.Error):
-                        result.named("a")
-                else:
-                    self.assertEqual(result.named("a"), expected)
+                self.assertEqual(result.named("a"), expected)
 
     def test_convert(self):
         for result, expected in list[
@@ -106,3 +101,123 @@ class MultipleResultTest(TestCase):
                     result.convert(lambda r: results.SingleResult[int](sum(r))),
                     expected,
                 )
+
+    def test_or(self):
+        for lhs, rhs, expected in list[
+            tuple[results.MultipleResult[int], results.OrArgs, results.Results[int]]
+        ](
+            [
+                (
+                    results.MultipleResult[int](),
+                    results.NoResult[int](),
+                    results.MultipleResult[int](),
+                ),
+                (
+                    results.MultipleResult[int]([0]),
+                    results.NoResult[int](),
+                    results.MultipleResult[int]([0]),
+                ),
+                (
+                    results.MultipleResult[int]([0, 1]),
+                    results.NoResult[int](),
+                    results.MultipleResult[int]([0, 1]),
+                ),
+                (
+                    results.MultipleResult[int](),
+                    results.SingleResult[int](2),
+                    results.MultipleResult[int]([2]),
+                ),
+                (
+                    results.MultipleResult[int]([0]),
+                    results.SingleResult[int](2),
+                    results.MultipleResult[int]([0, 2]),
+                ),
+                (
+                    results.MultipleResult[int]([0, 1]),
+                    results.SingleResult[int](2),
+                    results.MultipleResult[int]([0, 1, 2]),
+                ),
+                (
+                    results.MultipleResult[int](),
+                    results.OptionalResult[int](),
+                    results.MultipleResult[int](),
+                ),
+                (
+                    results.MultipleResult[int]([0]),
+                    results.OptionalResult[int](),
+                    results.MultipleResult[int]([0]),
+                ),
+                (
+                    results.MultipleResult[int]([0, 1]),
+                    results.OptionalResult[int](),
+                    results.MultipleResult[int]([0, 1]),
+                ),
+                (
+                    results.MultipleResult[int](),
+                    results.OptionalResult[int](2),
+                    results.MultipleResult[int]([2]),
+                ),
+                (
+                    results.MultipleResult[int]([0]),
+                    results.OptionalResult[int](2),
+                    results.MultipleResult[int]([0, 2]),
+                ),
+                (
+                    results.MultipleResult[int]([0, 1]),
+                    results.OptionalResult[int](2),
+                    results.MultipleResult[int]([0, 1, 2]),
+                ),
+                (
+                    results.MultipleResult[int](),
+                    results.MultipleResult[int](),
+                    results.MultipleResult[int](),
+                ),
+                (
+                    results.MultipleResult[int]([0]),
+                    results.MultipleResult[int](),
+                    results.MultipleResult[int]([0]),
+                ),
+                (
+                    results.MultipleResult[int]([0]),
+                    results.MultipleResult[int]([2]),
+                    results.MultipleResult[int]([0, 2]),
+                ),
+                (
+                    results.MultipleResult[int]([0]),
+                    results.MultipleResult[int]([2, 3]),
+                    results.MultipleResult[int]([0, 2, 3]),
+                ),
+                (
+                    results.MultipleResult[int]([0, 1]),
+                    results.MultipleResult[int](),
+                    results.MultipleResult[int]([0, 1]),
+                ),
+                (
+                    results.MultipleResult[int]([0, 1]),
+                    results.MultipleResult[int]([2]),
+                    results.MultipleResult[int]([0, 1, 2]),
+                ),
+                (
+                    results.MultipleResult[int]([0, 1]),
+                    results.MultipleResult[int]([2, 3]),
+                    results.MultipleResult[int]([0, 1, 2, 3]),
+                ),
+                (
+                    results.MultipleResult[int](),
+                    results.NamedResult[int]({"a": 2}),
+                    results.NamedResult[int]({"a": 2}),
+                ),
+                (
+                    results.MultipleResult[int]([0]),
+                    results.NamedResult[int]({"a": 2}),
+                    results.NamedResult[int]({"": 0, "a": 2}),
+                ),
+                (
+                    results.MultipleResult[int]([0, 1]),
+                    results.NamedResult[int]({"a": 2}),
+                    results.NamedResult[int]({"": 0, "a": 2}),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
+                self.assertEqual(lhs | rhs, expected)

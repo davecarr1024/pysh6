@@ -28,3 +28,38 @@ class NoResultTest(TestCase):
             results.NoResult[int]().convert(lambda _: results.SingleResult[int](0)),
             results.SingleResult[int](0),
         )
+
+    def test_or(self):
+        for lhs, rhs, expected in list[
+            tuple[results.NoResult[int], results.OrArgs, results.Results[int]]
+        ](
+            [
+                (
+                    results.NoResult[int](),
+                    results.NoResult[int](),
+                    results.NoResult[int](),
+                ),
+                (
+                    results.NoResult[int](),
+                    results.SingleResult[int](0),
+                    results.SingleResult[int](0),
+                ),
+                (
+                    results.NoResult[int](),
+                    results.OptionalResult[int](0),
+                    results.OptionalResult[int](0),
+                ),
+                (
+                    results.NoResult[int](),
+                    results.MultipleResult[int]([0]),
+                    results.MultipleResult[int]([0]),
+                ),
+                (
+                    results.NoResult[int](),
+                    results.NamedResult[int]({"a": 0}),
+                    results.NamedResult[int]({"a": 0}),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
+                self.assertEqual(lhs | rhs, expected)

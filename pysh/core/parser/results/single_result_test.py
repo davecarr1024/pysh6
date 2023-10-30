@@ -33,3 +33,43 @@ class SingleResultTest(TestCase):
             ),
             results.SingleResult[int](2),
         )
+
+    def test_or(self):
+        for lhs, rhs, expected in list[
+            tuple[results.SingleResult[int], results.OrArgs, results.Results[int]]
+        ](
+            [
+                (
+                    results.SingleResult[int](0),
+                    results.NoResult[int](),
+                    results.SingleResult[int](0),
+                ),
+                (
+                    results.SingleResult[int](0),
+                    results.SingleResult[int](1),
+                    results.MultipleResult[int]([0, 1]),
+                ),
+                (
+                    results.SingleResult[int](0),
+                    results.OptionalResult[int](),
+                    results.MultipleResult[int]([0]),
+                ),
+                (
+                    results.SingleResult[int](0),
+                    results.OptionalResult[int](1),
+                    results.MultipleResult[int]([0, 1]),
+                ),
+                (
+                    results.SingleResult[int](0),
+                    results.MultipleResult[int]([1]),
+                    results.MultipleResult[int]([0, 1]),
+                ),
+                (
+                    results.SingleResult[int](0),
+                    results.NamedResult[int]({"a": 1}),
+                    results.NamedResult[int]({"": 0, "a": 1}),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
+                self.assertEqual(lhs | rhs, expected)

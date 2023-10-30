@@ -284,7 +284,10 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.MultipleResult[int]([1, 2]),
                     ),
-                    None,
+                    states.StateAndOptionalResult[int](
+                        states.State(),
+                        results.OptionalResult[int](1),
+                    ),
                 ),
                 (
                     states.StateAndNamedResult[int](
@@ -311,7 +314,10 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.NamedResult[int]({"a": 1, "b": 2}),
                     ),
-                    None,
+                    states.StateAndOptionalResult[int](
+                        states.State(),
+                        results.OptionalResult[int](1),
+                    ),
                 ),
             ]
         ):
@@ -337,7 +343,7 @@ class StateAndResultTest(TestCase):
                     ),
                     states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResult[int]([]),
+                        results.MultipleResult[int](),
                     ),
                 ),
                 (
@@ -357,7 +363,7 @@ class StateAndResultTest(TestCase):
                     ),
                     states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResult[int]([]),
+                        results.MultipleResult[int](),
                     ),
                 ),
                 (
@@ -377,7 +383,7 @@ class StateAndResultTest(TestCase):
                     ),
                     states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResult[int]([]),
+                        results.MultipleResult[int](),
                     ),
                 ),
                 (
@@ -407,7 +413,7 @@ class StateAndResultTest(TestCase):
                     ),
                     states.StateAndMultipleResult[int](
                         states.State(),
-                        results.MultipleResult[int]([]),
+                        results.MultipleResult[int](),
                     ),
                 ),
                 (
@@ -509,7 +515,10 @@ class StateAndResultTest(TestCase):
                         states.State(),
                         results.MultipleResult[int]([1, 2]),
                     ),
-                    None,
+                    states.StateAndNamedResult[int](
+                        states.State(),
+                        results.NamedResult[int]({"a": 1}),
+                    ),
                 ),
                 (
                     states.StateAndNamedResult[int](

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Iterator, Mapping
+from typing import Iterator, Mapping, overload
 
 from pysh.core.parser.results import error, result, results
 
@@ -36,12 +36,7 @@ class NamedResult(results.Results[result.Result], Mapping[str, result.Result]):
             )
 
     def optional(self) -> "optional_result.OptionalResult[result.Result]":
-        if len(self) > 1:
-            raise error.Error(
-                result=self,
-                msg=f"unable to convert NamedResult to SingleResult: invalid len {len(self)}",
-            )
-        elif len(self) == 1:
+        if len(self) > 0:
             return optional_result.OptionalResult[result.Result](
                 list(self._results.values())[0]
             )
@@ -56,8 +51,56 @@ class NamedResult(results.Results[result.Result], Mapping[str, result.Result]):
     def named(self, name: str) -> "NamedResult[result.Result]":
         return self
 
+    @overload
+    def __or__(
+        self, rhs: "no_result.NoResult[result.Result]"
+    ) -> "NamedResult[result.Result]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "single_result.SingleResult[result.Result]"
+    ) -> "NamedResult[result.Result]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "optional_result.OptionalResult[result.Result]"
+    ) -> "NamedResult[result.Result]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "multiple_result.MultipleResult[result.Result]"
+    ) -> "multiple_result.MultipleResult[result.Result]":
+        ...
+
+    @overload
+    def __or__(self, rhs: "NamedResult[result.Result]") -> "NamedResult[result.Result]":
+        ...
+
+    def __or__(
+        self,
+        rhs: "or_args.OrArgs",
+    ) -> "results.Results[result.Result]":
+        if isinstance(rhs, no_result.NoResult):
+            return self
+        elif isinstance(rhs, single_result.SingleResult):
+            return NamedResult(dict(self) | dict(rhs.named("")))
+        elif isinstance(rhs, optional_result.OptionalResult):
+            return NamedResult(dict(self) | dict(rhs.named("")))
+        elif isinstance(rhs, multiple_result.MultipleResult):
+            return NamedResult(dict(self) | dict(rhs.named("")))
+        elif isinstance(rhs, multiple_result.MultipleResult):
+            return NamedResult(dict(self) | dict(rhs))
+        elif isinstance(rhs, NamedResult):
+            return NamedResult(dict(self) | dict(rhs.named("")))
+        else:
+            raise error.Error(result=self, msg="unknown results rhs {rhs}")
+
 
 from pysh.core.parser.results import (
+    or_args,
     no_result,
     single_result,
     optional_result,

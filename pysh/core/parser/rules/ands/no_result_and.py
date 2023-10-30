@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from pysh.core.parser import results, states
+from pysh.core.parser import errors, results, states
 from pysh.core.parser.rules import no_result_rule, scope
 
 from pysh.core.parser.rules.ands import and_
@@ -14,6 +14,9 @@ class NoResultAnd(
         self, state: states.State, scope: scope.Scope
     ) -> states.StateAndNoResult[results.Result]:
         for child in self:
-            child_state_and_result = child(state, scope)
+            try:
+                child_state_and_result = child(state, scope)
+            except errors.Error as child_error:
+                raise errors.ParseError(rule=self, state=state, _children=[child_error])
             state = child_state_and_result.state
         return states.StateAndNoResult[results.Result](state, results.NoResult())

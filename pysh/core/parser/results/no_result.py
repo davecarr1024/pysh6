@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import overload
 
 from pysh.core.parser.results import error, result, results
 
@@ -20,8 +21,45 @@ class NoResult(results.Results[result.Result]):
     def named(self, name: str) -> "named_result.NamedResult[result.Result]":
         return named_result.NamedResult[result.Result]()
 
+    @overload
+    def __or__(
+        self, rhs: "NoResult[result.Result]"
+    ) -> "single_result.SingleResult[result.Result]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "single_result.SingleResult[result.Result]"
+    ) -> "multiple_result.MultipleResult[result.Result]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "optional_result.OptionalResult[result.Result]"
+    ) -> "multiple_result.MultipleResult[result.Result]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "multiple_result.MultipleResult[result.Result]"
+    ) -> "multiple_result.MultipleResult[result.Result]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "named_result.NamedResult[result.Result]"
+    ) -> "named_result.NamedResult[result.Result]":
+        ...
+
+    def __or__(
+        self,
+        rhs: "or_args.OrArgs",
+    ) -> "results.Results[result.Result]":
+        return rhs
+
 
 from pysh.core.parser.results import (
+    or_args,
     single_result,
     optional_result,
     multiple_result,
