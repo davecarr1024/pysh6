@@ -20,4 +20,5 @@ class OptionalResultRule(rule.Rule[results.Result]):
             rule=self, msg="unable to convert OptionalResultRule to SingleResultRule"
         )
 
+
 from pysh.core.parser.rules import single_result_rule
