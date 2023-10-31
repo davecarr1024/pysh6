@@ -27,6 +27,9 @@ class RulesTest(TestCase):
         named_result_rule: rules.NamedResultRule[int] = rules.ands.NamedResultAnd[int](
             [single_result_rule.named("a"), single_result_rule.named("b")]
         )
+        no_result_literal: rules.literals.NoResultLiteral[
+            int
+        ] = rules.literals.NoResultLiteral[int].load("a")
         for lhs, rhs, expected in list[
             tuple[
                 rules.Rule[int],
@@ -67,6 +70,16 @@ class RulesTest(TestCase):
                     rules.ands.NamedResultAnd[int]([no_result_rule, named_result_rule]),
                 ),
                 (
+                    no_result_rule,
+                    "a",
+                    rules.ands.NoResultAnd[int]([no_result_rule, no_result_literal]),
+                ),
+                (
+                    no_result_rule,
+                    no_result_literal,
+                    rules.ands.NoResultAnd[int]([no_result_rule, no_result_literal]),
+                ),
+                (
                     single_result_rule,
                     no_result_rule,
                     rules.ands.SingleResultAnd[int](
@@ -99,6 +112,20 @@ class RulesTest(TestCase):
                     named_result_rule,
                     rules.ands.NamedResultAnd[int](
                         [single_result_rule, named_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    "a",
+                    rules.ands.SingleResultAnd[int](
+                        [single_result_rule, no_result_literal]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    no_result_literal,
+                    rules.ands.SingleResultAnd[int](
+                        [single_result_rule, no_result_literal]
                     ),
                 ),
                 (
@@ -137,6 +164,20 @@ class RulesTest(TestCase):
                     ),
                 ),
                 (
+                    optional_result_rule,
+                    "a",
+                    rules.ands.OptionalResultAnd[int](
+                        [optional_result_rule, no_result_literal]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    no_result_literal,
+                    rules.ands.OptionalResultAnd[int](
+                        [optional_result_rule, no_result_literal]
+                    ),
+                ),
+                (
                     multiple_result_rule,
                     no_result_rule,
                     rules.ands.MultipleResultAnd[int](
@@ -172,6 +213,20 @@ class RulesTest(TestCase):
                     ),
                 ),
                 (
+                    multiple_result_rule,
+                    "a",
+                    rules.ands.MultipleResultAnd[int](
+                        [multiple_result_rule, no_result_literal]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    no_result_literal,
+                    rules.ands.MultipleResultAnd[int](
+                        [multiple_result_rule, no_result_literal]
+                    ),
+                ),
+                (
                     named_result_rule,
                     no_result_rule,
                     rules.ands.NamedResultAnd[int]([named_result_rule, no_result_rule]),
@@ -202,6 +257,20 @@ class RulesTest(TestCase):
                     named_result_rule,
                     rules.ands.NamedResultAnd[int](
                         [named_result_rule, named_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    "a",
+                    rules.ands.NamedResultAnd[int](
+                        [named_result_rule, no_result_literal]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    no_result_literal,
+                    rules.ands.NamedResultAnd[int](
+                        [named_result_rule, no_result_literal]
                     ),
                 ),
             ]

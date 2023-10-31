@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Optional, overload
+from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
 
@@ -46,6 +47,16 @@ class NamedResultRule(rule.Rule[results.Result]):
     ) -> "named_result_and.NamedResultAnd[results.Result]":
         ...
 
+    @overload
+    def __and__(self, rhs: str) -> "named_result_and.NamedResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "lexer.Rule"
+    ) -> "named_result_and.NamedResultAnd[results.Result]":
+        ...
+
     def __and__(
         self, rhs: "and_args.AndArgs"
     ) -> "and_.And[results.Result, rule.Rule[results.Result]]":
@@ -59,6 +70,13 @@ class NamedResultRule(rule.Rule[results.Result]):
             return named_result_and.NamedResultAnd[results.Result]([self, rhs])
         elif isinstance(rhs, NamedResultRule):
             return named_result_and.NamedResultAnd[results.Result]([self, rhs])
+        elif isinstance(rhs, str) or isinstance(rhs, lexer.Rule):
+            return named_result_and.NamedResultAnd[results.Result](
+                [
+                    self,
+                    no_result_literal.NoResultLiteral[results.Result].load(rhs),
+                ]
+            )
         else:
             raise errors.RuleError(rule=self, msg=f"unknown and rhs type {type(rhs)}")
 
@@ -75,6 +93,4 @@ from pysh.core.parser.rules.ands import (
     and_args,
     named_result_and,
 )
-
-
-from pysh.core.parser import states
+from pysh.core.parser.rules.literals import no_result_literal

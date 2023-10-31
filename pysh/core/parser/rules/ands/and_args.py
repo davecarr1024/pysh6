@@ -1,4 +1,5 @@
 from typing import Union
+from pysh.core import lexer
 from pysh.core.parser import results
 
 from pysh.core.parser.rules import (
@@ -16,4 +17,6 @@ AndArgs = Union[
     optional_result_rule.OptionalResultRule[results.Result],
     multiple_result_rule.MultipleResultRule[results.Result],
     named_result_rule.NamedResultRule[results.Result],
+    lexer.Rule,
+    str,
 ]

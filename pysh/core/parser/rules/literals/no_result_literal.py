@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from pysh.core import tokens
+from pysh.core import lexer, tokens
 from pysh.core.parser import errors, results, states
 from pysh.core.parser.rules import no_result_rule, scope
 
@@ -29,6 +29,12 @@ class NoResultLiteral(
             raise errors.ParseError(
                 rule=self, state=state, msg=f"failed to get token: {error}"
             )
+
+    @classmethod
+    def load(cls, lexer_rule: str | lexer.Rule) -> "NoResultLiteral[results.Result]":
+        if isinstance(lexer_rule, str):
+            lexer_rule = lexer.Rule.load(lexer_rule)
+        return NoResultLiteral[results.Result](lexer_rule)
 
 
 from pysh.core.parser import states

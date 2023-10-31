@@ -3,7 +3,6 @@ from typing import Generic, Optional, overload
 
 from pysh.core import lexer as lexer_lib
 from pysh.core.parser import results
-from pysh.core.parser.rules import scope
 
 
 class Rule(ABC, Generic[results.Result]):
@@ -45,6 +44,18 @@ class Rule(ABC, Generic[results.Result]):
     @abstractmethod
     def __and__(
         self, rhs: "named_result_rule.NamedResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(self, rhs: str) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "lexer_lib.Rule"
     ) -> "and_.And[results.Result, Rule[results.Result]]":
         ...
 
