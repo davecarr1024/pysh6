@@ -19,7 +19,7 @@ class NoResultConverter(
 ):
     func: Callable[
         [results.NoResult[results.Result]],
-        converter_result.ConverterResult,
+        results.SingleResult[converter_result.ConverterResult],
     ]
 
     def __call__(
