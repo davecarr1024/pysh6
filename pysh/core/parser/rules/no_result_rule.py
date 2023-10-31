@@ -83,6 +83,21 @@ class NoResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown and rhs type {type(rhs)}")
 
+    @overload
+    def __rand__(self, lhs: str) -> "no_result_and.NoResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __rand__(
+        self, lhs: "lexer.Rule"
+    ) -> "no_result_and.NoResultAnd[results.Result]":
+        ...
+
+    def __rand__(
+        self, lhs: "rand_args.RandArgs"
+    ) -> "no_result_and.NoResultAnd[results.Result]":
+        return no_result_literal.NoResultLiteral[results.Result].load(lhs) & self
+
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
@@ -95,6 +110,7 @@ from pysh.core.parser.rules.ands import (
     and_,
     and_args,
     no_result_and,
+    rand_args,
     single_result_and,
     optional_result_and,
     multiple_result_and,

@@ -277,3 +277,107 @@ class RulesTest(TestCase):
         ):
             with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
                 self.assertEqual(lhs & rhs, expected)
+
+    def test_rand(self) -> None:
+        no_result_rule: rules.NoResultRule[int] = rules.literals.NoResultLiteral[int](
+            lexer.Rule.load("a")
+        )
+        single_result_rule: rules.SingleResultRule[
+            int
+        ] = rules.literals.SingleResultLiteral[int](
+            lexer.Rule.load("a"),
+            lambda token: int(token.value),
+        )
+        optional_result_rule: rules.OptionalResultRule[
+            int
+        ] = rules.literals.OptionalResultLiteral[int](
+            lexer.Rule.load("a"),
+            lambda token: int(token.value),
+        )
+        multiple_result_rule: rules.MultipleResultRule[
+            int
+        ] = rules.ands.MultipleResultAnd[int]([single_result_rule, single_result_rule])
+        named_result_rule: rules.NamedResultRule[int] = rules.ands.NamedResultAnd[int](
+            [single_result_rule.named("a"), single_result_rule.named("b")]
+        )
+        no_result_literal: rules.literals.NoResultLiteral[
+            int
+        ] = rules.literals.NoResultLiteral[int].load("a")
+        for lhs, rhs, expected in list[
+            tuple[
+                rules.ands.RandArgs,
+                rules.Rule[int],
+                rules.ands.And[int, rules.Rule[int]],
+            ]
+        ](
+            [
+                (
+                    "a",
+                    no_result_rule,
+                    rules.ands.NoResultAnd[int]([no_result_literal, no_result_rule]),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    no_result_rule,
+                    rules.ands.NoResultAnd[int]([no_result_literal, no_result_rule]),
+                ),
+                (
+                    "a",
+                    single_result_rule,
+                    rules.ands.SingleResultAnd[int](
+                        [no_result_literal, single_result_rule]
+                    ),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    single_result_rule,
+                    rules.ands.SingleResultAnd[int](
+                        [no_result_literal, single_result_rule]
+                    ),
+                ),
+                (
+                    "a",
+                    optional_result_rule,
+                    rules.ands.OptionalResultAnd[int](
+                        [no_result_literal, optional_result_rule]
+                    ),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    optional_result_rule,
+                    rules.ands.OptionalResultAnd[int](
+                        [no_result_literal, optional_result_rule]
+                    ),
+                ),
+                (
+                    "a",
+                    multiple_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [no_result_literal, multiple_result_rule]
+                    ),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    multiple_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [no_result_literal, multiple_result_rule]
+                    ),
+                ),
+                (
+                    "a",
+                    named_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [no_result_literal, named_result_rule]
+                    ),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    named_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [no_result_literal, named_result_rule]
+                    ),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
+                self.assertEqual(lhs & rhs, expected)

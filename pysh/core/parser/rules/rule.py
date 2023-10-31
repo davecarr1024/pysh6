@@ -65,6 +65,24 @@ class Rule(ABC, Generic[results.Result]):
     ) -> "and_.And[results.Result, Rule[results.Result]]":
         ...
 
+    @overload
+    @abstractmethod
+    def __rand__(self, lhs: str) -> "and_.And[results.Result,Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __rand__(
+        self, lhs: "lexer_lib.Rule"
+    ) -> "and_.And[results.Result,Rule[results.Result]]":
+        ...
+
+    @abstractmethod
+    def __rand__(
+        self, lhs: "rand_args.RandArgs"
+    ) -> "and_.And[results.Result,Rule[results.Result]]":
+        ...
+
     @abstractmethod
     def lexer(self) -> lexer_lib.Lexer:
         ...
@@ -88,7 +106,6 @@ class Rule(ABC, Generic[results.Result]):
 
 
 from pysh.core.parser import states
-
 from pysh.core.parser.rules import (
     no_result_rule,
     single_result_rule,
@@ -106,4 +123,5 @@ from pysh.core.parser.rules.unary_rules import (
 from pysh.core.parser.rules.ands import (
     and_,
     and_args,
+    rand_args,
 )

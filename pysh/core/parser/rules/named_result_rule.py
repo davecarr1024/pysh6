@@ -80,6 +80,21 @@ class NamedResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown and rhs type {type(rhs)}")
 
+    @overload
+    def __rand__(self, lhs: str) -> "named_result_and.NamedResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __rand__(
+        self, lhs: "lexer.Rule"
+    ) -> "named_result_and.NamedResultAnd[results.Result]":
+        ...
+
+    def __rand__(
+        self, lhs: "rand_args.RandArgs"
+    ) -> "named_result_and.NamedResultAnd[results.Result]":
+        return no_result_literal.NoResultLiteral[results.Result].load(lhs) & self
+
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
@@ -92,5 +107,6 @@ from pysh.core.parser.rules.ands import (
     and_,
     and_args,
     named_result_and,
+    rand_args,
 )
 from pysh.core.parser.rules.literals import no_result_literal

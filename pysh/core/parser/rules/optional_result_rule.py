@@ -87,6 +87,23 @@ class OptionalResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown and rhs type {type(rhs)}")
 
+    @overload
+    def __rand__(
+        self, lhs: str
+    ) -> "optional_result_and.OptionalResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __rand__(
+        self, lhs: "lexer.Rule"
+    ) -> "optional_result_and.OptionalResultAnd[results.Result]":
+        ...
+
+    def __rand__(
+        self, lhs: "rand_args.RandArgs"
+    ) -> "optional_result_and.OptionalResultAnd[results.Result]":
+        return no_result_literal.NoResultLiteral[results.Result].load(lhs) & self
+
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
@@ -101,5 +118,6 @@ from pysh.core.parser.rules.ands import (
     optional_result_and,
     multiple_result_and,
     named_result_and,
+    rand_args,
 )
 from pysh.core.parser.rules.literals import no_result_literal

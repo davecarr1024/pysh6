@@ -80,6 +80,21 @@ class SingleResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown and rhs type {type(rhs)}")
 
+    @overload
+    def __rand__(self, lhs: str) -> "single_result_and.SingleResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __rand__(
+        self, lhs: "lexer.Rule"
+    ) -> "single_result_and.SingleResultAnd[results.Result]":
+        ...
+
+    def __rand__(
+        self, lhs: "rand_args.RandArgs"
+    ) -> "single_result_and.SingleResultAnd[results.Result]":
+        return no_result_literal.NoResultLiteral[results.Result].load(lhs) & self
+
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
@@ -91,6 +106,7 @@ from pysh.core.parser.rules import (
 from pysh.core.parser.rules.ands import (
     and_,
     and_args,
+    rand_args,
     single_result_and,
     multiple_result_and,
     named_result_and,
