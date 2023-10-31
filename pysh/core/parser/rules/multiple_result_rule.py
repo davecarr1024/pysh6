@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import overload
+from typing import Callable, overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
@@ -99,6 +99,17 @@ class MultipleResultRule(rule.Rule[results.Result]):
     ) -> "multiple_result_and.MultipleResultAnd[results.Result]":
         return no_result_literal.NoResultLiteral[results.Result].load(lhs) & self
 
+    def convert(
+        self,
+        func: Callable[
+            [results.MultipleResult[results.Result]],
+            results.SingleResult["converter_result.ConverterResult"],
+        ],
+    ) -> "multiple_result_converter.MultipleResultConverter[results.Result,converter_result.ConverterResult]":
+        return multiple_result_converter.MultipleResultConverter[
+            results.Result, converter_result.ConverterResult
+        ](self, func)
+
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
@@ -115,3 +126,7 @@ from pysh.core.parser.rules.ands import (
     rand_args,
 )
 from pysh.core.parser.rules.literals import no_result_literal
+from pysh.core.parser.rules.converters import (
+    converter_result,
+    multiple_result_converter,
+)

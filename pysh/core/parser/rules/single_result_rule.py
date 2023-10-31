@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import overload
+from typing import Callable, overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
+from pysh.core.parser.rules.converters import converter_result
 
 
 @dataclass(frozen=True)
@@ -95,6 +96,17 @@ class SingleResultRule(rule.Rule[results.Result]):
     ) -> "single_result_and.SingleResultAnd[results.Result]":
         return no_result_literal.NoResultLiteral[results.Result].load(lhs) & self
 
+    def convert(
+        self,
+        func: Callable[
+            [results.SingleResult[results.Result]],
+            results.SingleResult[converter_result.ConverterResult],
+        ],
+    ) -> "single_result_converter.SingleResultConverter[results.Result,converter_result.ConverterResult]":
+        return single_result_converter.SingleResultConverter[
+            results.Result, converter_result.ConverterResult
+        ](self, func)
+
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
@@ -112,3 +124,4 @@ from pysh.core.parser.rules.ands import (
     named_result_and,
 )
 from pysh.core.parser.rules.literals import no_result_literal
+from pysh.core.parser.rules.converters import single_result_converter

@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Optional, overload
+from typing import Callable, Optional, overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
+from pysh.core.parser.rules.converters import converter_result
 
 
 @dataclass(frozen=True)
@@ -95,6 +96,17 @@ class NamedResultRule(rule.Rule[results.Result]):
     ) -> "named_result_and.NamedResultAnd[results.Result]":
         return no_result_literal.NoResultLiteral[results.Result].load(lhs) & self
 
+    def convert(
+        self,
+        func: Callable[
+            ...,
+            results.SingleResult[converter_result.ConverterResult],
+        ],
+    ) -> "named_result_converter.NamedResultConverter[results.Result,converter_result.ConverterResult]":
+        return named_result_converter.NamedResultConverter[
+            results.Result, converter_result.ConverterResult
+        ](self, func)
+
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
@@ -110,3 +122,4 @@ from pysh.core.parser.rules.ands import (
     rand_args,
 )
 from pysh.core.parser.rules.literals import no_result_literal
+from pysh.core.parser.rules.converters import named_result_converter

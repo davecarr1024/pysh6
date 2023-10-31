@@ -104,6 +104,21 @@ class Rule(ABC, Generic[results.Result]):
     ) -> "named_result_rule.NamedResultRule[results.Result]":
         return unary_named_result_rule.UnaryNamedResultRule(self, name)
 
+    def zero_or_more(
+        self,
+    ) -> "zero_or_more.ZeroOrMore[results.Result,Rule[results.Result]]":
+        return zero_or_more.ZeroOrMore[results.Result, Rule[results.Result]](self)
+
+    def one_or_more(
+        self,
+    ) -> "one_or_more.OneOrMore[results.Result,Rule[results.Result]]":
+        return one_or_more.OneOrMore[results.Result, Rule[results.Result]](self)
+
+    def zero_or_one(
+        self,
+    ) -> "zero_or_one.ZeroOrOne[results.Result,Rule[results.Result]]":
+        return zero_or_one.ZeroOrOne[results.Result, Rule[results.Result]](self)
+
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
@@ -114,11 +129,14 @@ from pysh.core.parser.rules import (
     named_result_rule,
 )
 from pysh.core.parser.rules.unary_rules import (
+    one_or_more,
     unary_no_result_rule,
     unary_single_result_rule,
     unary_optional_result_rule,
     unary_multiple_result_rule,
     unary_named_result_rule,
+    zero_or_more,
+    zero_or_one,
 )
 from pysh.core.parser.rules.ands import (
     and_,
