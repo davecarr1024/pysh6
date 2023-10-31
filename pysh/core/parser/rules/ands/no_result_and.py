@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pysh.core.parser import errors, results, states
-from pysh.core.parser.rules import no_result_rule, scope
+from pysh.core.parser.rules import no_result_rule
 
 from pysh.core.parser.rules.ands import and_
 

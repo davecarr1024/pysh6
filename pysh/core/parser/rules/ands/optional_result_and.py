@@ -37,10 +37,6 @@ class OptionalResultAnd(
                         msg=f"duplicate results for OptionalResultAnd {result} {child_result}",
                     )
                 result = child_result
-        if result is None:
-            raise errors.ParseError(
-                rule=self, state=state, msg="no result for OptionalResultAnd"
-            )
         return states.StateAndOptionalResult[results.Result](
             state, results.OptionalResult[results.Result](result)
         )
