@@ -13,46 +13,46 @@ class Rule(ABC, Generic[results.Result]):
     ) -> "states.StateAndResult[results.Result]":
         ...
 
-    # @overload
-    # @abstractmethod
-    # def __and__(
-    #     self, rhs: "no_result_rule.NoResultRule[results.Result]"
-    # ) -> "and_.And[results.Result, Rule[results.Result]]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "no_result_rule.NoResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
 
-    # @overload
-    # @abstractmethod
-    # def __and__(
-    #     self, rhs: "single_result_rule.SingleResultRule[results.Result]"
-    # ) -> "and_.And[results.Result, Rule[results.Result]]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "single_result_rule.SingleResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
 
-    # @overload
-    # @abstractmethod
-    # def __and__(
-    #     self, rhs: "optional_result_rule.OptionalResultRule[results.Result]"
-    # ) -> "and_.And[results.Result, Rule[results.Result]]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "optional_result_rule.OptionalResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
 
-    # @overload
-    # @abstractmethod
-    # def __and__(
-    #     self, rhs: "multiple_result_rule.MultipleResultRule[results.Result]"
-    # ) -> "and_.And[results.Result, Rule[results.Result]]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "multiple_result_rule.MultipleResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
 
-    # @overload
-    # @abstractmethod
-    # def __and__(
-    #     self, rhs: "named_result_rule.NamedResultRule[results.Result]"
-    # ) -> "and_.And[results.Result, Rule[results.Result]]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "named_result_rule.NamedResultRule[results.Result]"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
 
-    # @abstractmethod
-    # def __and__(
-    #     self, rhs: "and_args.AndArgs"
-    # ) -> "and_.And[results.Result, Rule[results.Result]]":
-    #     ...
+    @abstractmethod
+    def __and__(
+        self, rhs: "and_args.AndArgs"
+    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        ...
 
     @abstractmethod
     def lexer(self) -> lexer_lib.Lexer:

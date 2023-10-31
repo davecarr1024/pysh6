@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from pysh.core.parser import results
+from typing import overload
+from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
 
 
@@ -15,5 +16,64 @@ class SingleResultRule(rule.Rule[results.Result]):
     def single(self) -> "SingleResultRule[results.Result]":
         return self
 
+    @overload
+    def __and__(
+        self, rhs: "no_result_rule.NoResultRule[results.Result]"
+    ) -> "single_result_and.SingleResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "SingleResultRule[results.Result]"
+    ) -> "multiple_result_and.MultipleResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "optional_result_rule.OptionalResultRule[results.Result]"
+    ) -> "multiple_result_and.MultipleResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "multiple_result_rule.MultipleResultRule[results.Result]"
+    ) -> "multiple_result_and.MultipleResultAnd[results.Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: "named_result_rule.NamedResultRule[results.Result]"
+    ) -> "named_result_and.NamedResultAnd[results.Result]":
+        ...
+
+    def __and__(
+        self, rhs: "and_args.AndArgs"
+    ) -> "and_.And[results.Result, rule.Rule[results.Result]]":
+        if isinstance(rhs, no_result_rule.NoResultRule):
+            return single_result_and.SingleResultAnd[results.Result]([self, rhs])
+        elif isinstance(rhs, SingleResultRule):
+            return multiple_result_and.MultipleResultAnd[results.Result]([self, rhs])
+        elif isinstance(rhs, optional_result_rule.OptionalResultRule):
+            return multiple_result_and.MultipleResultAnd[results.Result]([self, rhs])
+        elif isinstance(rhs, multiple_result_rule.MultipleResultRule):
+            return multiple_result_and.MultipleResultAnd[results.Result]([self, rhs])
+        elif isinstance(rhs, named_result_rule.NamedResultRule):
+            return named_result_and.NamedResultAnd[results.Result]([self, rhs])
+        else:
+            raise errors.RuleError(rule=self, msg=f"unknown and rhs type {type(rhs)}")
+
 
 from pysh.core.parser import states
+from pysh.core.parser.rules import (
+    no_result_rule,
+    optional_result_rule,
+    multiple_result_rule,
+    named_result_rule,
+)
+from pysh.core.parser.rules.ands import (
+    and_,
+    and_args,
+    single_result_and,
+    multiple_result_and,
+    named_result_and,
+)
