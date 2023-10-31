@@ -5,7 +5,7 @@ from pysh.core.parser import rules
 
 
 class RulesTest(TestCase):
-    def test_and(self):
+    def test_and(self) -> None:
         no_result_rule: rules.NoResultRule[int] = rules.literals.NoResultLiteral[int](
             lexer.Rule.load("a")
         )
@@ -71,6 +71,137 @@ class RulesTest(TestCase):
                     no_result_rule,
                     rules.ands.SingleResultAnd[int](
                         [single_result_rule, no_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    single_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [single_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    optional_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [single_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    multiple_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [single_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    named_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [single_result_rule, named_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    no_result_rule,
+                    rules.ands.OptionalResultAnd[int](
+                        [optional_result_rule, no_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    single_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [optional_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    optional_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [optional_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    multiple_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [optional_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    named_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [optional_result_rule, named_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    no_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [multiple_result_rule, no_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    single_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [multiple_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    optional_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [multiple_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    multiple_result_rule,
+                    rules.ands.MultipleResultAnd[int](
+                        [multiple_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    named_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [multiple_result_rule, named_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    no_result_rule,
+                    rules.ands.NamedResultAnd[int]([named_result_rule, no_result_rule]),
+                ),
+                (
+                    named_result_rule,
+                    single_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [named_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    optional_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [named_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    multiple_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [named_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    named_result_rule,
+                    rules.ands.NamedResultAnd[int](
+                        [named_result_rule, named_result_rule]
                     ),
                 ),
             ]
