@@ -3,6 +3,7 @@ from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
 from pysh.core.parser import results, states
+from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.ands import no_result_and
 from pysh.core.parser.rules.literals import no_result_literal
 
@@ -10,15 +11,15 @@ from pysh.core.parser.rules.literals import no_result_literal
 class NoResultAndTest(TestCase):
     def test_call(self):
         for state, expected in list[
-            tuple[states.State[int], Optional[states.StateAndNoResult[int]]]
+            tuple[states.State, Optional[states.StateAndNoResult[int]]]
         ](
             [
                 (
-                    states.State[int](),
+                    states.State(),
                     None,
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("a", "1"),
@@ -28,7 +29,7 @@ class NoResultAndTest(TestCase):
                     None,
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("b", "1"),
@@ -38,7 +39,7 @@ class NoResultAndTest(TestCase):
                     None,
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("a", "1"),
@@ -52,7 +53,7 @@ class NoResultAndTest(TestCase):
                     ),
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("a", "1"),
@@ -87,6 +88,6 @@ class NoResultAndTest(TestCase):
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state)
+                        rule(state, scope.Scope())
                 else:
-                    self.assertEqual(rule(state), expected)
+                    self.assertEqual(rule(state, scope.Scope()), expected)

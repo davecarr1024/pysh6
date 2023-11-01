@@ -3,6 +3,7 @@ from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
 from pysh.core.parser import results, states
+from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.literals import single_result_literal
 
 
@@ -10,7 +11,7 @@ class MultipleResultConverterTest(TestCase):
     def test_call(self):
         for state, expected in list[
             tuple[
-                states.State[int],
+                states.State,
                 Optional[states.StateAndSingleResult[int]],
             ]
         ](
@@ -38,7 +39,7 @@ class MultipleResultConverterTest(TestCase):
                         )
                     ),
                     states.StateAndSingleResult[int](
-                        states.State[int](),
+                        states.State(),
                         results.SingleResult[int](1),
                     ),
                 ),
@@ -52,7 +53,7 @@ class MultipleResultConverterTest(TestCase):
                         )
                     ),
                     states.StateAndSingleResult[int](
-                        states.State[int](),
+                        states.State(),
                         results.SingleResult[int](2),
                     ),
                 ),
@@ -72,6 +73,6 @@ class MultipleResultConverterTest(TestCase):
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state)
+                        rule(state, scope.Scope())
                 else:
-                    self.assertEqual(rule(state), expected)
+                    self.assertEqual(rule(state, scope.Scope()), expected)

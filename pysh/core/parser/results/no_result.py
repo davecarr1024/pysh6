@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import Optional, overload
+from typing import Callable, Optional, overload
+from pysh.core.parser.results import converter_result, error, result, results
 
-from pysh.core.parser.results import error, result, results
+NoResultConverterFunc = Callable[[], converter_result.ConverterResult]
 
 
 @dataclass(frozen=True)
@@ -58,6 +59,11 @@ class NoResult(results.Results[result.Result]):
         rhs: "or_args.OrArgs",
     ) -> "results.Results[result.Result]":
         return rhs
+
+    def convert(
+        self, func: NoResultConverterFunc[converter_result.ConverterResult]
+    ) -> "single_result.SingleResult[converter_result.ConverterResult]":
+        return single_result.SingleResult[converter_result.ConverterResult](func())
 
 
 from pysh.core.parser.results import (

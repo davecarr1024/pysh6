@@ -11,7 +11,7 @@ class NoResultLiteral(
     literal.Literal[results.Result], no_result_rule.NoResultRule[results.Result]
 ):
     def __call__(
-        self, state: "states.State[results.Result]"
+        self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndNoResult[results.Result]":
         try:
             if state.tokens.head().rule_name != self.lexer_rule.name:
@@ -35,6 +35,3 @@ class NoResultLiteral(
         if isinstance(lexer_rule, str):
             lexer_rule = lexer.Rule.load(lexer_rule)
         return NoResultLiteral[results.Result](lexer_rule)
-
-
-from pysh.core.parser import states

@@ -1,7 +1,15 @@
 from dataclasses import dataclass
-from typing import Optional, overload
+from typing import Callable, Optional, overload
+from pysh.core.parser.results import (
+    converter_result,
+    error,
+    result as result_lib,
+    results,
+)
 
-from pysh.core.parser.results import error, result as result_lib, results
+SingleResultConverterFunc = Callable[
+    [result_lib.Result], converter_result.ConverterResult
+]
 
 
 @dataclass(frozen=True)
@@ -62,19 +70,31 @@ class SingleResult(results.Results[result_lib.Result]):
         if isinstance(rhs, no_result.NoResult):
             return self
         elif isinstance(rhs, SingleResult):
-            return multiple_result.MultipleResult(
+            return multiple_result.MultipleResult[result_lib.Result](
                 list(self.multiple()) + list(rhs.multiple())
             )
         elif isinstance(rhs, optional_result.OptionalResult):
-            return multiple_result.MultipleResult(
+            return multiple_result.MultipleResult[result_lib.Result](
                 list(self.multiple()) + list(rhs.multiple())
             )
         elif isinstance(rhs, multiple_result.MultipleResult):
-            return multiple_result.MultipleResult(list(self.multiple()) + list(rhs))
+            return multiple_result.MultipleResult[result_lib.Result](
+                list(self.multiple()) + list(rhs)
+            )
         elif isinstance(rhs, named_result.NamedResult):
-            return named_result.NamedResult(dict(self.named()) | dict(rhs))
+            return named_result.NamedResult[result_lib.Result](
+                dict(self.named()) | dict(rhs)
+            )
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
+
+    def convert(
+        self,
+        func: SingleResultConverterFunc[
+            result_lib.Result, converter_result.ConverterResult
+        ],
+    ) -> "SingleResult[converter_result.ConverterResult]":
+        return SingleResult[converter_result.ConverterResult](func(self.result))
 
 
 from pysh.core.parser.results import (

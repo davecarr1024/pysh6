@@ -14,12 +14,14 @@ class NamedResultAnd(
     ],
 ):
     def __call__(
-        self, state: "states.State[results.Result]"
+        self,
+        state: states.State,
+        scope: scope.Scope[results.Result],
     ) -> "states.StateAndNamedResult[results.Result]":
         results_ = results.NamedResult[results.Result]()
         for child in self:
             try:
-                child_state_and_result = child(state)
+                child_state_and_result = child(state, scope)
             except errors.Error as child_error:
                 raise errors.ParseError(rule=self, state=state, _children=[child_error])
             state = child_state_and_result.state

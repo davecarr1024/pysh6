@@ -98,7 +98,7 @@ class MultipleResultTest(TestCase):
         ):
             with self.subTest(result=result, expected=expected):
                 self.assertEqual(
-                    result.convert(lambda r: results.SingleResult[int](sum(r))),
+                    result.convert(sum),
                     expected,
                 )
 

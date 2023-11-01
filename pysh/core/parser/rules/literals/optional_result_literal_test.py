@@ -125,9 +125,9 @@ class OptionalResultLiteralTest(TestCase):
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state)
+                        rule(state, scope.Scope())
                 else:
                     self.assertEqual(
-                        rule(state),
+                        rule(state, scope.Scope()),
                         expected,
                     )

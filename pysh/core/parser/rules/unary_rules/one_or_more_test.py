@@ -1,8 +1,8 @@
 from typing import Optional
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
-
 from pysh.core.parser import results, states
+from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.literals import single_result_literal
 from pysh.core.parser.rules.unary_rules import one_or_more
 
@@ -10,15 +10,15 @@ from pysh.core.parser.rules.unary_rules import one_or_more
 class OneOrMoreTest(TestCase):
     def test_call(self):
         for state, expected in list[
-            tuple[states.State[int], Optional[states.StateAndMultipleResult[int]]]
+            tuple[states.State, Optional[states.StateAndMultipleResult[int]]]
         ](
             [
                 (
-                    states.State[int](),
+                    states.State(),
                     None,
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("i", "1"),
@@ -26,12 +26,12 @@ class OneOrMoreTest(TestCase):
                         )
                     ),
                     states.StateAndMultipleResult[int](
-                        states.State[int](),
+                        states.State(),
                         results.MultipleResult[int]([1]),
                     ),
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("s", "a"),
@@ -41,7 +41,7 @@ class OneOrMoreTest(TestCase):
                     None,
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("i", "1"),
@@ -51,7 +51,7 @@ class OneOrMoreTest(TestCase):
                         )
                     ),
                     states.StateAndMultipleResult[int](
-                        states.State[int](
+                        states.State(
                             tokens.Stream(
                                 [
                                     tokens.Token("s", "a"),
@@ -72,6 +72,6 @@ class OneOrMoreTest(TestCase):
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state)
+                        rule(state, scope.Scope())
                 else:
-                    self.assertEqual(rule(state), expected)
+                    self.assertEqual(rule(state, scope.Scope()), expected)

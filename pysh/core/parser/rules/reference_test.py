@@ -2,42 +2,50 @@ from typing import Optional
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
-from pysh.core.parser import results, states
-from pysh.core.parser.rules import scope
-from pysh.core.parser.rules.converters import optional_result_converter
-from pysh.core.parser.rules.literals import token_value
+from pysh.core.parser import results, rules, states
 
 
-class OptionalResultConverterTest(TestCase):
+class ReferenceTest(TestCase):
     def test_call(self):
-        for state, expected in list[
+        for state, scope, expected in list[
             tuple[
                 states.State,
+                rules.Scope[int],
                 Optional[states.StateAndSingleResult[int]],
             ]
         ](
             [
                 (
                     states.State(),
+                    rules.Scope(),
                     None,
                 ),
                 (
                     states.State(
                         tokens.Stream(
                             [
-                                tokens.Token("b", "2"),
+                                tokens.Token("i", "1"),
                             ]
-                        )
+                        ),
                     ),
+                    rules.Scope(),
                     None,
                 ),
                 (
                     states.State(
                         tokens.Stream(
                             [
-                                tokens.Token("a", "1"),
+                                tokens.Token("i", "1"),
                             ]
-                        )
+                        ),
+                    ),
+                    rules.Scope[int](
+                        {
+                            "a": rules.literals.SingleResultLiteral[int](
+                                lexer.Rule.load("i"),
+                                lambda token: int(token.value),
+                            ),
+                        }
                     ),
                     states.StateAndSingleResult[int](
                         states.State(),
@@ -46,18 +54,10 @@ class OptionalResultConverterTest(TestCase):
                 ),
             ]
         ):
-            with self.subTest(state=state, expected=expected):
-
-                def convert(result: Optional[str]) -> int:
-                    return int(result or "0")
-
-                rule = (
-                    token_value.TokenValue(lexer.Rule.load("a"))
-                    .optional()
-                    .convert(convert)
-                )
+            with self.subTest(state=state, scope=scope, expected=expected):
+                rule = rules.Reference("a")
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state, scope.Scope())
+                        rule(state, scope)
                 else:
-                    self.assertEqual(rule(state, scope.Scope()), expected)
+                    self.assertEqual(rule(state, scope), expected)

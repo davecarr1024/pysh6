@@ -1,10 +1,9 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Optional, TypeVar, overload
+from typing import Optional, TypeVar, overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
-from pysh.core.parser.rules.converters import converter_result
 
 _RhsResult = TypeVar("_RhsResult")
 
@@ -13,7 +12,7 @@ _RhsResult = TypeVar("_RhsResult")
 class NamedResultRule(rule.Rule[results.Result]):
     @abstractmethod
     def __call__(
-        self, state: "states.State[results.Result]"
+        self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndNamedResult[results.Result]":
         ...
 
@@ -105,15 +104,17 @@ class NamedResultRule(rule.Rule[results.Result]):
 
     def convert(
         self,
-        func: "named_result_converter.NamedResultConverterFunc[converter_result.ConverterResult]",
-    ) -> "named_result_converter.NamedResultConverter[results.Result,converter_result.ConverterResult]":
+        func: "results.NamedResultConverterFunc[results.ConverterResult]",
+        scope: Optional["scope.Scope[results.Result]"] = None,
+    ) -> "named_result_converter.NamedResultConverter[results.Result,results.ConverterResult]":
         return named_result_converter.NamedResultConverter[
-            results.Result, converter_result.ConverterResult
-        ](self, func)
+            results.Result, results.ConverterResult
+        ](self, func, scope=scope)
 
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
+    scope,
     no_result_rule,
     single_result_rule,
     optional_result_rule,

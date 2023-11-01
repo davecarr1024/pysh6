@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Iterator, Mapping, Optional, overload
+from typing import Callable, Iterator, Mapping, Optional, overload
+from pysh.core.parser.results import converter_result, error, result, results
 
-from pysh.core.parser.results import error, result, results
+NamedResultConverterFunc = Callable[..., converter_result.ConverterResult]
 
 
 @dataclass(frozen=True)
@@ -97,6 +98,13 @@ class NamedResult(results.Results[result.Result], Mapping[str, result.Result]):
             return NamedResult(dict(self) | dict(rhs.named()))
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
+
+    def convert(
+        self, func: NamedResultConverterFunc[converter_result.ConverterResult]
+    ) -> "single_result.SingleResult[converter_result.ConverterResult]":
+        return single_result.SingleResult[converter_result.ConverterResult](
+            func(**dict(self))
+        )
 
 
 from pysh.core.parser.results import (

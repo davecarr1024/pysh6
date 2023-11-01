@@ -1,17 +1,16 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, overload
+from typing import Optional, overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
-from pysh.core.parser.rules.converters import converter_result
 
 
 @dataclass(frozen=True)
 class NoResultRule(rule.Rule[results.Result]):
     @abstractmethod
     def __call__(
-        self, state: "states.State[results.Result]"
+        self, state: "states.State", scope: "scope_lib.Scope[results.Result]"
     ) -> "states.StateAndNoResult[results.Result]":
         ...
 
@@ -101,15 +100,19 @@ class NoResultRule(rule.Rule[results.Result]):
 
     def convert(
         self,
-        func: "no_result_converter.NoResultConverterFunc[converter_result.ConverterResult]",
-    ) -> "no_result_converter.NoResultConverter[results.Result,converter_result.ConverterResult]":
+        func: "results.NoResultConverterFunc[results.ConverterResult]",
+        scope: Optional["scope_lib.Scope[results.Result]"] = None,
+    ) -> (
+        "no_result_converter.NoResultConverter[results.Result,results.ConverterResult]"
+    ):
         return no_result_converter.NoResultConverter[
-            results.Result, converter_result.ConverterResult
-        ](self, func)
+            results.Result, results.ConverterResult
+        ](self, func, scope=scope)
 
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
+    scope as scope_lib,
     single_result_rule,
     optional_result_rule,
     multiple_result_rule,
@@ -126,4 +129,4 @@ from pysh.core.parser.rules.ands import (
     named_result_and,
 )
 from pysh.core.parser.rules.literals import no_result_literal
-from pysh.core.parser.rules.converters import converter_result, no_result_converter
+from pysh.core.parser.rules.converters import no_result_converter

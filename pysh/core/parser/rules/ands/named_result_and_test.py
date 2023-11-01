@@ -3,6 +3,7 @@ from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
 from pysh.core.parser import results, states
+from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.ands import named_result_and
 from pysh.core.parser.rules.literals import single_result_literal
 
@@ -10,7 +11,7 @@ from pysh.core.parser.rules.literals import single_result_literal
 class NamedResultAndTest(TestCase):
     def test_call(self):
         for state, expected in list[
-            tuple[states.State[int], Optional[states.StateAndNamedResult[int]]]
+            tuple[states.State, Optional[states.StateAndNamedResult[int]]]
         ](
             [
                 (
@@ -109,6 +110,6 @@ class NamedResultAndTest(TestCase):
 
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state)
+                        rule(state, scope.Scope())
                 else:
-                    self.assertEqual(rule(state), expected)
+                    self.assertEqual(rule(state, scope.Scope()), expected)

@@ -29,11 +29,6 @@ class Results(ABC, Generic[result.Result]):
     ) -> "named_result.NamedResult[result.Result]":
         ...
 
-    def convert(
-        self, func: Callable[[Self], "single_result.SingleResult[result.Result]"]
-    ) -> "single_result.SingleResult[result.Result]":
-        return func(self)
-
     @overload
     @abstractmethod
     def __or__(

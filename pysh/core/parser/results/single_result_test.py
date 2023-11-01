@@ -27,10 +27,11 @@ class SingleResultTest(TestCase):
         )
 
     def test_convert(self):
+        def convert(result: int) -> int:
+            return result * 2
+
         self.assertEqual(
-            results.SingleResult[int](1).convert(
-                lambda r: results.SingleResult[int](r.result * 2)
-            ),
+            results.SingleResult[int](1).convert(convert),
             results.SingleResult[int](2),
         )
 

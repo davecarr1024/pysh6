@@ -3,6 +3,7 @@ from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
 from pysh.core.parser import results, states
+from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.ands import optional_result_and
 from pysh.core.parser.rules.literals import no_result_literal, optional_result_literal
 
@@ -10,7 +11,7 @@ from pysh.core.parser.rules.literals import no_result_literal, optional_result_l
 class OptionalResultAndTest(TestCase):
     def test_call(self):
         for state, expected in list[
-            tuple[states.State[int], Optional[states.StateAndOptionalResult[int]]]
+            tuple[states.State, Optional[states.StateAndOptionalResult[int]]]
         ](
             [
                 (
@@ -134,6 +135,6 @@ class OptionalResultAndTest(TestCase):
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state)
+                        rule(state, scope.Scope())
                 else:
-                    self.assertEqual(rule(state), expected)
+                    self.assertEqual(rule(state, scope.Scope()), expected)

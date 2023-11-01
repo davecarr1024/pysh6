@@ -1,17 +1,16 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, overload
+from typing import Optional, overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
-from pysh.core.parser.rules.converters import converter_result
 
 
 @dataclass(frozen=True)
 class OptionalResultRule(rule.Rule[results.Result]):
     @abstractmethod
     def __call__(
-        self, state: "states.State[results.Result]"
+        self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndOptionalResult[results.Result]":
         ...
 
@@ -107,15 +106,17 @@ class OptionalResultRule(rule.Rule[results.Result]):
 
     def convert(
         self,
-        func: "optional_result_converter.OptionalResultConverterFunc[results.Result, converter_result.ConverterResult]",
-    ) -> "optional_result_converter.OptionalResultConverter[results.Result,converter_result.ConverterResult]":
+        func: "results.OptionalResultConverterFunc[results.Result, results.ConverterResult]",
+        scope: Optional["scope.Scope[results.Result]"] = None,
+    ) -> "optional_result_converter.OptionalResultConverter[results.Result,results.ConverterResult]":
         return optional_result_converter.OptionalResultConverter[
-            results.Result, converter_result.ConverterResult
-        ](self, func)
+            results.Result, results.ConverterResult
+        ](self, func, scope=scope)
 
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
+    scope,
     no_result_rule,
     single_result_rule,
     multiple_result_rule,

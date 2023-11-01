@@ -1,8 +1,9 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, overload
+from typing import Callable, Optional, overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
+from pysh.core.parser.results import converter_result
 from pysh.core.parser.rules import rule
 
 
@@ -10,7 +11,7 @@ from pysh.core.parser.rules import rule
 class MultipleResultRule(rule.Rule[results.Result]):
     @abstractmethod
     def __call__(
-        self, state: "states.State[results.Result]"
+        self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndMultipleResult[results.Result]":
         ...
 
@@ -101,15 +102,17 @@ class MultipleResultRule(rule.Rule[results.Result]):
 
     def convert(
         self,
-        func: "multiple_result_converter.MultipleResultConverterFunc[results.Result, converter_result.ConverterResult]",
-    ) -> "multiple_result_converter.MultipleResultConverter[results.Result,converter_result.ConverterResult]":
+        func: "results.MultipleResultConverterFunc[results.Result, results.ConverterResult]",
+        scope: Optional["scope.Scope[results.Result]"] = None,
+    ) -> "multiple_result_converter.MultipleResultConverter[results.Result,results.ConverterResult]":
         return multiple_result_converter.MultipleResultConverter[
-            results.Result, converter_result.ConverterResult
-        ](self, func)
+            results.Result, results.ConverterResult
+        ](self, func, scope=scope)
 
 
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
+    scope,
     no_result_rule,
     single_result_rule,
     optional_result_rule,
@@ -124,6 +127,5 @@ from pysh.core.parser.rules.ands import (
 )
 from pysh.core.parser.rules.literals import no_result_literal
 from pysh.core.parser.rules.converters import (
-    converter_result,
     multiple_result_converter,
 )

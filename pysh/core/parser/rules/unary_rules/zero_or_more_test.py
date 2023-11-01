@@ -1,7 +1,7 @@
 from unittest import TestCase
 from pysh.core import lexer, tokens
-
 from pysh.core.parser import results, states
+from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.literals import single_result_literal
 from pysh.core.parser.rules.unary_rules import zero_or_more
 
@@ -9,18 +9,18 @@ from pysh.core.parser.rules.unary_rules import zero_or_more
 class ZeroOrMoreTest(TestCase):
     def test_call(self):
         for state, expected in list[
-            tuple[states.State[int], states.StateAndMultipleResult[int]]
+            tuple[states.State, states.StateAndMultipleResult[int]]
         ](
             [
                 (
-                    states.State[int](),
+                    states.State(),
                     states.StateAndMultipleResult[int](
-                        states.State[int](),
+                        states.State(),
                         results.MultipleResult[int](),
                     ),
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("i", "1"),
@@ -28,12 +28,12 @@ class ZeroOrMoreTest(TestCase):
                         )
                     ),
                     states.StateAndMultipleResult[int](
-                        states.State[int](),
+                        states.State(),
                         results.MultipleResult[int]([1]),
                     ),
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("s", "a"),
@@ -41,7 +41,7 @@ class ZeroOrMoreTest(TestCase):
                         )
                     ),
                     states.StateAndMultipleResult[int](
-                        states.State[int](
+                        states.State(
                             tokens.Stream(
                                 [
                                     tokens.Token("s", "a"),
@@ -52,7 +52,7 @@ class ZeroOrMoreTest(TestCase):
                     ),
                 ),
                 (
-                    states.State[int](
+                    states.State(
                         tokens.Stream(
                             [
                                 tokens.Token("i", "1"),
@@ -62,7 +62,7 @@ class ZeroOrMoreTest(TestCase):
                         )
                     ),
                     states.StateAndMultipleResult[int](
-                        states.State[int](
+                        states.State(
                             tokens.Stream(
                                 [
                                     tokens.Token("s", "a"),
@@ -81,6 +81,6 @@ class ZeroOrMoreTest(TestCase):
                             lexer.Rule.load("i"),
                             lambda token: int(token.value),
                         )
-                    )(state),
+                    )(state, scope.Scope()),
                     expected,
                 )

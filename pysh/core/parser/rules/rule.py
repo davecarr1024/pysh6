@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Generic, Optional, overload
-
 from pysh.core import lexer as lexer_lib
-from pysh.core.parser import results
+from pysh.core.parser import results, states
 
 
 class Rule(ABC, Generic[results.Result]):
     @abstractmethod
     def __call__(
-        self, state: "states.State[results.Result]"
+        self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndResult[results.Result]":
         ...
 
@@ -120,9 +119,9 @@ class Rule(ABC, Generic[results.Result]):
         return zero_or_one.ZeroOrOne[results.Result, Rule[results.Result]](self)
 
 
-from pysh.core.parser import states
 from pysh.core.parser.rules import (
     no_result_rule,
+    scope,
     single_result_rule,
     optional_result_rule,
     multiple_result_rule,

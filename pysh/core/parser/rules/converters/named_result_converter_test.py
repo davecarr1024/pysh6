@@ -3,6 +3,7 @@ from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
 from pysh.core.parser import results, states
+from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.literals import single_result_literal
 
 
@@ -10,7 +11,7 @@ class NamedResultConverterTest(TestCase):
     def test_call(self):
         for state, expected in list[
             tuple[
-                states.State[int],
+                states.State,
                 Optional[states.StateAndSingleResult[int]],
             ]
         ](
@@ -49,7 +50,7 @@ class NamedResultConverterTest(TestCase):
                         )
                     ),
                     states.StateAndSingleResult[int](
-                        states.State[int](),
+                        states.State(),
                         results.SingleResult[int](3),
                     ),
                 ),
@@ -70,7 +71,7 @@ class NamedResultConverterTest(TestCase):
                 ).convert(convert)
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state)
+                        rule(state, scope.Scope())
                 else:
-                    actual = rule(state)
+                    actual = rule(state, scope.Scope())
                     self.assertEqual(actual, expected, msg=f"{actual} != {expected}")

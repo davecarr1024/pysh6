@@ -90,12 +90,15 @@ class OptionalResultTest(TestCase):
             ]
         ):
             with self.subTest(result=result, expected=expected):
+
+                def convert(result: Optional[int]) -> int:
+                    if result is None:
+                        return -1
+                    else:
+                        return result * 2
+
                 self.assertEqual(
-                    result.convert(
-                        lambda r: results.SingleResult[int](r.result * 2)
-                        if r.result is not None
-                        else results.SingleResult[int](-1)
-                    ),
+                    result.convert(convert),
                     expected,
                 )
 

@@ -3,6 +3,7 @@ from unittest import TestCase
 from pysh.core import lexer, tokens
 
 from pysh.core.parser import results, rules, states
+from pysh.core.parser.rules import scope
 
 
 class NamedResultRuleTest(TestCase):
@@ -15,7 +16,7 @@ class NamedResultRuleTest(TestCase):
             lambda token: int(token.value),
         ).named("value")
         rule = lhs @ rhs
-        state = states.State[int | str](
+        state = states.State(
             tokens.Stream(
                 [
                     tokens.Token("l", "a"),
@@ -23,9 +24,9 @@ class NamedResultRuleTest(TestCase):
                 ]
             )
         )
-        actual = rule(state)
+        actual = rule(state, scope.Scope())
         expected = states.StateAndNamedResult[str | int](
-            states.State[int | str](),
+            states.State(),
             results.NamedResult[str | int](
                 {
                     "name": "a",
@@ -41,8 +42,8 @@ class NamedResultRuleTest(TestCase):
             value: int
 
         self.assertEqual(
-            rule.convert(Decl)(states.State[Decl](state.tokens)),
+            rule.convert(Decl)(state, scope.Scope()),
             states.StateAndSingleResult[Decl](
-                states.State[Decl](), results.SingleResult[Decl](Decl("a", 1))
+                states.State(), results.SingleResult[Decl](Decl("a", 1))
             ),
         )

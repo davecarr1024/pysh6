@@ -24,7 +24,7 @@ class NoResultLiteralTest(TestCase):
         ):
             with self.subTest(token=token):
                 no_result_literal.NoResultLiteral[int](_INT_LEXER_RULE)(
-                    states.State(tokens.Stream([token]))
+                    states.State(tokens.Stream([token])), scope.Scope()
                 )
 
     def test_call_fail(self):
@@ -36,5 +36,5 @@ class NoResultLiteralTest(TestCase):
             with self.subTest(token=token):
                 with self.assertRaises(parser.errors.ParseError):
                     no_result_literal.NoResultLiteral[int](_INT_LEXER_RULE)(
-                        states.State(tokens.Stream([token]))
+                        states.State(tokens.Stream([token])), scope.Scope()
                     )

@@ -114,10 +114,12 @@ class NamedResultTest(TestCase):
             ]
         ):
             with self.subTest(result=result, expected=expected):
+
+                def convert(**results: int) -> int:
+                    return sum(list(results.values()))
+
                 self.assertEqual(
-                    result.convert(
-                        lambda r: results.SingleResult[int](sum(dict(r).values()))
-                    ),
+                    result.convert(convert),
                     expected,
                 )
 

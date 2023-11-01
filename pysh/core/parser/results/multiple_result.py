@@ -1,7 +1,10 @@
 from dataclasses import dataclass, field
-from typing import Iterable, Iterator, Optional, Sequence, Sized, overload
+from typing import Callable, Iterable, Iterator, Optional, Sequence, Sized, overload
+from pysh.core.parser.results import converter_result, error, result, results
 
-from pysh.core.parser.results import error, result, results
+MultipleResultConverterFunc = Callable[
+    [Sequence[result.Result]], converter_result.ConverterResult
+]
 
 
 @dataclass(frozen=True)
@@ -91,6 +94,16 @@ class MultipleResult(results.Results[result.Result], Sized, Iterable[result.Resu
             return named_result.NamedResult(dict(self.named()) | dict(rhs))
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
+
+    def convert(
+        self,
+        func: MultipleResultConverterFunc[
+            result.Result, converter_result.ConverterResult
+        ],
+    ) -> "single_result.SingleResult[converter_result.ConverterResult]":
+        return single_result.SingleResult[converter_result.ConverterResult](
+            func(list(self))
+        )
 
 
 from pysh.core.parser.results import (
