@@ -46,12 +46,14 @@ class SingleResultConverterTest(TestCase):
             ]
         ):
             with self.subTest(state=state, expected=expected):
+
+                def convert(result: str) -> int:
+                    return int(result)
+
                 rule = (
                     token_value.TokenValue(lexer.Rule.load("a"))
                     .single()
-                    .convert(
-                        lambda result: results.SingleResult[int](int(result.result))
-                    )
+                    .convert(convert)
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):

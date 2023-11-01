@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Sequence
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
@@ -59,12 +59,16 @@ class MultipleResultConverterTest(TestCase):
             ]
         ):
             with self.subTest(state=state, expected=expected):
+
+                def convert(results: Sequence[int]) -> int:
+                    return sum(results)
+
                 rule = (
                     single_result_literal.SingleResultLiteral[int](
                         lexer.Rule.load("a"), lambda token: int(token.value)
                     )
                     .one_or_more()
-                    .convert(lambda results_: results.SingleResult[int](sum(results_)))
+                    .convert(convert)
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):

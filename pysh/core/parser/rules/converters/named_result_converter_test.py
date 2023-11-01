@@ -57,8 +57,8 @@ class NamedResultConverterTest(TestCase):
         ):
             with self.subTest(state=state, expected=expected):
 
-                def convert(a: int, b: int) -> results.SingleResult[int]:
-                    return results.SingleResult[int](a + b)
+                def convert(a: int, b: int, **_) -> int:
+                    return a + b
 
                 rule = (
                     single_result_literal.SingleResultLiteral[int](

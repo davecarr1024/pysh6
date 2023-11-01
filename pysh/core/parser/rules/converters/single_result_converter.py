@@ -9,6 +9,9 @@ from pysh.core.parser.rules.converters import converter_result
 from pysh.core.parser.rules.unary_rules import unary_rule
 
 
+SingleResultConverterFunc = Callable[[results.Result], converter_result.ConverterResult]
+
+
 @dataclass(frozen=True)
 class SingleResultConverter(
     Generic[results.Result, converter_result.ConverterResult],
@@ -18,10 +21,7 @@ class SingleResultConverter(
         single_result_rule.SingleResultRule[results.Result],
     ],
 ):
-    func: Callable[
-        [results.SingleResult[results.Result]],
-        results.SingleResult[converter_result.ConverterResult],
-    ]
+    func: SingleResultConverterFunc[results.Result, converter_result.ConverterResult]
 
     def __call__(
         self, state: "states.State[converter_result.ConverterResult]"
@@ -34,7 +34,9 @@ class SingleResultConverter(
         state = states.State[converter_result.ConverterResult](
             state_and_result.state.tokens
         )
-        result = self.func(state_and_result.results)
+        result = results.SingleResult[converter_result.ConverterResult](
+            self.func(state_and_result.results.result)
+        )
         return states.StateAndSingleResult[converter_result.ConverterResult](
             state, result
         )

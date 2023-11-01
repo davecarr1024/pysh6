@@ -98,10 +98,7 @@ class NamedResultRule(rule.Rule[results.Result]):
 
     def convert(
         self,
-        func: Callable[
-            ...,
-            results.SingleResult[converter_result.ConverterResult],
-        ],
+        func: "named_result_converter.NamedResultConverterFunc[results.Result, converter_result.ConverterResult]",
     ) -> "named_result_converter.NamedResultConverter[results.Result,converter_result.ConverterResult]":
         return named_result_converter.NamedResultConverter[
             results.Result, converter_result.ConverterResult

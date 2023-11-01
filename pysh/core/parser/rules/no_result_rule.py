@@ -101,10 +101,7 @@ class NoResultRule(rule.Rule[results.Result]):
 
     def convert(
         self,
-        func: Callable[
-            [results.NoResult[results.Result]],
-            results.SingleResult[converter_result.ConverterResult],
-        ],
+        func: "no_result_converter.NoResultConverterFunc[converter_result.ConverterResult]",
     ) -> "no_result_converter.NoResultConverter[results.Result,converter_result.ConverterResult]":
         return no_result_converter.NoResultConverter[
             results.Result, converter_result.ConverterResult

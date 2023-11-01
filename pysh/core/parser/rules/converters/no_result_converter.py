@@ -9,6 +9,9 @@ from pysh.core.parser.rules.converters import converter_result
 from pysh.core.parser.rules.unary_rules import unary_rule
 
 
+NoResultConverterFunc = Callable[[], converter_result.ConverterResult]
+
+
 @dataclass(frozen=True)
 class NoResultConverter(
     Generic[results.Result, converter_result.ConverterResult],
@@ -17,10 +20,7 @@ class NoResultConverter(
         converter_result.ConverterResult, no_result_rule.NoResultRule[results.Result]
     ],
 ):
-    func: Callable[
-        [results.NoResult[results.Result]],
-        results.SingleResult[converter_result.ConverterResult],
-    ]
+    func: NoResultConverterFunc[converter_result.ConverterResult]
 
     def __call__(
         self, state: "states.State[converter_result.ConverterResult]"
@@ -33,7 +33,7 @@ class NoResultConverter(
         state = states.State[converter_result.ConverterResult](
             state_and_result.state.tokens
         )
-        result = self.func(state_and_result.results)
+        result = results.SingleResult[converter_result.ConverterResult](self.func())
         return states.StateAndSingleResult[converter_result.ConverterResult](
             state, result
         )

@@ -101,10 +101,7 @@ class MultipleResultRule(rule.Rule[results.Result]):
 
     def convert(
         self,
-        func: Callable[
-            [results.MultipleResult[results.Result]],
-            results.SingleResult["converter_result.ConverterResult"],
-        ],
+        func: "multiple_result_converter.MultipleResultConverterFunc[results.Result, converter_result.ConverterResult]",
     ) -> "multiple_result_converter.MultipleResultConverter[results.Result,converter_result.ConverterResult]":
         return multiple_result_converter.MultipleResultConverter[
             results.Result, converter_result.ConverterResult

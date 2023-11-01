@@ -47,9 +47,7 @@ class NoResultConverterTest(TestCase):
         ):
             with self.subTest(state=state, expected=expected):
                 rule = (
-                    token_value.TokenValue(lexer.Rule.load("a"))
-                    .no()
-                    .convert(lambda _: results.SingleResult[int](1))
+                    token_value.TokenValue(lexer.Rule.load("a")).no().convert(lambda: 1)
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):

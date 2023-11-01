@@ -46,14 +46,14 @@ class OptionalResultConverterTest(TestCase):
             ]
         ):
             with self.subTest(state=state, expected=expected):
+
+                def convert(result: Optional[str]) -> int:
+                    return int(result or "0")
+
                 rule = (
                     token_value.TokenValue(lexer.Rule.load("a"))
                     .optional()
-                    .convert(
-                        lambda result: results.SingleResult[int](
-                            int(result.result or "0")
-                        )
-                    )
+                    .convert(convert)
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):

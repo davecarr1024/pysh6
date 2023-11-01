@@ -107,10 +107,7 @@ class OptionalResultRule(rule.Rule[results.Result]):
 
     def convert(
         self,
-        func: Callable[
-            [results.OptionalResult[results.Result]],
-            results.SingleResult[converter_result.ConverterResult],
-        ],
+        func: "optional_result_converter.OptionalResultConverterFunc[results.Result, converter_result.ConverterResult]",
     ) -> "optional_result_converter.OptionalResultConverter[results.Result,converter_result.ConverterResult]":
         return optional_result_converter.OptionalResultConverter[
             results.Result, converter_result.ConverterResult
