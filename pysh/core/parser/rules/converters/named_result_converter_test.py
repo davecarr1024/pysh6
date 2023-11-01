@@ -57,7 +57,7 @@ class NamedResultConverterTest(TestCase):
         ):
             with self.subTest(state=state, expected=expected):
 
-                def convert(a: int, b: int, **_) -> int:
+                def convert(*, a: int, b: int, **_) -> int:
                     return a + b
 
                 rule = (

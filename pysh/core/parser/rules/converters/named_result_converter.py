@@ -8,13 +8,15 @@ from pysh.core.parser.rules import named_result_rule, single_result_rule
 from pysh.core.parser.rules.converters import converter_result
 from pysh.core.parser.rules.unary_rules import unary_rule
 
-_Result = TypeVar("_Result", contravariant=True)
-_ConverterResult = TypeVar("_ConverterResult", covariant=True)
+# _Result = TypeVar("_Result", contravariant=True)
+# _ConverterResult = TypeVar("_ConverterResult", covariant=True)
 
 
-class NamedResultConverterFunc(Protocol, Generic[_Result, _ConverterResult]):
-    def __call__(self, **kwargs: _Result) -> _ConverterResult:
-        ...
+# class NamedResultConverterFunc(Protocol, Generic[_Result, _ConverterResult]):
+#     def __call__(self, **kwargs: _Result) -> _ConverterResult:
+#         ...
+
+NamedResultConverterFunc = Callable[..., converter_result.ConverterResult]
 
 
 @dataclass(frozen=True)
@@ -26,7 +28,7 @@ class NamedResultConverter(
         named_result_rule.NamedResultRule[results.Result],
     ],
 ):
-    func: NamedResultConverterFunc[results.Result, converter_result.ConverterResult]
+    func: NamedResultConverterFunc[converter_result.ConverterResult]
 
     def __call__(
         self, state: "states.State[converter_result.ConverterResult]"

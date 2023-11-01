@@ -1,4 +1,4 @@
 from typing import TypeVar
 
 
-ConverterResult = TypeVar("ConverterResult")
+ConverterResult = TypeVar("ConverterResult", covariant=True)

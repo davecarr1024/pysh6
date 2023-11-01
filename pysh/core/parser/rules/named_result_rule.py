@@ -1,10 +1,12 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Optional, overload
+from typing import Callable, Optional, TypeVar, overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
 from pysh.core.parser.rules.converters import converter_result
+
+_RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
@@ -96,9 +98,14 @@ class NamedResultRule(rule.Rule[results.Result]):
     ) -> "named_result_and.NamedResultAnd[results.Result]":
         return no_result_literal.NoResultLiteral[results.Result].load(lhs) & self
 
+    def __matmul__(
+        self, rhs: "NamedResultRule[_RhsResult]"
+    ) -> "named_result_and.NamedResultAnd[results.Result|_RhsResult]":
+        return named_result_and.NamedResultAnd[results.Result | _RhsResult]([self, rhs])
+
     def convert(
         self,
-        func: "named_result_converter.NamedResultConverterFunc[results.Result, converter_result.ConverterResult]",
+        func: "named_result_converter.NamedResultConverterFunc[converter_result.ConverterResult]",
     ) -> "named_result_converter.NamedResultConverter[results.Result,converter_result.ConverterResult]":
         return named_result_converter.NamedResultConverter[
             results.Result, converter_result.ConverterResult
