@@ -381,3 +381,207 @@ class RulesTest(TestCase):
         ):
             with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
                 self.assertEqual(lhs & rhs, expected)
+
+    def test_or(self) -> None:
+        no_result_rule: rules.NoResultRule[int] = rules.literals.NoResultLiteral[int](
+            lexer.Rule.load("a")
+        )
+        single_result_rule: rules.SingleResultRule[
+            int
+        ] = rules.literals.SingleResultLiteral[int](
+            lexer.Rule.load("a"),
+            lambda token: int(token.value),
+        )
+        optional_result_rule: rules.OptionalResultRule[
+            int
+        ] = rules.literals.OptionalResultLiteral[int](
+            lexer.Rule.load("a"),
+            lambda token: int(token.value),
+        )
+        multiple_result_rule: rules.MultipleResultRule[
+            int
+        ] = rules.ors.MultipleResultOr[int]([single_result_rule, single_result_rule])
+        named_result_rule: rules.NamedResultRule[int] = rules.ors.NamedResultOr[int](
+            [single_result_rule.named("a"), single_result_rule.named("b")]
+        )
+        for lhs, rhs, expected in list[
+            tuple[
+                rules.Rule[int],
+                rules.ors.OrArgs[int],
+                rules.ors.Or[int, rules.Rule[int]],
+            ]
+        ](
+            [
+                (
+                    no_result_rule,
+                    no_result_rule,
+                    rules.ors.NoResultOr[int]([no_result_rule, no_result_rule]),
+                ),
+                (
+                    no_result_rule,
+                    single_result_rule,
+                    rules.ors.OptionalResultOr[int](
+                        [no_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    no_result_rule,
+                    optional_result_rule,
+                    rules.ors.OptionalResultOr[int](
+                        [no_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    no_result_rule,
+                    multiple_result_rule,
+                    rules.ors.MultipleResultOr[int](
+                        [no_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    no_result_rule,
+                    named_result_rule,
+                    rules.ors.NamedResultOr[int]([no_result_rule, named_result_rule]),
+                ),
+                (
+                    single_result_rule,
+                    no_result_rule,
+                    rules.ors.OptionalResultOr[int](
+                        [single_result_rule, no_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    single_result_rule,
+                    rules.ors.SingleResultOr[int](
+                        [single_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    optional_result_rule,
+                    rules.ors.OptionalResultOr[int](
+                        [single_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    multiple_result_rule,
+                    rules.ors.MultipleResultOr[int](
+                        [single_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    named_result_rule,
+                    rules.ors.NamedResultOr[int](
+                        [single_result_rule, named_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    no_result_rule,
+                    rules.ors.OptionalResultOr[int](
+                        [optional_result_rule, no_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    single_result_rule,
+                    rules.ors.OptionalResultOr[int](
+                        [optional_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    optional_result_rule,
+                    rules.ors.OptionalResultOr[int](
+                        [optional_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    multiple_result_rule,
+                    rules.ors.MultipleResultOr[int](
+                        [optional_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    optional_result_rule,
+                    named_result_rule,
+                    rules.ors.NamedResultOr[int](
+                        [optional_result_rule, named_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    no_result_rule,
+                    rules.ors.MultipleResultOr[int](
+                        [multiple_result_rule, no_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    single_result_rule,
+                    rules.ors.MultipleResultOr[int](
+                        [multiple_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    optional_result_rule,
+                    rules.ors.MultipleResultOr[int](
+                        [multiple_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    multiple_result_rule,
+                    rules.ors.MultipleResultOr[int](
+                        [multiple_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    multiple_result_rule,
+                    named_result_rule,
+                    rules.ors.NamedResultOr[int](
+                        [multiple_result_rule, named_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    no_result_rule,
+                    rules.ors.NamedResultOr[int]([named_result_rule, no_result_rule]),
+                ),
+                (
+                    named_result_rule,
+                    single_result_rule,
+                    rules.ors.NamedResultOr[int](
+                        [named_result_rule, single_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    optional_result_rule,
+                    rules.ors.NamedResultOr[int](
+                        [named_result_rule, optional_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    multiple_result_rule,
+                    rules.ors.NamedResultOr[int](
+                        [named_result_rule, multiple_result_rule]
+                    ),
+                ),
+                (
+                    named_result_rule,
+                    named_result_rule,
+                    rules.ors.NamedResultOr[int](
+                        [named_result_rule, named_result_rule]
+                    ),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
+                self.assertEqual(lhs | rhs, expected)

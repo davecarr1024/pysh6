@@ -4,5 +4,5 @@ from pysh.core.parser.rules import child_rule, nary_rule
 
 
 @dataclass(frozen=True)
-class And(nary_rule.NaryRule[results.Result, child_rule.ChildRule]):
+class Or(nary_rule.NaryRule[results.Result, child_rule.ChildRule]):
     ...

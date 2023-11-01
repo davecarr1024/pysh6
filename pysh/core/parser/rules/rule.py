@@ -82,6 +82,47 @@ class Rule(ABC, Generic[results.Result]):
     ) -> "and_.And[results.Result,Rule[results.Result]]":
         ...
 
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "no_result_rule.NoResultRule[results.Result]"
+    ) -> "or_.Or[results.Result,Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "single_result_rule.SingleResultRule[results.Result]"
+    ) -> "or_.Or[results.Result,Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "optional_result_rule.OptionalResultRule[results.Result]"
+    ) -> "or_.Or[results.Result,Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "multiple_result_rule.MultipleResultRule[results.Result]"
+    ) -> "or_.Or[results.Result,Rule[results.Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "named_result_rule.NamedResultRule[results.Result]"
+    ) -> "or_.Or[results.Result,Rule[results.Result]]":
+        ...
+
+    @abstractmethod
+    def __or__(
+        self, rhs: "or_args.OrArgs"
+    ) -> "or_.Or[results.Result,Rule[results.Result]]":
+        ...
+
     @abstractmethod
     def lexer(self) -> lexer_lib.Lexer:
         ...
@@ -141,4 +182,8 @@ from pysh.core.parser.rules.ands import (
     and_,
     and_args,
     rand_args,
+)
+from pysh.core.parser.rules.ors import (
+    or_,
+    or_args,
 )
