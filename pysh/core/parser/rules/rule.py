@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Optional, overload
+from typing import Callable, Generic, Optional, overload
 from pysh.core import lexer as lexer_lib
 from pysh.core.parser import results, states
 
@@ -158,6 +158,12 @@ class Rule(ABC, Generic[results.Result]):
         self,
     ) -> "zero_or_one.ZeroOrOne[results.Result,Rule[results.Result]]":
         return zero_or_one.ZeroOrOne[results.Result, Rule[results.Result]](self)
+
+    @abstractmethod
+    def convert(
+        self, func: Callable[..., results.ConverterResult]
+    ) -> "Rule[results.ConverterResult]":
+        ...
 
     @abstractmethod
     def with_scope(
