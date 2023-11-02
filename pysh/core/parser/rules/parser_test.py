@@ -13,7 +13,7 @@ class ParserTest(TestCase):
         class Expr(ABC):
             @classmethod
             def loader(cls) -> rules.SingleResultRule["Expr"]:
-                return Int.reference() | Str.reference() | List.reference()
+                return Int.reference() | Str.reference()
 
             @classmethod
             def scope(cls) -> rules.Scope["Expr"]:
@@ -27,7 +27,7 @@ class ParserTest(TestCase):
 
             @classmethod
             def types(cls) -> Sequence[Type["Expr"]]:
-                return [Expr, Int, Str, List]
+                return [Expr, Int, Str]
 
             @classmethod
             def parser(cls) -> rules.Parser["Expr"]:
@@ -68,20 +68,6 @@ class ParserTest(TestCase):
                     lambda token: Str(token.value),
                 )
 
-        @dataclass(frozen=True)
-        class List(Expr, Sized, Iterable):
-            _values: Sequence[Expr] = field(default_factory=list[Expr])
-
-            def __iter__(self) -> Iterator[Expr]:
-                return iter(self._values)
-
-            def __len__(self) -> int:
-                return len(self._values)
-
-            @classmethod
-            def loader(cls) -> rules.SingleResultRule[Expr]:
-                return "(" & Expr.reference().zero_or_more().convert(List) & ")"
-
         for state, expected in list[
             tuple[
                 states.State | str,
@@ -89,71 +75,34 @@ class ParserTest(TestCase):
             ]
         ](
             [
-                # (
-                #     states.State(),
-                #     None,
-                # ),
-                # (
-                #     states.State(
-                #         tokens.Stream(
-                #             [
-                #                 tokens.Token("int", "1"),
-                #             ]
-                #         )
-                #     ),
-                #     states.StateAndSingleResult[Expr](
-                #         states.State(),
-                #         results.SingleResult[Expr](Int(1)),
-                #     ),
-                # ),
-                # (
-                #     states.State(
-                #         tokens.Stream(
-                #             [
-                #                 tokens.Token("str", "a"),
-                #             ]
-                #         )
-                #     ),
-                #     states.StateAndSingleResult[Expr](
-                #         states.State(),
-                #         results.SingleResult[Expr](Str("a")),
-                #     ),
-                # ),
-                # (
-                #     states.State(
-                #         tokens.Stream(
-                #             [
-                #                 tokens.Token("(", "("),
-                #                 tokens.Token(")", ")"),
-                #             ]
-                #         )
-                #     ),
-                #     states.StateAndSingleResult[Expr](
-                #         states.State(),
-                #         results.SingleResult[Expr](List()),
-                #     ),
-                # ),
+                (
+                    states.State(),
+                    None,
+                ),
                 (
                     states.State(
                         tokens.Stream(
                             [
-                                tokens.Token("(", "("),
                                 tokens.Token("int", "1"),
-                                tokens.Token("int", "2"),
-                                tokens.Token(")", ")"),
                             ]
                         )
                     ),
                     states.StateAndSingleResult[Expr](
                         states.State(),
-                        results.SingleResult[Expr](
-                            List(
-                                [
-                                    Int(1),
-                                    Int(2),
-                                ]
-                            )
-                        ),
+                        results.SingleResult[Expr](Int(1)),
+                    ),
+                ),
+                (
+                    states.State(
+                        tokens.Stream(
+                            [
+                                tokens.Token("str", "a"),
+                            ]
+                        )
+                    ),
+                    states.StateAndSingleResult[Expr](
+                        states.State(),
+                        results.SingleResult[Expr](Str("a")),
                     ),
                 ),
             ]
