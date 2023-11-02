@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable
 from pysh.core import errors, tokens
 from pysh.core import parser
@@ -11,7 +11,7 @@ from pysh.core.parser.rules.literals import literal
 class SingleResultLiteral(
     literal.Literal[results.Result], single_result_rule.SingleResultRule[results.Result]
 ):
-    func: Callable[[tokens.Token], results.Result]
+    func: Callable[[tokens.Token], results.Result] = field(compare=False, repr=False)
 
     def __call__(
         self, state: "states.State", scope: "scope.Scope[results.Result]"

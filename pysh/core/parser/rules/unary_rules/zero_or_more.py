@@ -19,7 +19,7 @@ class ZeroOrMore(
         results_ = results.MultipleResult[results.Result]()
         while True:
             try:
-                state_and_result = self.child(state, scope)
+                state_and_result = super().__call__(state, scope)
                 state = state_and_result.state
                 results_ |= state_and_result.multiple().results
             except errors.Error:

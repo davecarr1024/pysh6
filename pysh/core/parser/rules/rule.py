@@ -159,6 +159,12 @@ class Rule(ABC, Generic[results.Result]):
     ) -> "zero_or_one.ZeroOrOne[results.Result,Rule[results.Result]]":
         return zero_or_one.ZeroOrOne[results.Result, Rule[results.Result]](self)
 
+    @abstractmethod
+    def with_scope(
+        self, scope: "scope.Scope[results.Result]"
+    ) -> "Rule[results.Result]":
+        ...
+
 
 from pysh.core.parser.rules import (
     no_result_rule,

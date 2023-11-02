@@ -153,11 +153,17 @@ class OptionalResultRule(rule.Rule[results.Result]):
     def convert(
         self,
         func: "results.OptionalResultConverterFunc[results.Result, results.ConverterResult]",
-        scope: Optional["scope.Scope[results.Result]"] = None,
     ) -> "optional_result_converter.OptionalResultConverter[results.Result,results.ConverterResult]":
         return optional_result_converter.OptionalResultConverter[
             results.Result, results.ConverterResult
-        ](self, func, scope=scope)
+        ](self, func)
+
+    def with_scope(
+        self, scope: "scope.Scope[results.Result]"
+    ) -> "OptionalResultRule[results.Result]":
+        return unary_optional_result_rule.UnaryOptionalResultRule[
+            results.Result, OptionalResultRule[results.Result]
+        ](self, scope=scope)
 
 
 from pysh.core.parser import states
@@ -185,3 +191,4 @@ from pysh.core.parser.rules.ors import (
     multiple_result_or,
     named_result_or,
 )
+from pysh.core.parser.rules.unary_rules import unary_optional_result_rule

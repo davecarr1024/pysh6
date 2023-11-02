@@ -10,6 +10,6 @@ class ZeroOrOne(unary_regex.UnaryRegex):
 
     def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
         try:
-            return self.child(state)
+            return super().__call__(state)
         except errors.Error:
             return state, result.Result()

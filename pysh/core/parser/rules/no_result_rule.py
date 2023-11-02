@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Optional, overload
+from typing import overload
 from pysh.core import lexer
 from pysh.core.parser import errors, results
 from pysh.core.parser.rules import rule
@@ -147,13 +147,19 @@ class NoResultRule(rule.Rule[results.Result]):
     def convert(
         self,
         func: "results.NoResultConverterFunc[results.ConverterResult]",
-        scope: Optional["scope_lib.Scope[results.Result]"] = None,
     ) -> (
         "no_result_converter.NoResultConverter[results.Result,results.ConverterResult]"
     ):
         return no_result_converter.NoResultConverter[
             results.Result, results.ConverterResult
-        ](self, func, scope=scope)
+        ](self, func)
+
+    def with_scope(
+        self, scope: "scope_lib.Scope[results.Result]"
+    ) -> "NoResultRule[results.Result]":
+        return unary_no_result_rule.UnaryNoResultRule[
+            results.Result, NoResultRule[results.Result]
+        ](self, scope=scope)
 
 
 from pysh.core.parser import states
@@ -184,3 +190,4 @@ from pysh.core.parser.rules.ors import (
     multiple_result_or,
     named_result_or,
 )
+from pysh.core.parser.rules.unary_rules import unary_no_result_rule

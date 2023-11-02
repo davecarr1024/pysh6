@@ -22,6 +22,6 @@ class NoResultConverter(
         self, state: states.State, scope: scope.Scope[results.ConverterResult]
     ) -> states.StateAndSingleResult[results.ConverterResult]:
         try:
-            return self.child(state, self._scope()).convert(self.func)
+            return self.child(state, self.scope).convert(self.func)
         except errors.Error as error:
             raise parse_error.ParseError(rule=self, state=state, _children=[error])

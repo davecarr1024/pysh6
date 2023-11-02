@@ -151,11 +151,17 @@ class NamedResultRule(rule.Rule[results.Result]):
     def convert(
         self,
         func: "results.NamedResultConverterFunc[results.ConverterResult]",
-        scope: Optional["scope.Scope[results.Result]"] = None,
     ) -> "named_result_converter.NamedResultConverter[results.Result,results.ConverterResult]":
         return named_result_converter.NamedResultConverter[
             results.Result, results.ConverterResult
-        ](self, func, scope=scope)
+        ](self, func)
+
+    def with_scope(
+        self, scope: "scope.Scope[results.Result]"
+    ) -> "NamedResultRule[results.Result]":
+        return unary_named_result_rule.UnaryNamedResultRule[
+            results.Result, NamedResultRule[results.Result]
+        ](self, scope=scope)
 
 
 from pysh.core.parser import states
@@ -179,3 +185,4 @@ from pysh.core.parser.rules.ors import (
     or_args,
     named_result_or,
 )
+from pysh.core.parser.rules.unary_rules import unary_named_result_rule

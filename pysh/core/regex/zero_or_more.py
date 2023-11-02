@@ -12,7 +12,7 @@ class ZeroOrMore(unary_regex.UnaryRegex):
         result_ = result.Result()
         while True:
             try:
-                state, child_result = self.child(state)
+                state, child_result = super().__call__(state)
                 result_ += child_result
             except errors.Error:
                 return state, result_

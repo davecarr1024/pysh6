@@ -144,11 +144,17 @@ class SingleResultRule(rule.Rule[results.Result]):
     def convert(
         self,
         func: "results.SingleResultConverterFunc[results.Result, results.ConverterResult]",
-        scope: Optional["scope.Scope[results.Result]"] = None,
     ) -> "single_result_converter.SingleResultConverter[results.Result,results.ConverterResult]":
         return single_result_converter.SingleResultConverter[
             results.Result, results.ConverterResult
-        ](self, func, scope=scope)
+        ](self, func)
+
+    def with_scope(
+        self, scope: "scope.Scope[results.Result]"
+    ) -> "SingleResultRule[results.Result]":
+        return unary_single_result_rule.UnarySingleResultRule[
+            results.Result, SingleResultRule[results.Result]
+        ](self, scope=scope)
 
 
 from pysh.core.parser import states
@@ -177,3 +183,4 @@ from pysh.core.parser.rules.ors import (
     multiple_result_or,
     named_result_or,
 )
+from pysh.core.parser.rules.unary_rules import unary_single_result_rule

@@ -10,12 +10,12 @@ class OneOrMore(unary_regex.UnaryRegex):
 
     def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
         try:
-            state, result = self.child(state)
+            state, result = super().__call__(state)
         except errors.Error as error_:
             raise nary_error.NaryError(regex=self, state=state, _children=[error_])
         while True:
             try:
-                state, child_result = self.child(state)
+                state, child_result = super().__call__(state)
                 result += child_result
             except errors.Error:
                 return state, result

@@ -149,11 +149,17 @@ class MultipleResultRule(rule.Rule[results.Result]):
     def convert(
         self,
         func: "results.MultipleResultConverterFunc[results.Result, results.ConverterResult]",
-        scope: Optional["scope.Scope[results.Result]"] = None,
     ) -> "multiple_result_converter.MultipleResultConverter[results.Result,results.ConverterResult]":
         return multiple_result_converter.MultipleResultConverter[
             results.Result, results.ConverterResult
-        ](self, func, scope=scope)
+        ](self, func)
+
+    def with_scope(
+        self, scope: "scope.Scope[results.Result]"
+    ) -> "MultipleResultRule[results.Result]":
+        return unary_multiple_result_rule.UnaryMultipleResultRule[
+            results.Result, MultipleResultRule[results.Result]
+        ](self, scope=scope)
 
 
 from pysh.core.parser import states
@@ -181,3 +187,4 @@ from pysh.core.parser.rules.ors import (
     multiple_result_or,
     named_result_or,
 )
+from pysh.core.parser.rules.unary_rules import unary_multiple_result_rule

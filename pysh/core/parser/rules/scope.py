@@ -27,5 +27,8 @@ class Scope(
     def __iter__(self) -> Iterator[str]:
         return iter(self._rules)
 
+    def __or__(self, rhs: "Scope[results.Result]") -> "Scope[results.Result]":
+        return Scope[results.Result](dict(self) | dict(rhs))
+
 
 from pysh.core.parser.rules import single_result_rule

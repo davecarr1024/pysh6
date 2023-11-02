@@ -1,10 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, Optional
 from pysh.core import errors, tokens
 from pysh.core import parser
 from pysh.core.parser import results, states
 from pysh.core.parser.rules import scope, optional_result_rule
-
 from pysh.core.parser.rules.literals import literal
 
 
@@ -13,7 +12,9 @@ class OptionalResultLiteral(
     literal.Literal[results.Result],
     optional_result_rule.OptionalResultRule[results.Result],
 ):
-    func: Callable[[tokens.Token], Optional[results.Result]]
+    func: Callable[[tokens.Token], Optional[results.Result]] = field(
+        compare=False, repr=False
+    )
 
     def __call__(
         self,

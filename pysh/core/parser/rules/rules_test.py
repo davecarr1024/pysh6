@@ -585,3 +585,71 @@ class RulesTest(TestCase):
         ):
             with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
                 self.assertEqual(lhs | rhs, expected)
+
+    def test_with_scope(self) -> None:
+        a: rules.SingleResultRule[int] = rules.literals.SingleResultLiteral[int](
+            lexer.Rule.load("a"), lambda token: int(token.value)
+        )
+        scope: rules.Scope[int] = rules.Scope[int]({"a": a})
+        no_result_rule: rules.NoResultRule[int] = rules.literals.NoResultLiteral[int](
+            lexer.Rule.load("a")
+        )
+        single_result_rule: rules.SingleResultRule[
+            int
+        ] = rules.literals.SingleResultLiteral[int](
+            lexer.Rule.load("a"),
+            lambda token: int(token.value),
+        )
+        optional_result_rule: rules.OptionalResultRule[
+            int
+        ] = rules.literals.OptionalResultLiteral[int](
+            lexer.Rule.load("a"),
+            lambda token: int(token.value),
+        )
+        multiple_result_rule: rules.MultipleResultRule[
+            int
+        ] = rules.ors.MultipleResultOr[int]([single_result_rule, single_result_rule])
+        named_result_rule: rules.NamedResultRule[int] = rules.ors.NamedResultOr[int](
+            [single_result_rule.named("a"), single_result_rule.named("b")]
+        )
+        for rule, expected in list[
+            tuple[
+                rules.Rule[int],
+                rules.Rule[int],
+            ]
+        ](
+            [
+                (
+                    no_result_rule,
+                    rules.unary_rules.UnaryNoResultRule[int, rules.NoResultRule[int]](
+                        no_result_rule, scope=scope
+                    ),
+                ),
+                (
+                    single_result_rule,
+                    rules.unary_rules.UnarySingleResultRule[
+                        int, rules.SingleResultRule[int]
+                    ](single_result_rule, scope=scope),
+                ),
+                (
+                    optional_result_rule,
+                    rules.unary_rules.UnaryOptionalResultRule[
+                        int, rules.OptionalResultRule[int]
+                    ](optional_result_rule, scope=scope),
+                ),
+                (
+                    multiple_result_rule,
+                    rules.unary_rules.UnaryMultipleResultRule[
+                        int, rules.MultipleResultRule[int]
+                    ](multiple_result_rule, scope=scope),
+                ),
+                (
+                    named_result_rule,
+                    rules.unary_rules.UnaryNamedResultRule[
+                        int, rules.NamedResultRule[int]
+                    ](named_result_rule, scope=scope),
+                ),
+            ]
+        ):
+            with self.subTest(rule=rule, expected=expected):
+                self.assertEqual(rule.with_scope(scope), expected)
