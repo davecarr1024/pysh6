@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Generic, Optional, overload
+from typing import Callable, Generic, Optional, Self, overload
 from pysh.core import lexer as lexer_lib
 from pysh.core.parser import results, states
 
@@ -146,18 +146,18 @@ class Rule(ABC, Generic[results.Result]):
 
     def zero_or_more(
         self,
-    ) -> "zero_or_more.ZeroOrMore[results.Result,Rule[results.Result]]":
-        return zero_or_more.ZeroOrMore[results.Result, Rule[results.Result]](self)
+    ) -> "zero_or_more.ZeroOrMore[results.Result,Self]":
+        return zero_or_more.ZeroOrMore[results.Result, Self](self)
 
     def one_or_more(
         self,
-    ) -> "one_or_more.OneOrMore[results.Result,Rule[results.Result]]":
-        return one_or_more.OneOrMore[results.Result, Rule[results.Result]](self)
+    ) -> "one_or_more.OneOrMore[results.Result,Self]":
+        return one_or_more.OneOrMore[results.Result, Self](self)
 
     def zero_or_one(
         self,
-    ) -> "zero_or_one.ZeroOrOne[results.Result,Rule[results.Result]]":
-        return zero_or_one.ZeroOrOne[results.Result, Rule[results.Result]](self)
+    ) -> "zero_or_one.ZeroOrOne[results.Result,Self]":
+        return zero_or_one.ZeroOrOne[results.Result, Self](self)
 
     @abstractmethod
     def convert(
@@ -166,9 +166,7 @@ class Rule(ABC, Generic[results.Result]):
         ...
 
     @abstractmethod
-    def with_scope(
-        self, scope: "scope.Scope[results.Result]"
-    ) -> "Rule[results.Result]":
+    def with_scope(self, scope: "scope.Scope[results.Result]") -> Self:
         ...
 
 
