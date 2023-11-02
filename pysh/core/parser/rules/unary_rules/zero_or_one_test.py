@@ -55,11 +55,9 @@ class ZeroOrOneTest(TestCase):
         ):
             with self.subTest(state=state, expected=expected):
                 self.assertEqual(
-                    zero_or_one.ZeroOrOne(
-                        single_result_literal.SingleResultLiteral[int](
-                            lexer.Rule.load("i"),
-                            lambda token: int(token.value),
-                        )
-                    )(state, scope.Scope()),
+                    single_result_literal.SingleResultLiteral[int](
+                        lexer.Rule.load("i"),
+                        lambda token: int(token.value),
+                    ).zero_or_one()(state, scope.Scope()),
                     expected,
                 )

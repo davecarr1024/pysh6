@@ -64,12 +64,10 @@ class OneOrMoreTest(TestCase):
             ]
         ):
             with self.subTest(state=state, expected=expected):
-                rule = one_or_more.OneOrMore(
-                    single_result_literal.SingleResultLiteral[int](
-                        lexer.Rule.load("i"),
-                        lambda token: int(token.value),
-                    )
-                )
+                rule = single_result_literal.SingleResultLiteral[int](
+                    lexer.Rule.load("i"),
+                    lambda token: int(token.value),
+                ).one_or_more()
                 if expected is None:
                     with self.assertRaises(errors.Error):
                         rule(state, scope.Scope())

@@ -76,11 +76,9 @@ class ZeroOrMoreTest(TestCase):
         ):
             with self.subTest(state=state, expected=expected):
                 self.assertEqual(
-                    zero_or_more.ZeroOrMore(
-                        single_result_literal.SingleResultLiteral[int](
-                            lexer.Rule.load("i"),
-                            lambda token: int(token.value),
-                        )
-                    )(state, scope.Scope()),
+                    single_result_literal.SingleResultLiteral[int](
+                        lexer.Rule.load("i"),
+                        lambda token: int(token.value),
+                    ).zero_or_more()(state, scope.Scope()),
                     expected,
                 )
