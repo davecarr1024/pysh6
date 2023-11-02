@@ -146,11 +146,11 @@ class MultipleResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown or rhs type {type(rhs)}")
 
-    def convert(
+    def convert_type(
         self,
         func: "results.MultipleResultConverterFunc[results.Result, results.ConverterResult]",
-    ) -> "multiple_result_converter.MultipleResultConverter[results.Result,results.ConverterResult]":
-        return multiple_result_converter.MultipleResultConverter[
+    ) -> "multiple_result_type_converter.MultipleResultTypeConverter[results.Result,results.ConverterResult]":
+        return multiple_result_type_converter.MultipleResultTypeConverter[
             results.Result, results.ConverterResult
         ](self, func)
 
@@ -179,7 +179,7 @@ from pysh.core.parser.rules.ands import (
 )
 from pysh.core.parser.rules.literals import no_result_literal
 from pysh.core.parser.rules.converters import (
-    multiple_result_converter,
+    multiple_result_type_converter,
 )
 from pysh.core.parser.rules.ors import (
     or_,

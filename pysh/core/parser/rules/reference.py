@@ -11,7 +11,7 @@ class Reference(single_result_rule.SingleResultRule[results.Result]):
     rule_name: str
 
     def __str__(self) -> str:
-        return repr(self.rule_name)
+        return self.rule_name
 
     def __call__(
         self,

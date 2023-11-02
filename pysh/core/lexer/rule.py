@@ -10,9 +10,9 @@ class Rule:
 
     def __str__(self) -> str:
         if self.name == str(self.regex_):
-            return repr(self.name)
+            return self.name
         else:
-            return f"{self.name}={repr(str(self.regex_))}"
+            return f"{self.name}={self.regex_}"
 
     def __call__(self, state: str | chars.Stream) -> state_and_result.StateAndResult:
         if isinstance(state, str):

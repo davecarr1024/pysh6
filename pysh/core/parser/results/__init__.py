@@ -15,5 +15,8 @@ from pysh.core.parser.results.multiple_result import (
     MultipleResult,
     MultipleResultConverterFunc,
 )
-from pysh.core.parser.results.named_result import NamedResult, NamedResultConverterFunc
+from pysh.core.parser.results.named_result import (
+    NamedResult,
+    NamedResultConverterFunc,
+)
 from pysh.core.parser.results.or_args import OrArgs

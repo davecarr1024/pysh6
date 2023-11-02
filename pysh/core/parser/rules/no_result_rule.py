@@ -144,15 +144,18 @@ class NoResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown or rhs type {type(rhs)}")
 
-    def convert(
+    def convert_type(
         self,
         func: "results.NoResultConverterFunc[results.ConverterResult]",
-    ) -> (
-        "no_result_converter.NoResultConverter[results.Result,results.ConverterResult]"
-    ):
-        return no_result_converter.NoResultConverter[
+    ) -> "no_result_type_converter.NoResultTypeConverter[results.Result,results.ConverterResult]":
+        return no_result_type_converter.NoResultTypeConverter[
             results.Result, results.ConverterResult
         ](self, func)
+
+    def convert(
+        self, func: results.NoResultConverterFunc[results.Result]
+    ) -> "no_result_converter.NoResultConverter[results.Result]":
+        return no_result_converter.NoResultConverter[results.Result](self, func)
 
     def with_scope(
         self, scope: "scope_lib.Scope[results.Result]"
@@ -181,7 +184,10 @@ from pysh.core.parser.rules.ands import (
     named_result_and,
 )
 from pysh.core.parser.rules.literals import no_result_literal
-from pysh.core.parser.rules.converters import no_result_converter
+from pysh.core.parser.rules.converters import (
+    no_result_converter,
+    no_result_type_converter,
+)
 from pysh.core.parser.rules.ors import (
     or_,
     or_args,

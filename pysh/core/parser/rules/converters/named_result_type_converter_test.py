@@ -7,7 +7,7 @@ from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.literals import single_result_literal
 
 
-class NamedResultConverterTest(TestCase):
+class NamedResultTypeConverterTest(TestCase):
     def test_call(self):
         for state, expected in list[
             tuple[
@@ -68,7 +68,7 @@ class NamedResultConverterTest(TestCase):
                     & single_result_literal.SingleResultLiteral[int](
                         lexer.Rule.load("b"), lambda token: int(token.value)
                     ).named("b")
-                ).convert(convert)
+                ).convert_type(convert)
                 if expected is None:
                     with self.assertRaises(errors.Error):
                         rule(state, scope.Scope())

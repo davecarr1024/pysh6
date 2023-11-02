@@ -1,6 +1,5 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Iterable, Iterator, Optional, Sequence, Sized, Type
+from typing import Callable, Iterable, Iterator, Optional, Sequence, Sized, Type
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
@@ -10,10 +9,10 @@ from pysh.core.parser import results, rules, states
 class ParserTest(TestCase):
     def test_call(self) -> None:
         @dataclass(frozen=True)
-        class Expr(ABC):
+        class Expr:
             @classmethod
             def loader(cls) -> rules.SingleResultRule["Expr"]:
-                return Int.reference() | Str.reference()
+                return Int.reference() | Str.reference() | List.reference()
 
             @classmethod
             def scope(cls) -> rules.Scope["Expr"]:
@@ -27,7 +26,7 @@ class ParserTest(TestCase):
 
             @classmethod
             def types(cls) -> Sequence[Type["Expr"]]:
-                return [Expr, Int, Str]
+                return [Expr, Int, Str, List]
 
             @classmethod
             def parser(cls) -> rules.Parser["Expr"]:
@@ -68,6 +67,20 @@ class ParserTest(TestCase):
                     lambda token: Str(token.value),
                 )
 
+        @dataclass(frozen=True)
+        class List(Expr, Sized, Iterable[Expr]):
+            _exprs: Sequence[Expr] = field(default_factory=list[Expr])
+
+            def __iter__(self) -> Iterator[Expr]:
+                return iter(self._exprs)
+
+            def __len__(self) -> int:
+                return len(self._exprs)
+
+            @classmethod
+            def loader(cls) -> rules.SingleResultRule[Expr]:
+                return "(" & Expr.reference().one_or_more().convert_type(List) & ")"
+
         for state, expected in list[
             tuple[
                 states.State | str,
@@ -105,6 +118,31 @@ class ParserTest(TestCase):
                         results.SingleResult[Expr](Str("a")),
                     ),
                 ),
+                (
+                    states.State(
+                        tokens.Stream(
+                            [
+                                tokens.Token("(", "("),
+                            ]
+                        )
+                    ),
+                    None,
+                ),
+                # (
+                #     states.State(
+                #         tokens.Stream(
+                #             [
+                #                 tokens.Token("(", "("),
+                #                 tokens.Token("int", "1"),
+                #                 tokens.Token(")", ")"),
+                #             ]
+                #         )
+                #     ),
+                #     states.StateAndSingleResult[Expr](
+                #         states.State(),
+                #         results.SingleResult[Expr](List([Int(1)])),
+                #     ),
+                # ),
             ]
         ):
             with self.subTest(state=state, expected=expected):

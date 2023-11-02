@@ -7,14 +7,15 @@ from pysh.core.parser.states import state_and_result
 class StateAndNamedResult(state_and_result.StateAndResult[results_lib.Result]):
     results: results_lib.NamedResult[results_lib.Result]
 
-    def convert(
-        self, func: results_lib.NamedResultConverterFunc[results_lib.ConverterResult]
+    def convert_type(
+        self,
+        func: results_lib.NamedResultConverterFunc[results_lib.ConverterResult],
     ) -> "state_and_single_result.StateAndSingleResult[results_lib.ConverterResult]":
         return state_and_single_result.StateAndSingleResult[
             results_lib.ConverterResult
         ](
             self.state,
-            self.results.convert(func),
+            self.results.convert_type(func),
         )
 
 

@@ -1,14 +1,13 @@
-from typing import Optional
+from typing import Optional, Sequence
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 
 from pysh.core.parser import results, states
 from pysh.core.parser.rules import scope
-from pysh.core.parser.rules.converters import single_result_converter
-from pysh.core.parser.rules.literals import token_value
+from pysh.core.parser.rules.literals import single_result_literal
 
 
-class SingleResultConverterTest(TestCase):
+class MultipleResultTypeConverterTest(TestCase):
     def test_call(self):
         for state, expected in list[
             tuple[
@@ -44,17 +43,33 @@ class SingleResultConverterTest(TestCase):
                         results.SingleResult[int](1),
                     ),
                 ),
+                (
+                    states.State(
+                        tokens.Stream(
+                            [
+                                tokens.Token("a", "1"),
+                                tokens.Token("a", "1"),
+                            ]
+                        )
+                    ),
+                    states.StateAndSingleResult[int](
+                        states.State(),
+                        results.SingleResult[int](2),
+                    ),
+                ),
             ]
         ):
             with self.subTest(state=state, expected=expected):
 
-                def convert(result: str) -> int:
-                    return int(result)
+                def convert(results: Sequence[int]) -> int:
+                    return sum(results)
 
                 rule = (
-                    token_value.TokenValue(lexer.Rule.load("a"))
-                    .single()
-                    .convert(convert)
+                    single_result_literal.SingleResultLiteral[int](
+                        lexer.Rule.load("a"), lambda token: int(token.value)
+                    )
+                    .one_or_more()
+                    .convert_type(convert)
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):

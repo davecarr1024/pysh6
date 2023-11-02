@@ -101,7 +101,7 @@ class OptionalResult(results.Results[result_lib.Result]):
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
 
-    def convert(
+    def convert_type(
         self,
         func: OptionalResultConverterFunc[
             result_lib.Result, converter_result.ConverterResult

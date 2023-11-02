@@ -119,7 +119,7 @@ class NamedResultTest(TestCase):
                     return sum(list(results.values()))
 
                 self.assertEqual(
-                    result.convert(convert),
+                    result.convert_type(convert),
                     expected,
                 )
 

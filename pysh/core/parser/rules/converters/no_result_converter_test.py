@@ -1,11 +1,7 @@
 from typing import Optional
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
-
-from pysh.core.parser import results, states
-from pysh.core.parser.rules import scope
-from pysh.core.parser.rules.converters import no_result_converter
-from pysh.core.parser.rules.literals import token_value
+from pysh.core.parser import results, rules, states
 
 
 class NoResultConverterTest(TestCase):
@@ -25,7 +21,19 @@ class NoResultConverterTest(TestCase):
                     states.State(
                         tokens.Stream(
                             [
-                                tokens.Token("b", "2"),
+                                tokens.Token("a", "a"),
+                            ]
+                        )
+                    ),
+                    states.StateAndSingleResult[int](
+                        states.State(), results.SingleResult[int](0)
+                    ),
+                ),
+                (
+                    states.State(
+                        tokens.Stream(
+                            [
+                                tokens.Token("b", "b"),
                             ]
                         )
                     ),
@@ -35,23 +43,30 @@ class NoResultConverterTest(TestCase):
                     states.State(
                         tokens.Stream(
                             [
-                                tokens.Token("a", "1"),
+                                tokens.Token("a", "a"),
+                                tokens.Token("b", "b"),
                             ]
                         )
                     ),
                     states.StateAndSingleResult[int](
-                        states.State(),
-                        results.SingleResult[int](1),
+                        states.State(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        ),
+                        results.SingleResult[int](0),
                     ),
                 ),
             ]
         ):
             with self.subTest(state=state, expected=expected):
-                rule = (
-                    token_value.TokenValue(lexer.Rule.load("a")).no().convert(lambda: 1)
+                rule = rules.literals.NoResultLiteral(lexer.Rule.load("a")).convert(
+                    lambda: 0
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):
-                        rule(state, scope.Scope())
+                        rule(state, rules.Scope())
                 else:
-                    self.assertEqual(rule(state, scope.Scope()), expected)
+                    self.assertEqual(rule(state, rules.Scope()), expected)

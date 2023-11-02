@@ -3,25 +3,25 @@ from typing import Generic
 from pysh.core import errors
 from pysh.core.parser import results, states
 from pysh.core.parser.errors import parse_error
-from pysh.core.parser.rules import optional_result_rule, scope
-from pysh.core.parser.rules.converters import converter
+from pysh.core.parser.rules import no_result_rule, scope
+from pysh.core.parser.rules.converters import type_converter
 
 
 @dataclass(frozen=True)
-class OptionalResultConverter(
+class NoResultTypeConverter(
     Generic[results.Result, results.ConverterResult],
-    converter.Converter[
+    type_converter.TypeConverter[
         results.Result,
         results.ConverterResult,
-        optional_result_rule.OptionalResultRule[results.Result],
+        no_result_rule.NoResultRule[results.Result],
     ],
 ):
-    func: results.OptionalResultConverterFunc[results.Result, results.ConverterResult]
+    func: results.NoResultConverterFunc[results.ConverterResult]
 
     def __call__(
         self, state: states.State, scope: scope.Scope[results.ConverterResult]
     ) -> states.StateAndSingleResult[results.ConverterResult]:
         try:
-            return self.child(state, self.scope).convert(self.func)
+            return self.child(state, self.scope).convert_type(self.func)
         except errors.Error as error:
             raise parse_error.ParseError(rule=self, state=state, _children=[error])

@@ -28,7 +28,7 @@ class NoResultTest(TestCase):
             return 0
 
         self.assertEqual(
-            results.NoResult[int]().convert(convert),
+            results.NoResult[int]().convert_type(convert),
             results.SingleResult[int](0),
         )
 

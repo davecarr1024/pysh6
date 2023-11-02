@@ -141,11 +141,11 @@ class SingleResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown or rhs type {type(rhs)}")
 
-    def convert(
+    def convert_type(
         self,
         func: "results.SingleResultConverterFunc[results.Result, results.ConverterResult]",
-    ) -> "single_result_converter.SingleResultConverter[results.Result,results.ConverterResult]":
-        return single_result_converter.SingleResultConverter[
+    ) -> "single_result_type_converter.SingleResultTypeConverter[results.Result,results.ConverterResult]":
+        return single_result_type_converter.SingleResultTypeConverter[
             results.Result, results.ConverterResult
         ](self, func)
 
@@ -174,7 +174,7 @@ from pysh.core.parser.rules.ands import (
     named_result_and,
 )
 from pysh.core.parser.rules.literals import no_result_literal
-from pysh.core.parser.rules.converters import single_result_converter
+from pysh.core.parser.rules.converters import single_result_type_converter
 from pysh.core.parser.rules.ors import (
     or_,
     or_args,

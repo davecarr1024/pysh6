@@ -31,7 +31,7 @@ class SingleResultTest(TestCase):
             return result * 2
 
         self.assertEqual(
-            results.SingleResult[int](1).convert(convert),
+            results.SingleResult[int](1).convert_type(convert),
             results.SingleResult[int](2),
         )
 

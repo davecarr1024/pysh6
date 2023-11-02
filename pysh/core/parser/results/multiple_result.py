@@ -95,7 +95,7 @@ class MultipleResult(results.Results[result.Result], Sized, Iterable[result.Resu
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
 
-    def convert(
+    def convert_type(
         self,
         func: MultipleResultConverterFunc[
             result.Result, converter_result.ConverterResult

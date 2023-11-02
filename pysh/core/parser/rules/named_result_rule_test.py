@@ -42,7 +42,7 @@ class NamedResultRuleTest(TestCase):
             value: int
 
         self.assertEqual(
-            rule.convert(Decl)(state, scope.Scope()),
+            rule.convert_type(Decl)(state, scope.Scope()),
             states.StateAndSingleResult[Decl](
                 states.State(), results.SingleResult[Decl](Decl("a", 1))
             ),

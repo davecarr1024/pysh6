@@ -98,7 +98,7 @@ class OptionalResultTest(TestCase):
                         return result * 2
 
                 self.assertEqual(
-                    result.convert(convert),
+                    result.convert_type(convert),
                     expected,
                 )
 

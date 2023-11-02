@@ -160,10 +160,16 @@ class Rule(ABC, Generic[results.Result]):
         return zero_or_one.ZeroOrOne[results.Result, Self](self)
 
     @abstractmethod
-    def convert(
+    def convert_type(
         self, func: Callable[..., results.ConverterResult]
-    ) -> "Rule[results.ConverterResult]":
+    ) -> "single_result_rule.SingleResultRule[results.ConverterResult]":
         ...
+
+    # @abstractmethod
+    # def convert(
+    #     self, func: Callable[..., results.Result]
+    # ) -> "single_result_rule.SingleResultRule[results.Result]":
+    #     ...
 
     @abstractmethod
     def with_scope(self, scope: "scope.Scope[results.Result]") -> Self:

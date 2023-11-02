@@ -12,7 +12,7 @@ class Parser(single_result_rule.SingleResultRule[results.Result]):
     root_rule_name: str
 
     def __str__(self) -> str:
-        return f"Parser(root={repr(self.root_rule_name)}, rules={repr({name: str(rule) for name, rule in self.scope.items()})})"
+        return f"Parser(root={repr(self.root_rule_name)}, rules={self.scope})"
 
     def __call__(
         self,

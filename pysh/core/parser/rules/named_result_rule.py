@@ -148,11 +148,11 @@ class NamedResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown or rhs type {type(rhs)}")
 
-    def convert(
+    def convert_type(
         self,
         func: "results.NamedResultConverterFunc[results.ConverterResult]",
-    ) -> "named_result_converter.NamedResultConverter[results.Result,results.ConverterResult]":
-        return named_result_converter.NamedResultConverter[
+    ) -> "named_result_type_converter.NamedResultTypeConverter[results.Result,results.ConverterResult]":
+        return named_result_type_converter.NamedResultTypeConverter[
             results.Result, results.ConverterResult
         ](self, func)
 
@@ -179,7 +179,7 @@ from pysh.core.parser.rules.ands import (
     rand_args,
 )
 from pysh.core.parser.rules.literals import no_result_literal
-from pysh.core.parser.rules.converters import named_result_converter
+from pysh.core.parser.rules.converters import named_result_type_converter
 from pysh.core.parser.rules.ors import (
     or_,
     or_args,

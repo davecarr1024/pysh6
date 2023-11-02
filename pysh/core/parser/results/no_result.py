@@ -60,7 +60,7 @@ class NoResult(results.Results[result.Result]):
     ) -> "results.Results[result.Result]":
         return rhs
 
-    def convert(
+    def convert_type(
         self, func: NoResultConverterFunc[converter_result.ConverterResult]
     ) -> "single_result.SingleResult[converter_result.ConverterResult]":
         return single_result.SingleResult[converter_result.ConverterResult](func())

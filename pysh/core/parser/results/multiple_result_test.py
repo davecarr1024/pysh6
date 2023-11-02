@@ -98,7 +98,7 @@ class MultipleResultTest(TestCase):
         ):
             with self.subTest(result=result, expected=expected):
                 self.assertEqual(
-                    result.convert(sum),
+                    result.convert_type(sum),
                     expected,
                 )
 

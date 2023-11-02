@@ -99,7 +99,7 @@ class NamedResult(results.Results[result.Result], Mapping[str, result.Result]):
         else:
             raise error.Error(result=self, msg="unknown results rhs {rhs}")
 
-    def convert(
+    def convert_type(
         self, func: NamedResultConverterFunc[converter_result.ConverterResult]
     ) -> "single_result.SingleResult[converter_result.ConverterResult]":
         return single_result.SingleResult[converter_result.ConverterResult](

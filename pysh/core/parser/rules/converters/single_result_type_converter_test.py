@@ -1,14 +1,12 @@
 from typing import Optional
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
-
 from pysh.core.parser import results, states
 from pysh.core.parser.rules import scope
-from pysh.core.parser.rules.converters import optional_result_converter
 from pysh.core.parser.rules.literals import token_value
 
 
-class OptionalResultConverterTest(TestCase):
+class SingleResultTypeConverterTest(TestCase):
     def test_call(self):
         for state, expected in list[
             tuple[
@@ -48,13 +46,13 @@ class OptionalResultConverterTest(TestCase):
         ):
             with self.subTest(state=state, expected=expected):
 
-                def convert(result: Optional[str]) -> int:
-                    return int(result or "0")
+                def convert(result: str) -> int:
+                    return int(result)
 
                 rule = (
                     token_value.TokenValue(lexer.Rule.load("a"))
-                    .optional()
-                    .convert(convert)
+                    .single()
+                    .convert_type(convert)
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):

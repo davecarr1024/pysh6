@@ -150,11 +150,11 @@ class OptionalResultRule(rule.Rule[results.Result]):
         else:
             raise errors.RuleError(rule=self, msg=f"unknown or rhs type {type(rhs)}")
 
-    def convert(
+    def convert_type(
         self,
         func: "results.OptionalResultConverterFunc[results.Result, results.ConverterResult]",
-    ) -> "optional_result_converter.OptionalResultConverter[results.Result,results.ConverterResult]":
-        return optional_result_converter.OptionalResultConverter[
+    ) -> "optional_result_type_converter.OptionalResultTypeConverter[results.Result,results.ConverterResult]":
+        return optional_result_type_converter.OptionalResultTypeConverter[
             results.Result, results.ConverterResult
         ](self, func)
 
@@ -183,7 +183,7 @@ from pysh.core.parser.rules.ands import (
     rand_args,
 )
 from pysh.core.parser.rules.literals import no_result_literal
-from pysh.core.parser.rules.converters import optional_result_converter
+from pysh.core.parser.rules.converters import optional_result_type_converter
 from pysh.core.parser.rules.ors import (
     or_,
     or_args,

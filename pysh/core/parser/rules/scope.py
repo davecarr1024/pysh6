@@ -14,6 +14,9 @@ class Scope(
         ]()
     )
 
+    def __str__(self) -> str:
+        return f'{{{", ".join([f"{name}: {str(rule)}" for name, rule in self._rules.items()])}}}'
+
     def __getitem__(
         self, key: str
     ) -> "single_result_rule.SingleResultRule[results.Result]":
