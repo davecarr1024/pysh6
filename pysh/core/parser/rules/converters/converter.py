@@ -13,5 +13,8 @@ class Converter(
 ):
     scope: Optional[scope_lib.Scope[results.Result]] = field(default=None, kw_only=True)
 
+    def __str__(self) -> str:
+        return str(self.child)
+
     def _scope(self) -> scope_lib.Scope[results.Result]:
         return self.scope or scope_lib.Scope[results.Result]()

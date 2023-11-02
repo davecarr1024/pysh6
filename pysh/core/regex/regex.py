@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from pysh.core import chars
-from pysh.core.regex import state_and_result
+from pysh.core.regex import and_, state_and_result
 
 
 class Regex(ABC):
@@ -23,4 +23,7 @@ class Regex(ABC):
 
     @staticmethod
     def load(value: str) -> "Regex":
-        return Regex.literal(value)
+        if len(value) > 1:
+            return and_.And([Regex.literal(c) for c in value])
+        else:
+            return Regex.literal(value)

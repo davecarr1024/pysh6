@@ -1,8 +1,7 @@
 from typing import Optional
 from unittest import TestCase
-from pysh.core import lexer, tokens
-
-from pysh.core.parser import errors, results, states
+from pysh.core import errors, lexer, tokens
+from pysh.core.parser import results, states
 from pysh.core.parser.rules import scope
 from pysh.core.parser.rules.literals import single_result_literal
 
@@ -81,12 +80,13 @@ class SingleResultLiteralTest(TestCase):
                         raise errors.Error(msg=f"{error}")
 
                 rule = single_result_literal.SingleResultLiteral[int](
-                    lexer.Rule.load("int", "a"),
+                    lexer.Rule.load("int"),
                     convert_int,
                 )
                 if expected is None:
                     with self.assertRaises(errors.Error):
                         rule(state, scope.Scope())
+                        assert 0
                 else:
                     self.assertEqual(
                         rule(state, scope.Scope()),

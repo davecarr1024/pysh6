@@ -7,6 +7,9 @@ from pysh.core.parser.errors import error
 class State:
     tokens: tokens_lib.Stream = field(default_factory=tokens_lib.Stream)
 
+    def __str__(self) -> str:
+        return str(self.tokens)
+
     def tail(self) -> "State":
         try:
             return State(self.tokens.tail())

@@ -11,11 +11,8 @@ class Parser(single_result_rule.SingleResultRule[results.Result]):
     scope: scope_lib.Scope[results.Result]
     root_rule_name: str
 
-    def lexer(self) -> lexer.Lexer:
-        lexer_ = lexer.Lexer()
-        for rule in self.scope.values():
-            lexer_ |= rule.lexer()
-        return lexer_
+    def __str__(self) -> str:
+        return f"Parser(root={repr(self.root_rule_name)}, rules={repr({name: str(rule) for name, rule in self.scope.items()})})"
 
     def __call__(
         self,
@@ -34,3 +31,9 @@ class Parser(single_result_rule.SingleResultRule[results.Result]):
             return self.scope[rule_name](state, scope)
         except errors.Error as error:
             raise parse_error.ParseError(rule=self, state=state, _children=[error])
+
+    def lexer(self) -> lexer.Lexer:
+        lexer_ = lexer.Lexer()
+        for rule in self.scope.values():
+            lexer_ |= rule.lexer()
+        return lexer_

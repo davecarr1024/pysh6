@@ -10,6 +10,9 @@ class ZeroOrOne(
     unary_rule.UnaryRule[results.Result, child_rule.ChildRule],
     optional_result_rule.OptionalResultRule[results.Result],
 ):
+    def __str__(self) -> str:
+        return f"{self.child}?"
+
     def __call__(
         self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndOptionalResult[results.Result]":

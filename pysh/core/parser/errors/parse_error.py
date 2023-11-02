@@ -1,13 +1,19 @@
 from dataclasses import dataclass
 from pysh.core import errors
-from pysh.core.parser import results
-from pysh.core.parser.errors import error, rule_error, state_error
+from pysh.core.parser import states
+from pysh.core.parser.errors import error
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, repr=False)
 class ParseError(
-    state_error.StateError,
-    rule_error.RuleError[results.Result],
-    errors.NaryError[errors.Error],
+    errors.NaryError,
+    error.Error,
 ):
-    ...
+    rule: "rules.Rule"
+    state: states.State
+
+    def _repr_line(self) -> str:
+        return f"ParseError(rule={self.rule},state={self.state},msg={self.msg})"
+
+
+from pysh.core.parser import rules

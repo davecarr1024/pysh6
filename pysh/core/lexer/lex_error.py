@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pysh.core import chars, errors
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, repr=False)
 class LexError(errors.NaryError):
     lexer_: "lexer.Lexer"
     state: chars.Stream

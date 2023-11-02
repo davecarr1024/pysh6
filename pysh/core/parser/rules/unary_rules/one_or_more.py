@@ -11,6 +11,9 @@ class OneOrMore(
     unary_rule.UnaryRule[results.Result, child_rule.ChildRule],
     multiple_result_rule.MultipleResultRule[results.Result],
 ):
+    def __str__(self) -> str:
+        return f"{self.child}+"
+
     def __call__(
         self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndMultipleResult[results.Result]":

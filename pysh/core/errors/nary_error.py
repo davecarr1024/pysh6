@@ -1,20 +1,17 @@
 from dataclasses import dataclass, field
-from typing import Generic, Iterable, Iterator, Sequence, Sized
-from pysh.core.errors import child_error, error
+from typing import Iterable, Iterator, Sequence, Sized
+from pysh.core.errors import error
 
 
 @dataclass(kw_only=True, repr=False)
 class NaryError(
     error.Error,
-    Generic[child_error.ChildError],
     Sized,
-    Iterable[child_error.ChildError],
+    Iterable[error.Error],
 ):
-    _children: Sequence[child_error.ChildError] = field(
-        default_factory=list[child_error.ChildError]
-    )
+    _children: Sequence[error.Error] = field(default_factory=list[error.Error])
 
-    def __iter__(self) -> Iterator[child_error.ChildError]:
+    def __iter__(self) -> Iterator[error.Error]:
         return iter(self._children)
 
     def __len__(self) -> int:

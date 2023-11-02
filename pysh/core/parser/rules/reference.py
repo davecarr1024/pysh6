@@ -10,6 +10,9 @@ from pysh.core.parser.rules import scope, single_result_rule
 class Reference(single_result_rule.SingleResultRule[results.Result]):
     rule_name: str
 
+    def __str__(self) -> str:
+        return repr(self.rule_name)
+
     def __call__(
         self,
         state: states.State,

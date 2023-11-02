@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 from pysh.core.parser import errors, results, states
-
 from pysh.core.parser.rules import no_result_rule, scope, optional_result_rule
 from pysh.core.parser.rules.ands import and_
 
@@ -27,8 +26,8 @@ class OptionalResultAnd(
         for child in self:
             try:
                 child_state_and_result = child(state, scope)
-            except errors.Error as child_error:
-                raise errors.ParseError(rule=self, state=state, _children=[child_error])
+            except errors.Error as error:
+                raise errors.ParseError(rule=self, state=state, _children=[error])
             state = child_state_and_result.state
             child_result = child_state_and_result.optional().results.result
             if child_result is not None:

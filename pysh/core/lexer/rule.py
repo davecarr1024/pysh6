@@ -10,9 +10,9 @@ class Rule:
 
     def __str__(self) -> str:
         if self.name == str(self.regex_):
-            return self.name
+            return repr(self.name)
         else:
-            return f"{self.name}={self.regex_}"
+            return f"{self.name}={repr(str(self.regex_))}"
 
     def __call__(self, state: str | chars.Stream) -> state_and_result.StateAndResult:
         if isinstance(state, str):
@@ -26,7 +26,7 @@ class Rule:
     @staticmethod
     def load(rule_name: str, regex_: str | regex.Regex | None = None) -> "Rule":
         if regex_ is None:
-            regex_ = regex.Literal(rule_name)
+            regex_ = regex.Regex.load(rule_name)
         if isinstance(regex_, str):
             regex_ = regex.Regex.load(regex_)
         return Rule(rule_name, regex_)

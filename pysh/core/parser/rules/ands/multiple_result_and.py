@@ -22,8 +22,8 @@ class MultipleResultAnd(
         for child in self:
             try:
                 child_state_and_result = child(state, scope)
-            except errors.Error as child_error:
-                raise errors.ParseError(rule=self, state=state, _children=[child_error])
+            except errors.Error as error:
+                raise errors.ParseError(rule=self, state=state, _children=[error])
             state = child_state_and_result.state
             results_ |= child_state_and_result.results.multiple()
         return states.StateAndMultipleResult[results.Result](state, results_)
