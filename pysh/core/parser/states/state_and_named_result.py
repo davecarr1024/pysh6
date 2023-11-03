@@ -18,5 +18,13 @@ class StateAndNamedResult(state_and_result.StateAndResult[results_lib.Result]):
             self.results.convert_type(func),
         )
 
+    def convert(
+        self,
+        func: results_lib.NamedResultConverterFunc[results_lib.Result],
+    ) -> "state_and_single_result.StateAndSingleResult[results_lib.Result]":
+        return state_and_single_result.StateAndSingleResult[results_lib.Result](
+            self.state, self.results.convert(func)
+        )
+
 
 from pysh.core.parser.states import state_and_single_result

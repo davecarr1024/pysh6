@@ -80,7 +80,7 @@ class OptionalResultTest(TestCase):
                 else:
                     self.assertEqual(result.named("a"), expected)
 
-    def test_convert(self):
+    def test_convert_type(self):
         for result, expected in list[
             tuple[results.OptionalResult[int], results.SingleResult[int]]
         ](
@@ -99,6 +99,28 @@ class OptionalResultTest(TestCase):
 
                 self.assertEqual(
                     result.convert_type(convert),
+                    expected,
+                )
+
+    def test_convert(self):
+        for result, expected in list[
+            tuple[results.OptionalResult[int], results.SingleResult[int]]
+        ](
+            [
+                (results.OptionalResult[int](), results.SingleResult[int](-1)),
+                (results.OptionalResult[int](1), results.SingleResult[int](2)),
+            ]
+        ):
+            with self.subTest(result=result, expected=expected):
+
+                def convert(result: Optional[int]) -> int:
+                    if result is None:
+                        return -1
+                    else:
+                        return result * 2
+
+                self.assertEqual(
+                    result.convert(convert),
                     expected,
                 )
 

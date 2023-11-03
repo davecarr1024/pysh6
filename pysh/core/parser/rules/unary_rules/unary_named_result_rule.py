@@ -2,12 +2,12 @@ from dataclasses import dataclass
 from typing import Optional
 from pysh.core.parser import results, states
 from pysh.core.parser.rules import child_rule, named_result_rule, scope
-from pysh.core.parser.rules.unary_rules import unary_rule_with_scope
+from pysh.core.parser.rules.unary_rules import unary_rule
 
 
 @dataclass(frozen=True)
 class UnaryNamedResultRule(
-    unary_rule_with_scope.UnaryRuleWithScope[results.Result, child_rule.ChildRule],
+    unary_rule.UnaryRule[results.Result, child_rule.ChildRule],
     named_result_rule.NamedResultRule[results.Result],
 ):
     name: Optional[str] = None
@@ -15,4 +15,4 @@ class UnaryNamedResultRule(
     def __call__(
         self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndNamedResult[results.Result]":
-        return super().__call__(state, scope | self.scope).named(self.name)
+        return self._call(state, scope).named(self.name)

@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Generic, Optional, Self, overload
-
-from pysh.core.parser.results import result
+from typing import Callable, Generic, Optional, overload
+from pysh.core.parser.results import converter_result, result
 
 
 @dataclass(frozen=True)
@@ -69,6 +68,18 @@ class Results(ABC, Generic[result.Result]):
         self,
         rhs: "or_args.OrArgs",
     ) -> "Results[result.Result]":
+        ...
+
+    @abstractmethod
+    def convert(
+        self, func: Callable[..., result.Result]
+    ) -> "single_result.SingleResult[result.Result]":
+        ...
+
+    @abstractmethod
+    def convert_type(
+        self, func: Callable[..., converter_result.ConverterResult]
+    ) -> "single_result.SingleResult[converter_result.ConverterResult]":
         ...
 
 

@@ -144,10 +144,17 @@ class SingleResultRule(rule.Rule[results.Result]):
     def convert_type(
         self,
         func: "results.SingleResultConverterFunc[results.Result, results.ConverterResult]",
-    ) -> "single_result_type_converter.SingleResultTypeConverter[results.Result,results.ConverterResult]":
-        return single_result_type_converter.SingleResultTypeConverter[
+    ) -> "converters.SingleResultTypeConverter[results.Result,results.ConverterResult]":
+        return converters.SingleResultTypeConverter[
             results.Result, results.ConverterResult
         ](self, func)
+
+    def convert(
+        self,
+        func: "results.SingleResultConverterFunc[results.Result,results.Result]",
+        scope: Optional["scope.Scope[results.Result]"] = None,
+    ) -> "converters.SingleResultConverter[results.Result]":
+        return converters.SingleResultConverter[results.Result](self, func, scope=scope)
 
     def with_scope(
         self, scope: "scope.Scope[results.Result]"
@@ -174,7 +181,7 @@ from pysh.core.parser.rules.ands import (
     named_result_and,
 )
 from pysh.core.parser.rules.literals import no_result_literal
-from pysh.core.parser.rules.converters import single_result_type_converter
+from pysh.core.parser.rules import converters
 from pysh.core.parser.rules.ors import (
     or_,
     or_args,

@@ -23,12 +23,18 @@ class NoResultTest(TestCase):
     def test_named(self):
         self.assertEqual(results.NoResult[int]().named("a"), results.NamedResult[int]())
 
-    def test_convert(self) -> None:
+    def test_convert_type(self) -> None:
         def convert() -> int:
             return 0
 
         self.assertEqual(
             results.NoResult[int]().convert_type(convert),
+            results.SingleResult[int](0),
+        )
+
+    def test_convert(self) -> None:
+        self.assertEqual(
+            results.NoResult[int]().convert(lambda: 0),
             results.SingleResult[int](0),
         )
 

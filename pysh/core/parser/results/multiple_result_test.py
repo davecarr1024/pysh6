@@ -86,7 +86,7 @@ class MultipleResultTest(TestCase):
             with self.subTest(results=result, expected=expected):
                 self.assertEqual(result.named("a"), expected)
 
-    def test_convert(self):
+    def test_convert_type(self):
         for result, expected in list[
             tuple[results.MultipleResult[int], results.SingleResult[int]]
         ](
@@ -99,6 +99,22 @@ class MultipleResultTest(TestCase):
             with self.subTest(result=result, expected=expected):
                 self.assertEqual(
                     result.convert_type(sum),
+                    expected,
+                )
+
+    def test_convert(self):
+        for result, expected in list[
+            tuple[results.MultipleResult[int], results.SingleResult[int]]
+        ](
+            [
+                (results.MultipleResult[int](), results.SingleResult[int](0)),
+                (results.MultipleResult[int]([1]), results.SingleResult[int](1)),
+                (results.MultipleResult[int]([1, 2]), results.SingleResult[int](3)),
+            ]
+        ):
+            with self.subTest(result=result, expected=expected):
+                self.assertEqual(
+                    result.convert(sum),
                     expected,
                 )
 

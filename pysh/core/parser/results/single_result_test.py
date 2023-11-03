@@ -26,12 +26,18 @@ class SingleResultTest(TestCase):
             results.SingleResult[int](0).named("a"), results.NamedResult[int]({"a": 0})
         )
 
-    def test_convert(self):
+    def test_convert_type(self) -> None:
         def convert(result: int) -> int:
             return result * 2
 
         self.assertEqual(
             results.SingleResult[int](1).convert_type(convert),
+            results.SingleResult[int](2),
+        )
+
+    def test_convert(self) -> None:
+        self.assertEqual(
+            results.SingleResult[int](1).convert(lambda result: result * 2),
             results.SingleResult[int](2),
         )
 

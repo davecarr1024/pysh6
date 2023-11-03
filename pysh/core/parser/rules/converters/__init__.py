@@ -14,3 +14,6 @@ from pysh.core.parser.rules.converters.named_result_type_converter import (
     NamedResultTypeConverter,
 )
 from pysh.core.parser.rules.converters.no_result_converter import NoResultConverter
+from pysh.core.parser.rules.converters.single_result_converter import (
+    SingleResultConverter,
+)

@@ -1,5 +1,8 @@
 from typing import Optional
 from unittest import TestCase
+
+from pyparsing import str_type
+from pysh.core import errors
 from pysh.core.parser import results
 
 
@@ -100,28 +103,81 @@ class NamedResultTest(TestCase):
                 else:
                     self.assertEqual(result.named("a"), expected)
 
-    def test_convert(self):
+    def test_convert_type(self):
         for result, expected in list[
-            tuple[results.NamedResult[int], results.SingleResult[int]]
+            tuple[results.NamedResult[str], Optional[results.SingleResult[int]]]
         ](
             [
-                (results.NamedResult[int](), results.SingleResult[int](0)),
-                (results.NamedResult[int]({"a": 1}), results.SingleResult[int](1)),
                 (
-                    results.NamedResult[int]({"a": 1, "b": 2}),
-                    results.SingleResult[int](3),
+                    results.NamedResult[str](),
+                    None,
+                ),
+                (
+                    results.NamedResult[str]({"a": "1"}),
+                    None,
+                ),
+                (
+                    results.NamedResult[str]({"b": "2"}),
+                    None,
+                ),
+                (
+                    results.NamedResult[str]({"a": "1", "b": "2"}),
+                    results.SingleResult[int](12),
+                ),
+                (
+                    results.NamedResult[str]({"a": "1", "b": "2", "c": "3"}),
+                    None,
                 ),
             ]
         ):
             with self.subTest(result=result, expected=expected):
 
-                def convert(**results: int) -> int:
-                    return sum(list(results.values()))
+                def convert_type(a: str, b: str) -> int:
+                    return int(a) * 10 + int(b)
 
-                self.assertEqual(
-                    result.convert_type(convert),
-                    expected,
-                )
+                if expected is None:
+                    with self.assertRaises(errors.Error):
+                        result.convert_type(convert_type)
+                else:
+                    self.assertEqual(result.convert_type(convert_type), expected)
+
+    def test_convert(self):
+        for result, expected in list[
+            tuple[results.NamedResult[int], Optional[results.SingleResult[int]]]
+        ](
+            [
+                (
+                    results.NamedResult[int](),
+                    None,
+                ),
+                (
+                    results.NamedResult[int]({"a": 1}),
+                    None,
+                ),
+                (
+                    results.NamedResult[int]({"b": 2}),
+                    None,
+                ),
+                (
+                    results.NamedResult[int]({"a": 1, "b": 2}),
+                    results.SingleResult[int](12),
+                ),
+                (
+                    results.NamedResult[int]({"a": 1, "b": 2, "c": 3}),
+                    None,
+                ),
+            ]
+        ):
+            with self.subTest(result=result, expected=expected):
+
+                def convert(a: int, b: int) -> int:
+                    return a * 10 + b
+
+                if expected is None:
+                    with self.assertRaises(errors.Error):
+                        result.convert(convert)
+                else:
+                    self.assertEqual(result.convert(convert), expected)
 
     def test_or(self):
         for lhs, rhs, expected in list[

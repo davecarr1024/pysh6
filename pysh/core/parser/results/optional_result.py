@@ -111,6 +111,11 @@ class OptionalResult(results.Results[result_lib.Result]):
             func(self.result)
         )
 
+    def convert(
+        self, func: OptionalResultConverterFunc[result_lib.Result, result_lib.Result]
+    ) -> "single_result.SingleResult[result_lib.Result]":
+        return single_result.SingleResult[result_lib.Result](func(self.result))
+
 
 from pysh.core.parser.results import (
     or_args,

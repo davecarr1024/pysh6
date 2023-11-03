@@ -17,7 +17,7 @@ class ZeroOrOne(
         self, state: "states.State", scope: "scope.Scope[results.Result]"
     ) -> "states.StateAndOptionalResult[results.Result]":
         try:
-            return super().__call__(state, scope).optional()
+            return self._call(state, scope).optional()
         except errors.Error:
             return states.StateAndOptionalResult[results.Result](
                 state, results.OptionalResult[results.Result]()

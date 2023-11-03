@@ -65,6 +65,11 @@ class NoResult(results.Results[result.Result]):
     ) -> "single_result.SingleResult[converter_result.ConverterResult]":
         return single_result.SingleResult[converter_result.ConverterResult](func())
 
+    def convert(
+        self, func: NoResultConverterFunc[result.Result]
+    ) -> "single_result.SingleResult[result.Result]":
+        return single_result.SingleResult[result.Result](func())
+
 
 from pysh.core.parser.results import (
     or_args,

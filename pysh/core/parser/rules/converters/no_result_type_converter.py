@@ -11,7 +11,6 @@ from pysh.core.parser.rules.converters import type_converter
 class NoResultTypeConverter(
     Generic[results.Result, results.ConverterResult],
     type_converter.TypeConverter[
-        results.Result,
         results.ConverterResult,
         no_result_rule.NoResultRule[results.Result],
     ],
@@ -22,6 +21,8 @@ class NoResultTypeConverter(
         self, state: states.State, scope: scope.Scope[results.ConverterResult]
     ) -> states.StateAndSingleResult[results.ConverterResult]:
         try:
-            return self.child(state, self.scope).convert_type(self.func)
+            return self._call(state, scope.Scope[results.Result]()).convert_type(
+                self.func
+            )
         except errors.Error as error:
             raise parse_error.ParseError(rule=self, state=state, _children=[error])

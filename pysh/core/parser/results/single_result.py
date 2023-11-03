@@ -96,6 +96,11 @@ class SingleResult(results.Results[result_lib.Result]):
     ) -> "SingleResult[converter_result.ConverterResult]":
         return SingleResult[converter_result.ConverterResult](func(self.result))
 
+    def convert(
+        self, func: SingleResultConverterFunc[result_lib.Result, result_lib.Result]
+    ) -> "SingleResult[result_lib.Result]":
+        return SingleResult[result_lib.Result](func(self.result))
+
 
 from pysh.core.parser.results import (
     or_args,

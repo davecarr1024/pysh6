@@ -16,3 +16,13 @@ class StateAndSingleResult(state_and_result.StateAndResult[results_lib.Result]):
         return StateAndSingleResult[results_lib.ConverterResult](
             self.state, self.results.convert_type(func)
         )
+
+    def convert(
+        self,
+        func: results_lib.SingleResultConverterFunc[
+            results_lib.Result, results_lib.Result
+        ],
+    ) -> "StateAndSingleResult[results_lib.Result]":
+        return StateAndSingleResult[results_lib.Result](
+            self.state, self.results.convert(func)
+        )

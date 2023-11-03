@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Callable, Iterator, Mapping, Optional, overload
+from pysh.core import errors
 from pysh.core.parser.results import converter_result, error, result, results
 
 NamedResultConverterFunc = Callable[..., converter_result.ConverterResult]
@@ -102,9 +103,24 @@ class NamedResult(results.Results[result.Result], Mapping[str, result.Result]):
     def convert_type(
         self, func: NamedResultConverterFunc[converter_result.ConverterResult]
     ) -> "single_result.SingleResult[converter_result.ConverterResult]":
-        return single_result.SingleResult[converter_result.ConverterResult](
-            func(**dict(self))
-        )
+        try:
+            return single_result.SingleResult[converter_result.ConverterResult](
+                func(**dict(self))
+            )
+        except errors.Error as error:
+            raise errors.UnaryError(child=error, msg="failed to convert NamedResult")
+        except Exception as error:
+            raise errors.Error(msg=f"failed ot convert NamedResult: {error}")
+
+    def convert(
+        self, func: NamedResultConverterFunc[result.Result]
+    ) -> "single_result.SingleResult[result.Result]":
+        try:
+            return single_result.SingleResult[result.Result](func(**dict(self)))
+        except errors.Error as error:
+            raise errors.UnaryError(child=error, msg="failed to convert NamedResult")
+        except Exception as error:
+            raise errors.Error(msg=f"failed ot convert NamedResult: {error}")
 
 
 from pysh.core.parser.results import (

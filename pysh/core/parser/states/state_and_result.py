@@ -1,12 +1,12 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Optional
+from typing import Callable, Generic, Optional
 from pysh.core.parser import results as results_lib
-
 from pysh.core.parser.states import state as state_lib
 
 
 @dataclass(frozen=True)
-class StateAndResult(Generic[results_lib.Result]):
+class StateAndResult(Generic[results_lib.Result], ABC):
     state: state_lib.State
     results: results_lib.Results[results_lib.Result]
 
@@ -44,6 +44,18 @@ class StateAndResult(Generic[results_lib.Result]):
         return state_and_named_result.StateAndNamedResult[results_lib.Result](
             self.state, self.results.named(name)
         )
+
+    @abstractmethod
+    def convert(
+        self, func: Callable[..., results_lib.Result]
+    ) -> "StateAndResult[results_lib.Result]":
+        ...
+
+    @abstractmethod
+    def convert_type(
+        self, func: Callable[..., results_lib.ConverterResult]
+    ) -> "StateAndResult[results_lib.ConverterResult]":
+        ...
 
 
 from pysh.core.parser.states import (

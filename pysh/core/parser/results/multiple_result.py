@@ -105,6 +105,11 @@ class MultipleResult(results.Results[result.Result], Sized, Iterable[result.Resu
             func(list(self))
         )
 
+    def convert(
+        self, func: MultipleResultConverterFunc[result.Result, result.Result]
+    ) -> "single_result.SingleResult[result.Result]":
+        return single_result.SingleResult[result.Result](func(list(self)))
+
 
 from pysh.core.parser.results import (
     or_args,
