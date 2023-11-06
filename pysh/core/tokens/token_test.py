@@ -1,7 +1,7 @@
 from typing import Optional, Sequence
 from unittest import TestCase
-from pysh.core import chars
-from pysh.core.tokens import error, token
+from pysh.core import chars, errors
+from pysh.core.tokens import token
 
 
 class TokenTest(TestCase):
@@ -50,7 +50,7 @@ class TokenTest(TestCase):
         ):
             with self.subTest(rule_name=rule_name, value=value, expected=expected):
                 if expected is None:
-                    with self.assertRaises(error.Error):
+                    with self.assertRaises(errors.Error):
                         token.Token.load(rule_name, value)
                 else:
                     self.assertEqual(token.Token.load(rule_name, value), expected)

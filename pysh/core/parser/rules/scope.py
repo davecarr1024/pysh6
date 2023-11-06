@@ -1,28 +1,25 @@
 from dataclasses import dataclass, field
-from typing import Generic, Iterator, Mapping
-from pysh.core.parser import errors, results
+from typing import Generic, Iterator, Mapping, TypeVar
+from pysh.core import errors
+from pysh.core.parser import results
+
+
+_State = TypeVar("_State")
+_Result = TypeVar("_Result")
 
 
 @dataclass(frozen=True)
 class Scope(
-    Generic[results.Result],
-    Mapping[str, "single_result_rule.SingleResultRule[ results.Result]"],
+    Generic[_State, _Result],
+    Mapping[str, "rule.Rule[_State,results.SingleResults[_Result],_Result]"],
 ):
-    _rules: Mapping[str, "single_result_rule.SingleResultRule[results.Result]"] = field(
+    _rules: Mapping[
+        str, "rule.Rule[_State,results.SingleResults[_Result],_Result]"
+    ] = field(
         default_factory=lambda: dict[
-            str, single_result_rule.SingleResultRule[results.Result]
+            str, rule.Rule[_State, results.SingleResults[_Result], _Result]
         ]()
     )
-
-    def __str__(self) -> str:
-        return f'{{{", ".join([f"{name}: {str(rule)}" for name, rule in self._rules.items()])}}}'
-
-    def __getitem__(
-        self, key: str
-    ) -> "single_result_rule.SingleResultRule[results.Result]":
-        if key not in self._rules:
-            raise errors.Error(msg=f"unknown rule {key}")
-        return self._rules[key]
 
     def __len__(self) -> int:
         return len(self._rules)
@@ -30,8 +27,12 @@ class Scope(
     def __iter__(self) -> Iterator[str]:
         return iter(self._rules)
 
-    def __or__(self, rhs: "Scope[results.Result]") -> "Scope[results.Result]":
-        return Scope[results.Result](dict(self) | dict(rhs))
+    def __getitem__(
+        self, name: str
+    ) -> "rule.Rule[_State,results.SingleResults[_Result],_Result]":
+        if name not in self._rules:
+            raise errors.Error(msg=f"unknown rule {name}")
+        return self._rules[name]
 
 
-from pysh.core.parser.rules import single_result_rule
+from pysh.core.parser.rules import rule

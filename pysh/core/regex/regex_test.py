@@ -1,173 +1,172 @@
 from typing import Optional
 from unittest import TestCase
-from pysh.core import chars
-from pysh.core.regex import *
+from pysh.core import chars, errors, regex
 
 
 class RegexTest(TestCase):
     def test_literal(self):
-        for value, expected in list[tuple[str, Optional[Regex]]](
+        for value, expected in list[tuple[str, Optional[regex.Regex]]](
             [
                 (
                     "",
-                    And([]),
+                    regex.And([]),
                 ),
                 (
                     "a",
-                    Literal("a"),
+                    regex.Literal("a"),
                 ),
                 (
                     "ab",
-                    And(
+                    regex.And(
                         [
-                            Literal("a"),
-                            Literal("b"),
+                            regex.Literal("a"),
+                            regex.Literal("b"),
                         ]
                     ),
                 ),
             ]
         ):
             with self.subTest(value=value, expected=expected):
-                self.assertEqual(Regex.literal(value), expected)
+                self.assertEqual(regex.Regex.literal(value), expected)
 
     def test_call(self):
-        for regex, state, expected in list[
-            tuple[Regex, chars.Stream | str, Optional[StateAndResult | str]]
+        for regex_, state, expected in list[
+            tuple[regex.Regex, chars.Stream | str, Optional[regex.StateAndResult | str]]
         ](
             [
                 (
-                    Any(),
+                    regex.Any(),
                     "a",
                     "a",
                 ),
                 (
-                    Any(),
+                    regex.Any(),
                     "",
                     None,
                 ),
                 (
-                    Literal("a"),
+                    regex.Literal("a"),
                     "a",
                     "a",
                 ),
                 (
-                    Literal("a"),
+                    regex.Literal("a"),
                     "",
                     None,
                 ),
                 (
-                    Literal("a"),
+                    regex.Literal("a"),
                     "b",
                     None,
                 ),
                 (
-                    And([Literal("a"), Literal("b")]),
+                    regex.And([regex.Literal("a"), regex.Literal("b")]),
                     "",
                     None,
                 ),
                 (
-                    And([Literal("a"), Literal("b")]),
+                    regex.And([regex.Literal("a"), regex.Literal("b")]),
                     "a",
                     None,
                 ),
                 (
-                    And([Literal("a"), Literal("b")]),
+                    regex.And([regex.Literal("a"), regex.Literal("b")]),
                     "b",
                     None,
                 ),
                 (
-                    And([Literal("a"), Literal("b")]),
+                    regex.And([regex.Literal("a"), regex.Literal("b")]),
                     "ab",
                     "ab",
                 ),
                 (
-                    Or([Literal("a"), Literal("b")]),
+                    regex.Or([regex.Literal("a"), regex.Literal("b")]),
                     "",
                     None,
                 ),
                 (
-                    Or([Literal("a"), Literal("b")]),
+                    regex.Or([regex.Literal("a"), regex.Literal("b")]),
                     "c",
                     None,
                 ),
                 (
-                    Or([Literal("a"), Literal("b")]),
+                    regex.Or([regex.Literal("a"), regex.Literal("b")]),
                     "a",
                     "a",
                 ),
                 (
-                    Or([Literal("a"), Literal("b")]),
+                    regex.Or([regex.Literal("a"), regex.Literal("b")]),
                     "b",
                     "b",
                 ),
                 (
-                    OneOrMore(Literal("a")),
+                    regex.OneOrMore(regex.Literal("a")),
                     "",
                     None,
                 ),
                 (
-                    OneOrMore(Literal("a")),
+                    regex.OneOrMore(regex.Literal("a")),
                     "a",
                     "a",
                 ),
                 (
-                    OneOrMore(Literal("a")),
+                    regex.OneOrMore(regex.Literal("a")),
                     "aa",
                     "aa",
                 ),
                 (
-                    ZeroOrMore(Literal("a")),
+                    regex.ZeroOrMore(regex.Literal("a")),
                     "",
                     "",
                 ),
                 (
-                    ZeroOrMore(Literal("a")),
+                    regex.ZeroOrMore(regex.Literal("a")),
                     "a",
                     "a",
                 ),
                 (
-                    ZeroOrMore(Literal("a")),
+                    regex.ZeroOrMore(regex.Literal("a")),
                     "aa",
                     "aa",
                 ),
                 (
-                    ZeroOrOne(Literal("a")),
+                    regex.ZeroOrOne(regex.Literal("a")),
                     "",
                     "",
                 ),
                 (
-                    ZeroOrOne(Literal("a")),
+                    regex.ZeroOrOne(regex.Literal("a")),
                     "a",
                     "a",
                 ),
                 (
-                    ZeroOrOne(Literal("a")),
+                    regex.ZeroOrOne(regex.Literal("a")),
                     "b",
                     (
                         chars.Stream.load("b"),
-                        Result.load(""),
+                        regex.Result.load(""),
                     ),
                 ),
                 (
-                    ZeroOrOne(Literal("a")),
+                    regex.ZeroOrOne(regex.Literal("a")),
                     "aa",
                     (
                         chars.Stream([chars.Char("a", chars.Position(0, 1))]),
-                        Result.load("a"),
+                        regex.Result.load("a"),
                     ),
                 ),
             ]
         ):
-            with self.subTest(regex=regex, state=state, expected=expected):
+            with self.subTest(regex=regex_, state=state, expected=expected):
                 if isinstance(state, str):
                     state = chars.Stream.load(state)
                 if expected is None:
-                    with self.assertRaises(Error):
-                        regex(state)
+                    with self.assertRaises(errors.Error):
+                        regex_(state)
                 else:
                     if isinstance(expected, str):
-                        expected = (chars.Stream(), Result.load(expected))
-                    actual = regex(state)
+                        expected = (chars.Stream(), regex.Result.load(expected))
+                    actual = regex_(state)
                     self.assertEqual(
                         actual,
                         expected,

@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Sequence
-from pysh.core import chars
-from pysh.core.tokens import error
+from pysh.core import chars, errors
 
 
 @dataclass(frozen=True)
@@ -15,7 +14,7 @@ class Token:
         if isinstance(value, chars.Stream):
             value = list(value)
         if not value:
-            raise error.Error(msg=f"loading token with empty value")
+            raise errors.Error(msg=f"loading token with empty value")
         return Token(
             rule_name, "".join(char.value for char in value), value[0].position
         )

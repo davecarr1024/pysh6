@@ -1,205 +1,72 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Generic, Optional, Self, overload
-from pysh.core import lexer as lexer_lib
+from dataclasses import dataclass
+from typing import Generic, Optional, Sequence, TypeVar
+from pysh.core import errors, lexer
 from pysh.core.parser import results, states
 
 
-class Rule(ABC, Generic[results.Result]):
+_State = TypeVar("_State")
+_Results = TypeVar("_Results", bound=results.Results)
+_Result = TypeVar("_Result")
+
+
+@dataclass(frozen=True)
+class Rule(ABC, Generic[_State, _Results, _Result]):
     @abstractmethod
     def __call__(
-        self, state: "states.State", scope: "scope.Scope[results.Result]"
-    ) -> "states.StateAndResult[results.Result]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __and__(
-        self, rhs: "no_result_rule.NoResultRule[results.Result]"
-    ) -> "and_.And[results.Result, Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __and__(
-        self, rhs: "single_result_rule.SingleResultRule[results.Result]"
-    ) -> "and_.And[results.Result, Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __and__(
-        self, rhs: "optional_result_rule.OptionalResultRule[results.Result]"
-    ) -> "and_.And[results.Result, Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __and__(
-        self, rhs: "multiple_result_rule.MultipleResultRule[results.Result]"
-    ) -> "and_.And[results.Result, Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __and__(
-        self, rhs: "named_result_rule.NamedResultRule[results.Result]"
-    ) -> "and_.And[results.Result, Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __and__(self, rhs: str) -> "and_.And[results.Result, Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __and__(
-        self, rhs: "lexer_lib.Rule"
-    ) -> "and_.And[results.Result, Rule[results.Result]]":
+        self, state: _State
+    ) -> states.StateAndResults[_State, _Results, _Result]:
         ...
 
     @abstractmethod
-    def __and__(
-        self, rhs: "and_args.AndArgs"
-    ) -> "and_.And[results.Result, Rule[results.Result]]":
+    def lexer(self) -> lexer.Lexer:
         ...
 
-    @overload
-    @abstractmethod
-    def __rand__(self, lhs: str) -> "and_.And[results.Result,Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __rand__(
-        self, lhs: "lexer_lib.Rule"
-    ) -> "and_.And[results.Result,Rule[results.Result]]":
-        ...
-
-    @abstractmethod
-    def __rand__(
-        self, lhs: "rand_args.RandArgs"
-    ) -> "and_.And[results.Result,Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __or__(
-        self, rhs: "no_result_rule.NoResultRule[results.Result]"
-    ) -> "or_.Or[results.Result,Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __or__(
-        self, rhs: "single_result_rule.SingleResultRule[results.Result]"
-    ) -> "or_.Or[results.Result,Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __or__(
-        self, rhs: "optional_result_rule.OptionalResultRule[results.Result]"
-    ) -> "or_.Or[results.Result,Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __or__(
-        self, rhs: "multiple_result_rule.MultipleResultRule[results.Result]"
-    ) -> "or_.Or[results.Result,Rule[results.Result]]":
-        ...
-
-    @overload
-    @abstractmethod
-    def __or__(
-        self, rhs: "named_result_rule.NamedResultRule[results.Result]"
-    ) -> "or_.Or[results.Result,Rule[results.Result]]":
-        ...
-
-    @abstractmethod
-    def __or__(
-        self, rhs: "or_args.OrArgs"
-    ) -> "or_.Or[results.Result,Rule[results.Result]]":
-        ...
-
-    @abstractmethod
-    def lexer(self) -> lexer_lib.Lexer:
-        ...
-
-    def no(self) -> "no_result_rule.NoResultRule[results.Result]":
-        return unary_no_result_rule.UnaryNoResultRule(self)
-
-    def single(self) -> "single_result_rule.SingleResultRule[results.Result]":
-        return unary_single_result_rule.UnarySingleResultRule(self)
-
-    def optional(self) -> "optional_result_rule.OptionalResultRule[results.Result]":
-        return unary_optional_result_rule.UnaryOptionalResultRule(self)
-
-    def multiple(self) -> "multiple_result_rule.MultipleResultRule[results.Result]":
-        return unary_multiple_result_rule.UnaryMultipleResultRule(self)
-
-    def named(
-        self, name: Optional[str] = None
-    ) -> "named_result_rule.NamedResultRule[results.Result]":
-        return unary_named_result_rule.UnaryNamedResultRule(self, name)
+    def _error(
+        self,
+        state: _State,
+        *,
+        msg: Optional[str] = None,
+        children: Sequence[errors.Error] = []
+    ) -> "error.Error[_State,_Results,_Result]":
+        return error.Error[_State, _Results, _Result](
+            rule=self, state=state, msg=msg, _children=children
+        )
 
     def zero_or_more(
         self,
-    ) -> "zero_or_more.ZeroOrMore[results.Result,Self]":
-        return zero_or_more.ZeroOrMore[results.Result, Self](self)
+    ) -> "multiple_results_rule.MultipleResultsRule[_State,_Result]":
+        AdapterState = TypeVar("AdapterState")
+        AdapterResult = TypeVar("AdapterResult")
+        AdapterChildResults = TypeVar("AdapterChildResults", bound=results.Results)
 
-    def one_or_more(
-        self,
-    ) -> "one_or_more.OneOrMore[results.Result,Self]":
-        return one_or_more.OneOrMore[results.Result, Self](self)
+        @dataclass(frozen=True)
+        class ZeroOrMore(
+            Generic[AdapterState, AdapterResult, AdapterChildResults],
+            multiple_results_rule.MultipleResultsRule[AdapterState, AdapterResult],
+            unary_rule.UnaryRule[
+                AdapterState,
+                results.MultipleResults[AdapterResult],
+                AdapterResult,
+                AdapterChildResults,
+            ],
+        ):
+            def __call__(
+                self,
+                state: AdapterState,
+            ) -> states.StateAndMultipleResults[AdapterState, AdapterResult]:
+                results_ = results.MultipleResults[AdapterResult]()
+                while True:
+                    try:
+                        child_state_and_results = self._call_child(state)
+                        state = child_state_and_results.state
+                        results_ |= child_state_and_results.results.multiple()
+                    except errors.Error:
+                        return states.StateAndMultipleResults[
+                            AdapterState, AdapterResult
+                        ](state, results_)
 
-    def zero_or_one(
-        self,
-    ) -> "zero_or_one.ZeroOrOne[results.Result,Self]":
-        return zero_or_one.ZeroOrOne[results.Result, Self](self)
-
-    @abstractmethod
-    def convert_type(
-        self, func: Callable[..., results.ConverterResult]
-    ) -> "single_result_rule.SingleResultRule[results.ConverterResult]":
-        ...
-
-    # @abstractmethod
-    # def convert(
-    #     self, func: Callable[..., results.Result]
-    # ) -> "single_result_rule.SingleResultRule[results.Result]":
-    #     ...
-
-    @abstractmethod
-    def with_scope(self, scope: "scope.Scope[results.Result]") -> Self:
-        ...
+        return ZeroOrMore[_State, _Result, _Results](self)
 
 
-from pysh.core.parser.rules import (
-    no_result_rule,
-    scope,
-    single_result_rule,
-    optional_result_rule,
-    multiple_result_rule,
-    named_result_rule,
-)
-from pysh.core.parser.rules.unary_rules import (
-    one_or_more,
-    unary_no_result_rule,
-    unary_single_result_rule,
-    unary_optional_result_rule,
-    unary_multiple_result_rule,
-    unary_named_result_rule,
-    zero_or_more,
-    zero_or_one,
-)
-from pysh.core.parser.rules.ands import (
-    and_,
-    and_args,
-    rand_args,
-)
-from pysh.core.parser.rules.ors import (
-    or_,
-    or_args,
-)
+from pysh.core.parser.rules import error, multiple_results_rule, unary_rule
