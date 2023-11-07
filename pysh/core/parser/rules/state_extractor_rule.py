@@ -13,9 +13,10 @@ _StateValue = TypeVar("_StateValue")
 @dataclass(frozen=True)
 class StateExtractorRule(
     Generic[_State, _Result, _StateValue],
-    states.StateExtractor[_State, _StateValue],
     rule.Rule[_State, _Result],
 ):
+    state_extractor: states.StateExtractor[_State, _StateValue]
+
     @abstractmethod
     def _call(
         self, state: _State, state_value: _StateValue
@@ -23,4 +24,4 @@ class StateExtractorRule(
         ...
 
     def __call__(self, state: _State) -> states.StateAndResults[_State, _Result]:
-        return self._call(state, self.state_value(state))
+        return self._call(state, self.state_extractor(state))
