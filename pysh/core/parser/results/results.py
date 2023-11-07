@@ -70,12 +70,6 @@ class Results(ABC, Generic[_Result]):
     ) -> "Results[_Result]":
         ...
 
-    @abstractmethod
-    def convert(
-        self, func: Callable[..., _ConvertResult]
-    ) -> "single_results.SingleResults[_ConvertResult]":
-        ...
-
 
 from pysh.core.parser.results import (
     error,

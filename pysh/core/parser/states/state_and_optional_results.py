@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Callable, Generic, Optional, TypeVar
+from typing import Callable, Optional, TypeVar
 from pysh.core.parser import results
 from pysh.core.parser.states import state_and_results
 
@@ -11,11 +11,12 @@ _ConvertResult = TypeVar("_ConvertResult")
 
 @dataclass(frozen=True)
 class StateAndOptionalResults(
-    Generic[_State, _Result],
-    state_and_results.StateAndResults[
-        _State, results.OptionalResults[_Result], _Result
-    ],
+    state_and_results.StateAndResults[_State, _Result],
 ):
+    results: "results.OptionalResults[_Result]" = field(
+        default_factory=results.OptionalResults[_Result]
+    )
+
     def convert(
         self, func: Callable[[Optional[_Result]], _ConvertResult]
     ) -> "state_and_single_results.StateAndSingleResults[_State,_ConvertResult]":

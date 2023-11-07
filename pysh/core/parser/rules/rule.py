@@ -6,16 +6,13 @@ from pysh.core.parser import results, states
 
 
 _State = TypeVar("_State")
-_Results = TypeVar("_Results", bound=results.Results)
 _Result = TypeVar("_Result")
 
 
 @dataclass(frozen=True)
-class Rule(ABC, Generic[_State, _Results, _Result]):
+class Rule(ABC, Generic[_State, _Result]):
     @abstractmethod
-    def __call__(
-        self, state: _State
-    ) -> states.StateAndResults[_State, _Results, _Result]:
+    def __call__(self, state: _State) -> states.StateAndResults[_State, _Result]:
         ...
 
     @abstractmethod
@@ -28,8 +25,8 @@ class Rule(ABC, Generic[_State, _Results, _Result]):
         *,
         msg: Optional[str] = None,
         children: Sequence[errors.Error] = []
-    ) -> "error.Error[_State,_Results,_Result]":
-        return error.Error[_State, _Results, _Result](
+    ) -> "error.Error[_State,_Result]":
+        return error.Error[_State, _Result](
             rule=self, state=state, msg=msg, _children=children
         )
 
@@ -38,18 +35,11 @@ class Rule(ABC, Generic[_State, _Results, _Result]):
     ) -> "multiple_results_rule.MultipleResultsRule[_State,_Result]":
         AdapterState = TypeVar("AdapterState")
         AdapterResult = TypeVar("AdapterResult")
-        AdapterChildResults = TypeVar("AdapterChildResults", bound=results.Results)
 
         @dataclass(frozen=True)
         class ZeroOrMore(
-            Generic[AdapterState, AdapterResult, AdapterChildResults],
             multiple_results_rule.MultipleResultsRule[AdapterState, AdapterResult],
-            unary_rule.UnaryRule[
-                AdapterState,
-                results.MultipleResults[AdapterResult],
-                AdapterResult,
-                AdapterChildResults,
-            ],
+            unary_rule.UnaryRule[AdapterState, AdapterResult],
         ):
             def __call__(
                 self,
@@ -66,7 +56,7 @@ class Rule(ABC, Generic[_State, _Results, _Result]):
                             AdapterState, AdapterResult
                         ](state, results_)
 
-        return ZeroOrMore[_State, _Result, _Results](self)
+        return ZeroOrMore[_State, _Result](self)
 
 
 from pysh.core.parser.rules import error, multiple_results_rule, unary_rule

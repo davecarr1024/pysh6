@@ -10,10 +10,7 @@ _Result = TypeVar("_Result")
 
 
 @dataclass(frozen=True)
-class NoResultsRule(
-    Generic[_State, _Result],
-    rule.Rule[_State, results.NoResults[_Result], _Result],
-):
+class NoResultsRule(rule.Rule[_State, _Result]):
     @abstractmethod
     def __call__(self, state: _State) -> states.StateAndNoResults[_State, _Result]:
         ...
@@ -26,14 +23,8 @@ class NoResultsRule(
 
         @dataclass(frozen=True)
         class Converter(
-            Generic[AdapterState, AdapterResult],
             single_results_rule.SingleResultsRule[AdapterState, AdapterResult],
-            unary_rule.UnaryRule[
-                AdapterState,
-                results.SingleResults[AdapterResult],
-                AdapterResult,
-                results.NoResults[AdapterResult],
-            ],
+            unary_rule.UnaryRule[AdapterState, AdapterResult],
         ):
             func: Callable[[], AdapterResult]
 
@@ -41,7 +32,7 @@ class NoResultsRule(
                 self,
                 state: AdapterState,
             ) -> states.StateAndSingleResults[AdapterState, AdapterResult]:
-                return self._call_child(state).convert(self.func)
+                return self._call_child(state).no().convert(self.func)
 
         return Converter[_State, _Result](self, func)
 

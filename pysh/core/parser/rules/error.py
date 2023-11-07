@@ -5,11 +5,10 @@ from pysh.core.parser import results, states
 from pysh.core.parser.rules import rule
 
 _State = TypeVar("_State")
-_Results = TypeVar("_Results", bound=results.Results)
 _Result = TypeVar("_Result")
 
 
 @dataclass(kw_only=True)
-class Error(Generic[_State, _Results, _Result], errors.NaryError):
-    rule: rule.Rule[_State, _Results, _Result]
+class Error(Generic[_State, _Result], errors.NaryError):
+    rule: rule.Rule[_State, _Result]
     state: _State

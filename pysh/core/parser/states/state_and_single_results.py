@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
-from typing import Callable, Generic, TypeVar
+from dataclasses import dataclass
+from typing import Callable, TypeVar
 from pysh.core.parser import results
 from pysh.core.parser.states import state_and_results
 
@@ -11,9 +11,10 @@ _ConvertResult = TypeVar("_ConvertResult")
 
 @dataclass(frozen=True)
 class StateAndSingleResults(
-    Generic[_State, _Result],
-    state_and_results.StateAndResults[_State, results.SingleResults[_Result], _Result],
+    state_and_results.StateAndResults[_State, _Result],
 ):
+    results: "results.SingleResults[_Result]"
+
     def convert(
         self, func: Callable[[_Result], _ConvertResult]
     ) -> "StateAndSingleResults[_State,_ConvertResult]":

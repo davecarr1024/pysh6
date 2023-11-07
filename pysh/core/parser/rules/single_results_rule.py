@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Generic, TypeVar
-from pysh.core.parser import results, states
+from typing import TypeVar
+from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
 
@@ -10,10 +10,7 @@ _Result = TypeVar("_Result")
 
 
 @dataclass(frozen=True)
-class SingleResultsRule(
-    Generic[_State, _Result],
-    rule.Rule[_State, results.SingleResults[_Result], _Result],
-):
+class SingleResultsRule(rule.Rule[_State, _Result]):
     @abstractmethod
     def __call__(self, state: _State) -> states.StateAndSingleResults[_State, _Result]:
         ...
