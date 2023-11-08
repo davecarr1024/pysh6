@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-
 from pysh.core import chars, errors
-from pysh.core.regex import regex, state_and_result, result, error, unary_error
+from pysh.core.regex import regex, state, state_and_result, result
 
 
 @dataclass(frozen=True)
@@ -19,11 +18,10 @@ class Literal(regex.Regex):
         try:
             head = state.head()
             if head.value != self.value:
-                raise error.Error(
-                    regex=self,
-                    state=state,
+                raise self._error(
+                    state,
                     msg=f"expected literal {self.value} got {head}",
                 )
-            return state.tail(), result.Result([head])
-        except chars.Error as error_:
-            raise unary_error.UnaryError(regex=self, state=state, child=error_)
+            return state.tail().and_result(result.Result([head]))
+        except chars.Error as error:
+            raise self._error(state, children=[error])

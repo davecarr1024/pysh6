@@ -1,12 +1,12 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, MutableSequence, Sequence, Sized
 from pysh.core import chars, errors, regex, tokens
-from pysh.core.lexer import lex_error, state, state_and_result
+from pysh.core.lexer import lex_error, result, rule, state, state_and_result
 
 
 @dataclass(frozen=True)
-class Lexer(Sized, Iterable["rule.Rule"]):
-    _rules: Sequence["rule.Rule"] = field(default_factory=lambda: list[rule.Rule]())
+class Lexer(Sized, Iterable[rule.Rule]):
+    _rules: Sequence[rule.Rule] = field(default_factory=lambda: list[rule.Rule]())
 
     def __str__(self) -> str:
         return f'Lexer({", ".join(str(rule) for rule in self)})'
@@ -14,7 +14,7 @@ class Lexer(Sized, Iterable["rule.Rule"]):
     def __len__(self) -> int:
         return len(self._rules)
 
-    def __iter__(self) -> Iterator["rule.Rule"]:
+    def __iter__(self) -> Iterator[rule.Rule]:
         return iter(self._rules)
 
     def __or__(self, rhs: "Lexer") -> "Lexer":
@@ -29,15 +29,14 @@ class Lexer(Sized, Iterable["rule.Rule"]):
                 errors_.append(error)
         raise lex_error.LexError(lexer_=self, state=state, _children=errors_)
 
-    def __call__(self, state: chars.Stream | str) -> tokens.Stream:
-        if isinstance(state, str):
-            state = chars.Stream.load(state)
+    def __call__(self, state: state.State) -> result.Result:
         tokens_: MutableSequence[tokens.Token] = []
         while state:
-            state, token = self._apply_any(state)
-            if token.value:
-                tokens_.append(token)
-        return tokens.Stream(tokens_)
+            state_and_result_ = self._apply_any(state)
+            for token in state_and_result_.result.tokens:
+                if token.value:
+                    tokens_.append(token)
+        return result.Result(tokens.Stream(tokens_))
 
     @staticmethod
     def load(**regexes: str | regex.Regex) -> "Lexer":
@@ -48,6 +47,3 @@ class Lexer(Sized, Iterable["rule.Rule"]):
     @staticmethod
     def literal(*values: str) -> "Lexer":
         return Lexer([rule.Rule.load(value) for value in values])
-
-
-from pysh.core.lexer import rule

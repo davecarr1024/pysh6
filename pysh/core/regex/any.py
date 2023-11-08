@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from pysh.core import chars, errors
-from pysh.core.regex import regex, result, state_and_result, unary_error
+from pysh.core import errors
+from pysh.core.regex import regex, result, state, state_and_result
 
 
 @dataclass(frozen=True)
@@ -10,6 +10,6 @@ class Any(regex.Regex):
 
     def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         try:
-            return state.tail(), result.Result([state.head()])
+            return state.tail().and_result(result.Result([state.head()]))
         except errors.Error as error:
-            raise unary_error.UnaryError(regex=self, state=state, child=error)
+            raise self._error(state, children=[error])

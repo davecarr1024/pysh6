@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from pysh.core import chars, errors
-from pysh.core.regex import unary_regex, state_and_result, nary_error
+from pysh.core import errors
+from pysh.core.regex import unary_regex, state, state_and_result
 
 
 @dataclass(frozen=True)
@@ -10,12 +10,15 @@ class OneOrMore(unary_regex.UnaryRegex):
 
     def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         try:
-            state, result = super().__call__(state)
-        except errors.Error as error_:
-            raise nary_error.NaryError(regex=self, state=state, _children=[error_])
+            child_state_and_result = super().__call__(state)
+            state = child_state_and_result.state
+            result = child_state_and_result.result
+        except errors.Error as error:
+            raise self._error(state, children=[error])
         while True:
             try:
-                state, child_result = super().__call__(state)
-                result += child_result
+                child_state_and_result = super().__call__(state)
+                state = child_state_and_result.state
+                result += child_state_and_result.result
             except errors.Error:
-                return state, result
+                return state.and_result(result)

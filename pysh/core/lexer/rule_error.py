@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from pysh.core import chars, errors
+from pysh.core import errors
+from pysh.core.lexer import state
 
 
 @dataclass
 class RuleError(errors.UnaryError):
     rule: "rule.Rule"
-    state: chars.Stream
+    state: "state.State"
 
     def _repr_line(self) -> str:
         return f"RuleError(rule={self.rule},state={self.state},msg={self.msg})"

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from pysh.core import errors, chars
-from pysh.core.regex import regex, error, state_and_result, result
+from pysh.core import errors
+from pysh.core.regex import regex, error, state, state_and_result, result
 
 
 @dataclass(frozen=True)
@@ -18,4 +18,4 @@ class Range(regex.Regex):
     def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         if self.start > state.head().value or self.end < state.head().value:
             raise error.Error(regex=self, state=state)
-        return state.tail(), result.Result([state.head()])
+        return state.tail().and_result(result.Result([state.head()]))

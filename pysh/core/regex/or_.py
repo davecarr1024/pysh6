@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import MutableSequence
-from pysh.core import chars, errors
-from pysh.core.regex import nary_regex, state_and_result, nary_error
+from pysh.core import errors
+from pysh.core.regex import nary_regex, state, state_and_result
 
 
 @dataclass(frozen=True)
@@ -16,4 +16,4 @@ class Or(nary_regex.NaryRegex):
                 return child(state)
             except errors.Error as error_:
                 child_errors.append(error_)
-        raise nary_error.NaryError(regex=self, state=state, _children=child_errors)
+        raise self._error(state, children=child_errors)

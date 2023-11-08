@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from pysh.core.regex import and_, state, state_and_result
+from typing import Optional, Sequence
+from pysh.core import errors
+from pysh.core.regex import and_, error, state, state_and_result
 
 
 class Regex(ABC):
@@ -22,3 +24,12 @@ class Regex(ABC):
             return and_.And([Regex.literal(c) for c in value])
         else:
             return Regex.literal(value)
+
+    def _error(
+        self,
+        state: state.State,
+        *,
+        msg: Optional[str] = None,
+        children: Sequence[errors.Error] = []
+    ) -> error.Error:
+        return error.Error(regex=self, state=state, msg=msg, _children=children)
