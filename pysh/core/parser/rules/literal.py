@@ -4,6 +4,7 @@ from typing import TypeVar
 from pysh.core import errors, lexer, tokens
 from pysh.core.parser import results, states
 from pysh.core.parser.rules import lexer_rule, single_results_rule
+from pysh.core.parser.states import lexer_state_value
 
 
 _State = TypeVar("_State")
@@ -26,7 +27,7 @@ class Literal(
     def _call_with_state_value(
         self,
         state: _State,
-        state_value: tokens.Stream,
+        state_value: lexer_state_value.LexerStateValue,
     ) -> states.StateAndSingleResults[_State, tokens.Token]:
         try:
             if state_value.head().rule_name == self.lexer_rule.name:

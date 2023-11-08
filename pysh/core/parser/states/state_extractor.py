@@ -11,5 +11,5 @@ class StateExtractor(ABC, Generic[_State, _StateValue]):
         ...
 
     @abstractmethod
-    def state_with_value(self, state: _State, state_value: _StateValue) -> _State:
+    def state_with_value(self, state: _State, value: _StateValue) -> _State:
         ...

@@ -8,8 +8,8 @@ _Result = TypeVar("_Result")
 
 @dataclass(kw_only=True)
 class Error(
-    Generic[_State, _Result],
     errors.NaryError,
+    Generic[_State, _Result],
 ):
     rule: "rule.Rule[_State, _Result]"
     state: _State
