@@ -15,7 +15,7 @@ class Range(regex.Regex):
     def __str__(self):
         return f"[{self.start}-{self.end}]"
 
-    def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
+    def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         if self.start > state.head().value or self.end < state.head().value:
             raise error.Error(regex=self, state=state)
         return state.tail(), result.Result([state.head()])

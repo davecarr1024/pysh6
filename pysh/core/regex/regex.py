@@ -1,16 +1,11 @@
 from abc import ABC, abstractmethod
-from pysh.core import chars
-from pysh.core.regex import and_, state_and_result
+from pysh.core.regex import and_, state, state_and_result
 
 
 class Regex(ABC):
     @abstractmethod
-    def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
+    def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         ...
-
-    def apply(self, state: str) -> str:
-        _, result = self(chars.Stream.load(state))
-        return result.value()
 
     @staticmethod
     def literal(value: str) -> "Regex":

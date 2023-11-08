@@ -9,7 +9,7 @@ class Or(nary_regex.NaryRegex):
     def __str__(self) -> str:
         return f"({'|'.join([str(child) for child in self])})"
 
-    def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
+    def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         child_errors: MutableSequence[errors.Error] = []
         for child in self:
             try:

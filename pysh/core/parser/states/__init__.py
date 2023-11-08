@@ -5,8 +5,3 @@ from pysh.core.parser.states.state_and_optional_results import StateAndOptionalR
 from pysh.core.parser.states.state_and_multiple_results import StateAndMultipleResults
 from pysh.core.parser.states.state_and_named_results import StateAndNamedResults
 from pysh.core.parser.states.error import Error
-from pysh.core.parser.states.state_extractor import StateExtractor
-from pysh.core.parser.states.state_self_extractor import StateSelfExtractor
-from pysh.core.parser.states.abstract_lexer_state import AbstractLexerState
-from pysh.core.parser.states.lexer_state_value import LexerStateValue
-from pysh.core.parser.states.lexer_state import LexerState

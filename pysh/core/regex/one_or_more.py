@@ -8,7 +8,7 @@ class OneOrMore(unary_regex.UnaryRegex):
     def __str__(self) -> str:
         return f"{self.child}+"
 
-    def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
+    def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         try:
             state, result = super().__call__(state)
         except errors.Error as error_:

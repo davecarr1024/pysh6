@@ -15,7 +15,7 @@ class Literal(regex.Regex):
     def __str__(self) -> str:
         return self.value
 
-    def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
+    def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         try:
             head = state.head()
             if head.value != self.value:

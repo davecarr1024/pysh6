@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, MutableSequence, Sequence, Sized
 from pysh.core import chars, errors, regex, tokens
-from pysh.core.lexer import lex_error, state_and_result
+from pysh.core.lexer import lex_error, state, state_and_result
 
 
 @dataclass(frozen=True)
@@ -20,7 +20,7 @@ class Lexer(Sized, Iterable["rule.Rule"]):
     def __or__(self, rhs: "Lexer") -> "Lexer":
         return Lexer(list(self._rules) + list(rhs._rules))
 
-    def _apply_any(self, state: chars.Stream) -> state_and_result.StateAndResult:
+    def _apply_any(self, state: state.State) -> state_and_result.StateAndResult:
         errors_: MutableSequence[errors.Error] = []
         for rule in self._rules:
             try:

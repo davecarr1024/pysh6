@@ -1,4 +1,8 @@
-from pysh.core import chars
-from pysh.core.regex import result
+from dataclasses import dataclass
+from pysh.core.regex import result, state
 
-StateAndResult = tuple[chars.Stream, result.Result]
+
+@dataclass(frozen=True)
+class StateAndResult:
+    state: state.State
+    result: result.Result

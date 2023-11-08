@@ -1,3 +1,8 @@
-from pysh.core import chars, tokens
+from dataclasses import dataclass
+from pysh.core.lexer import result, state
 
-StateAndResult = tuple[chars.Stream, tokens.Token]
+
+@dataclass(frozen=True)
+class StateAndResult:
+    state: state.State
+    result: result.Result

@@ -7,5 +7,5 @@ from pysh.core.regex import regex, state_and_result
 class UnaryRegex(regex.Regex):
     child: regex.Regex
 
-    def __call__(self, state: chars.Stream) -> state_and_result.StateAndResult:
+    def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         return self.child(state)

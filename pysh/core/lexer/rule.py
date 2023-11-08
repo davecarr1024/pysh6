@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pysh.core import chars, errors, regex
-from pysh.core.lexer import rule_error, state_and_result
+from pysh.core.lexer import rule_error, state, state_and_result
 
 
 @dataclass(frozen=True)
@@ -14,9 +14,7 @@ class Rule:
         else:
             return f"{self.name}={self.regex_}"
 
-    def __call__(self, state: str | chars.Stream) -> state_and_result.StateAndResult:
-        if isinstance(state, str):
-            state = chars.Stream.load(state)
+    def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         try:
             state, result = self.regex_(state)
             return state, result.token(self.name)
