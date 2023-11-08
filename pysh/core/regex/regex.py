@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Sequence
 from pysh.core import errors
-from pysh.core.regex import and_, error, state, state_and_result
+from pysh.core.regex import error, state, state_and_result
 
 
 class Regex(ABC):
@@ -20,16 +20,20 @@ class Regex(ABC):
 
     @staticmethod
     def load(value: str) -> "Regex":
-        if len(value) > 1:
-            return and_.And([Regex.literal(c) for c in value])
-        else:
-            return Regex.literal(value)
+        match len(value):
+            case 1:
+                return literal.Literal(value)
+            case _:
+                return and_.And([Regex.load(c) for c in value])
 
     def _error(
         self,
         state: state.State,
         *,
         msg: Optional[str] = None,
-        children: Sequence[errors.Error] = []
+        children: Sequence[errors.Error] = [],
     ) -> error.Error:
         return error.Error(regex=self, state=state, msg=msg, _children=children)
+
+
+from pysh.core.regex import and_, literal
