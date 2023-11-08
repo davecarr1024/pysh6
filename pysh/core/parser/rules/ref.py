@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import TypeVar
-from pysh.core import errors
+from pysh.core import errors, lexer
 from pysh.core.parser import states
 from pysh.core.parser.rules import (
     scope,
@@ -15,12 +15,12 @@ _Result = TypeVar("_Result")
 
 @dataclass(frozen=True)
 class Ref(
-    single_results_rule.SingleResultsRule[_State, _Result],
     scope_rule.ScopeRule[
         _State,
         _Result,
         states.StateAndSingleResults[_State, _Result],
     ],
+    single_results_rule.SingleResultsRule[_State, _Result],
 ):
     name: str
 
@@ -33,3 +33,6 @@ class Ref(
             return scope[self.name](state)
         except errors.Error as error:
             raise self._error(state, children=[error])
+
+    def lexer(self) -> lexer.Lexer:
+        return lexer.Lexer()
