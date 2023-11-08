@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, Self, TypeVar
 from pysh.core import lexer
-
 from pysh.core.parser.states import lexer_state_value, state_extractor
 
 
@@ -13,9 +12,7 @@ class AbstractLexerState(
     Generic[_State],
 ):
     @abstractmethod
-    def with_lexer_state_value(
-        self: _State, value: lexer_state_value.LexerStateValue
-    ) -> _State:
+    def with_lexer_state_value(self, value: lexer_state_value.LexerStateValue) -> Self:
         ...
 
     @classmethod
