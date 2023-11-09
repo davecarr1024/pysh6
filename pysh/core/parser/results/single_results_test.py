@@ -1,3 +1,4 @@
+from typing import Union
 from unittest import TestCase
 from pysh.core.parser import results
 
@@ -76,3 +77,55 @@ class SingleResultsTest(TestCase):
         self.assertEqual(
             results.SingleResults[str]("1").convert(int), results.SingleResults[int](1)
         )
+
+    def test_or_type(self):
+        for rhs, expected in list[
+            tuple[
+                Union[
+                    results.NoResults[str],
+                    results.SingleResults[str],
+                    results.OptionalResults[str],
+                    results.MultipleResults[str],
+                    results.NamedResults[str],
+                ],
+                results.Results[int | str],
+            ]
+        ](
+            [
+                (
+                    results.NoResults[str](),
+                    results.SingleResults[int | str](1),
+                ),
+                (
+                    results.SingleResults[str]("a"),
+                    results.MultipleResults[int | str]([1, "a"]),
+                ),
+                (
+                    results.OptionalResults[str](),
+                    results.MultipleResults[int | str]([1]),
+                ),
+                (
+                    results.OptionalResults[str]("a"),
+                    results.MultipleResults[int | str]([1, "a"]),
+                ),
+                (
+                    results.MultipleResults[str](),
+                    results.MultipleResults[int | str]([1]),
+                ),
+                (
+                    results.MultipleResults[str](["a"]),
+                    results.MultipleResults[int | str]([1, "a"]),
+                ),
+                (
+                    results.NamedResults[str](),
+                    results.NamedResults[int | str]({"": 1}),
+                ),
+                (
+                    results.NamedResults[str]({"a": "v"}),
+                    results.NamedResults[int | str]({"": 1, "a": "v"}),
+                ),
+            ]
+        ):
+            with self.subTest(rhs=rhs, expected=expected):
+                lhs = results.SingleResults[int](1)
+                self.assertEqual(lhs | rhs, expected)

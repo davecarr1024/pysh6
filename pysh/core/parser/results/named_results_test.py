@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Union
 from unittest import TestCase
 from pysh.core import errors
 from pysh.core.parser import results
@@ -171,6 +172,104 @@ class NamedResultsTest(TestCase):
             value: int
 
         self.assertEqual(
-            results.NamedResults[int | str]({"name": "a", "value": 1}).convert(Decl),
+            (
+                results.SingleResults[str]("a").named("name")
+                | results.SingleResults[int](1).named("value")
+            ).convert(Decl),
             results.SingleResults[Decl](Decl("a", 1)),
         )
+
+    def test_or_type(self):
+        for lhs, rhs, expected in list[
+            tuple[
+                results.NamedResults[int],
+                Union[
+                    results.NoResults[str],
+                    results.SingleResults[str],
+                    results.OptionalResults[str],
+                    results.MultipleResults[str],
+                    results.NamedResults[str],
+                ],
+                results.Results[int | str],
+            ]
+        ](
+            [
+                (
+                    results.NamedResults[int](),
+                    results.NoResults[str](),
+                    results.NamedResults[int | str](),
+                ),
+                (
+                    results.NamedResults[int]({"i": 1}),
+                    results.NoResults[str](),
+                    results.NamedResults[int | str]({"i": 1}),
+                ),
+                (
+                    results.NamedResults[int](),
+                    results.SingleResults[str]("a"),
+                    results.NamedResults[int | str]({"": "a"}),
+                ),
+                (
+                    results.NamedResults[int]({"i": 1}),
+                    results.SingleResults[str]("a"),
+                    results.NamedResults[int | str]({"i": 1, "": "a"}),
+                ),
+                (
+                    results.NamedResults[int](),
+                    results.OptionalResults[str](),
+                    results.NamedResults[int | str](),
+                ),
+                (
+                    results.NamedResults[int]({"i": 1}),
+                    results.OptionalResults[str](),
+                    results.NamedResults[int | str]({"i": 1}),
+                ),
+                (
+                    results.NamedResults[int](),
+                    results.OptionalResults[str]("a"),
+                    results.NamedResults[int | str]({"": "a"}),
+                ),
+                (
+                    results.NamedResults[int]({"i": 1}),
+                    results.OptionalResults[str]("a"),
+                    results.NamedResults[int | str]({"i": 1, "": "a"}),
+                ),
+                (
+                    results.NamedResults[int](),
+                    results.MultipleResults[str](),
+                    results.NamedResults[int | str](),
+                ),
+                (
+                    results.NamedResults[int]({"i": 1}),
+                    results.MultipleResults[str](),
+                    results.NamedResults[int | str]({"i": 1}),
+                ),
+                (
+                    results.NamedResults[int](),
+                    results.NamedResults[str]({"a": "v"}),
+                    results.NamedResults[int | str]({"a": "v"}),
+                ),
+                (
+                    results.NamedResults[int]({"i": 1}),
+                    results.NamedResults[str]({"a": "v"}),
+                    results.NamedResults[int | str]({"i": 1, "a": "v"}),
+                ),
+                (
+                    results.NamedResults[int](),
+                    results.NamedResults[str](),
+                    results.NamedResults[int | str](),
+                ),
+                (
+                    results.NamedResults[int]({"i": 1}),
+                    results.NamedResults[str](),
+                    results.NamedResults[int | str]({"i": 1}),
+                ),
+                (
+                    results.NamedResults[int]({"i": 1}),
+                    results.NamedResults[str]({"a": "v"}),
+                    results.NamedResults[int | str]({"i": 1, "a": "v"}),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
+                self.assertEqual(lhs | rhs, expected)

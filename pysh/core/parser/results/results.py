@@ -4,7 +4,7 @@ from typing import Callable, Generic, Optional, TypeVar, Union, overload
 
 
 _Result = TypeVar("_Result")
-_ConvertResult = TypeVar("_ConvertResult")
+_RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
@@ -32,43 +32,53 @@ class Results(ABC, Generic[_Result]):
     def _error(self, msg: Optional[str] = None) -> "error.Error":
         return error.Error(results=self, msg=msg)
 
-    @overload
-    @abstractmethod
-    def __or__(self, rhs: "no_results.NoResults[_Result]"):
-        ...
+    # @overload
+    # @abstractmethod
+    # def __or__(
+    #     self, rhs: "no_results.NoResults[_RhsResult]"
+    # ) -> "Results[_Result|_RhsResult]":
+    #     ...
 
-    @overload
-    @abstractmethod
-    def __or__(self, rhs: "single_results.SingleResults[_Result]"):
-        ...
+    # @overload
+    # @abstractmethod
+    # def __or__(
+    #     self, rhs: "single_results.SingleResults[_RhsResult]"
+    # ) -> "Results[_Result|_RhsResult]":
+    #     ...
 
-    @overload
-    @abstractmethod
-    def __or__(self, rhs: "optional_results.OptionalResults[_Result]"):
-        ...
+    # @overload
+    # @abstractmethod
+    # def __or__(
+    #     self, rhs: "optional_results.OptionalResults[_RhsResult]"
+    # ) -> "Results[_Result|_RhsResult]":
+    #     ...
 
-    @overload
-    @abstractmethod
-    def __or__(self, rhs: "multiple_results.MultipleResults[_Result]"):
-        ...
+    # @overload
+    # @abstractmethod
+    # def __or__(
+    #     self, rhs: "multiple_results.MultipleResults[_RhsResult]"
+    # ) -> "Results[_Result|_RhsResult]":
+    #     ...
 
-    @overload
-    @abstractmethod
-    def __or__(self, rhs: "named_results.NamedResults[_Result]"):
-        ...
+    # @overload
+    # @abstractmethod
+    # def __or__(
+    #     self, rhs: "named_results.NamedResults[_RhsResult]"
+    # ) -> "Results[_Result|_RhsResult]":
+    #     ...
 
-    @abstractmethod
-    def __or__(
-        self,
-        rhs: Union[
-            "no_results.NoResults[_Result]",
-            "single_results.SingleResults[_Result]",
-            "optional_results.OptionalResults[_Result]",
-            "multiple_results.MultipleResults[_Result]",
-            "named_results.NamedResults[_Result]",
-        ],
-    ) -> "Results[_Result]":
-        ...
+    # @abstractmethod
+    # def __or__(
+    #     self,
+    #     rhs: Union[
+    #         "no_results.NoResults[_RhsResult]",
+    #         "single_results.SingleResults[_RhsResult]",
+    #         "optional_results.OptionalResults[_RhsResult]",
+    #         "multiple_results.MultipleResults[_RhsResult]",
+    #         "named_results.NamedResults[_RhsResult]",
+    #     ],
+    # ) -> "Results[_Result|_RhsResult]":
+    #     ...
 
 
 from pysh.core.parser.results import (

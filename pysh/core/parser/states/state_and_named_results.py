@@ -6,7 +6,7 @@ from pysh.core.parser.states import state_and_results
 
 _State = TypeVar("_State")
 _Result = TypeVar("_Result")
-_ConvertResult = TypeVar("_ConvertResult")
+_RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
@@ -18,9 +18,9 @@ class StateAndNamedResults(
     )
 
     def convert(
-        self, func: Callable[..., _ConvertResult]
-    ) -> "state_and_single_results.StateAndSingleResults[_State,_ConvertResult]":
-        return state_and_single_results.StateAndSingleResults[_State, _ConvertResult](
+        self, func: Callable[..., _RhsResult]
+    ) -> "state_and_single_results.StateAndSingleResults[_State,_RhsResult]":
+        return state_and_single_results.StateAndSingleResults[_State, _RhsResult](
             self.state, self.results.convert(func)
         )
 

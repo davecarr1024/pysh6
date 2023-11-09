@@ -6,7 +6,7 @@ from pysh.core.parser import results
 
 _State = TypeVar("_State")
 _Result = TypeVar("_Result")
-_ConvertResult = TypeVar("_ConvertResult")
+_RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)

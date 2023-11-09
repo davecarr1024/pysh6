@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 from unittest import TestCase
 from pysh.core import errors
 from pysh.core.parser import results
@@ -140,3 +140,98 @@ class OptionalResultsTest(TestCase):
                         return int(value)
 
                 self.assertEqual(lhs.convert(convert), expected)
+
+    def test_or_type(self):
+        for lhs, rhs, expected in list[
+            tuple[
+                results.OptionalResults[int],
+                Union[
+                    results.NoResults[str],
+                    results.SingleResults[str],
+                    results.OptionalResults[str],
+                    results.MultipleResults[str],
+                    results.NamedResults[str],
+                ],
+                results.Results[int | str],
+            ]
+        ](
+            [
+                (
+                    results.OptionalResults[int](),
+                    results.NoResults[str](),
+                    results.OptionalResults[int | str](),
+                ),
+                (
+                    results.OptionalResults[int](1),
+                    results.NoResults[str](),
+                    results.OptionalResults[int | str](1),
+                ),
+                (
+                    results.OptionalResults[int](),
+                    results.SingleResults[str]("a"),
+                    results.MultipleResults[int | str](["a"]),
+                ),
+                (
+                    results.OptionalResults[int](1),
+                    results.SingleResults[str]("a"),
+                    results.MultipleResults[int | str]([1, "a"]),
+                ),
+                (
+                    results.OptionalResults[int](),
+                    results.OptionalResults[str](),
+                    results.MultipleResults[int | str](),
+                ),
+                (
+                    results.OptionalResults[int](1),
+                    results.OptionalResults[str](),
+                    results.MultipleResults[int | str]([1]),
+                ),
+                (
+                    results.OptionalResults[int](),
+                    results.OptionalResults[str]("a"),
+                    results.MultipleResults[int | str](["a"]),
+                ),
+                (
+                    results.OptionalResults[int](1),
+                    results.OptionalResults[str]("a"),
+                    results.MultipleResults[int | str]([1, "a"]),
+                ),
+                (
+                    results.OptionalResults[int](),
+                    results.MultipleResults[str](),
+                    results.MultipleResults[int | str](),
+                ),
+                (
+                    results.OptionalResults[int](1),
+                    results.MultipleResults[str](),
+                    results.MultipleResults[int | str]([1]),
+                ),
+                (
+                    results.OptionalResults[int](),
+                    results.MultipleResults[str](["a"]),
+                    results.MultipleResults[int | str](["a"]),
+                ),
+                (
+                    results.OptionalResults[int](1),
+                    results.MultipleResults[str](["a"]),
+                    results.MultipleResults[int | str]([1, "a"]),
+                ),
+                (
+                    results.OptionalResults[int](),
+                    results.NamedResults[str](),
+                    results.NamedResults[int | str](),
+                ),
+                (
+                    results.OptionalResults[int](1),
+                    results.NamedResults[str](),
+                    results.NamedResults[int | str]({"": 1}),
+                ),
+                (
+                    results.OptionalResults[int](1),
+                    results.NamedResults[str]({"a": "v"}),
+                    results.NamedResults[int | str]({"": 1, "a": "v"}),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
+                self.assertEqual(lhs | rhs, expected)

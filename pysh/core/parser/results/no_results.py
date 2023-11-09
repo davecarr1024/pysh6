@@ -4,7 +4,7 @@ from pysh.core.parser.results import results
 
 
 _Result = TypeVar("_Result")
-_ConvertResult = TypeVar("_ConvertResult")
+_RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
@@ -25,49 +25,63 @@ class NoResults(results.Results[_Result]):
         return named_results.NamedResults[_Result]()
 
     @overload
-    def __or__(self, rhs: "NoResults[_Result]") -> "NoResults[_Result]":
+    def __or__(self, rhs: "NoResults[_RhsResult]") -> "NoResults[_Result|_RhsResult]":
         ...
 
     @overload
     def __or__(
-        self, rhs: "single_results.SingleResults[_Result]"
-    ) -> "single_results.SingleResults[_Result]":
+        self, rhs: "single_results.SingleResults[_RhsResult]"
+    ) -> "single_results.SingleResults[_Result|_RhsResult]":
         ...
 
     @overload
     def __or__(
-        self, rhs: "optional_results.OptionalResults[_Result]"
-    ) -> "optional_results.OptionalResults[_Result]":
+        self, rhs: "optional_results.OptionalResults[_RhsResult]"
+    ) -> "optional_results.OptionalResults[_Result|_RhsResult]":
         ...
 
     @overload
     def __or__(
-        self, rhs: "multiple_results.MultipleResults[_Result]"
-    ) -> "multiple_results.MultipleResults[_Result]":
+        self, rhs: "multiple_results.MultipleResults[_RhsResult]"
+    ) -> "multiple_results.MultipleResults[_Result|_RhsResult]":
         ...
 
     @overload
     def __or__(
-        self, rhs: "named_results.NamedResults[_Result]"
-    ) -> "named_results.NamedResults[_Result]":
+        self, rhs: "named_results.NamedResults[_RhsResult]"
+    ) -> "named_results.NamedResults[_Result|_RhsResult]":
         ...
 
     def __or__(
         self,
         rhs: Union[
-            "NoResults[_Result]",
-            "single_results.SingleResults[_Result]",
-            "optional_results.OptionalResults[_Result]",
-            "multiple_results.MultipleResults[_Result]",
-            "named_results.NamedResults[_Result]",
+            "NoResults[_RhsResult]",
+            "single_results.SingleResults[_RhsResult]",
+            "optional_results.OptionalResults[_RhsResult]",
+            "multiple_results.MultipleResults[_RhsResult]",
+            "named_results.NamedResults[_RhsResult]",
         ],
-    ) -> results.Results[_Result]:
-        return rhs
+    ) -> results.Results[_Result | _RhsResult]:
+        match rhs:
+            case NoResults():
+                return NoResults[_Result | _RhsResult]()
+            case single_results.SingleResults():
+                return single_results.SingleResults[_Result | _RhsResult](rhs.value)
+            case optional_results.OptionalResults():
+                return optional_results.OptionalResults[_Result | _RhsResult](rhs.value)
+            case multiple_results.MultipleResults():
+                return multiple_results.MultipleResults[_Result | _RhsResult](
+                    rhs._values
+                )
+            case named_results.NamedResults():
+                return named_results.NamedResults[_Result | _RhsResult](rhs._values)
+            case _:
+                raise self._error(f"unknown rhs {rhs}")
 
     def convert(
-        self, func: Callable[[], _ConvertResult]
-    ) -> "single_results.SingleResults[_ConvertResult]":
-        return single_results.SingleResults[_ConvertResult](func())
+        self, func: Callable[[], _RhsResult]
+    ) -> "single_results.SingleResults[_RhsResult]":
+        return single_results.SingleResults[_RhsResult](func())
 
 
 from pysh.core.parser.results import (
