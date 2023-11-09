@@ -5,3 +5,5 @@ from pysh.core.parser.states.state_and_optional_results import StateAndOptionalR
 from pysh.core.parser.states.state_and_multiple_results import StateAndMultipleResults
 from pysh.core.parser.states.state_and_named_results import StateAndNamedResults
 from pysh.core.parser.states.error import Error
+from pysh.core.parser.states.state_value_getter import StateValueGetter
+from pysh.core.parser.states.state_value_setter import StateValueSetter
