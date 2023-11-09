@@ -23,9 +23,6 @@ class Ref(
     def __str__(self) -> str:
         return f"Ref({self.name})"
 
-    def lexer(self) -> lexer.Lexer:
-        return lexer.Lexer()
-
     def __call__(self, state: _State) -> states.StateAndSingleResults[_State, _Result]:
         scope = self._get_state_value(state)
         if self.name not in scope:

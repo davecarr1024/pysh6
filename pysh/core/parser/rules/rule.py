@@ -15,9 +15,8 @@ class Rule(ABC, Generic[_State, _Result]):
     def __call__(self, state: _State) -> states.StateAndResults[_State, _Result]:
         ...
 
-    @abstractmethod
     def lexer(self) -> lexer.Lexer:
-        ...
+        return lexer.Lexer()
 
     def _error(
         self,
