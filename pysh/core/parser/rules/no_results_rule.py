@@ -7,6 +7,7 @@ from pysh.core.parser.rules import rule
 
 _State = TypeVar("_State")
 _Result = TypeVar("_Result")
+_ConvertResult = TypeVar("_ConvertResult")
 
 
 @dataclass(frozen=True)
@@ -16,15 +17,16 @@ class NoResultsRule(rule.Rule[_State, _Result]):
         ...
 
     def convert(
-        self, func: Callable[[], _Result]
-    ) -> "single_results_rule.SingleResultsRule[_State,_Result]":
+        self, func: Callable[[], _ConvertResult]
+    ) -> "single_results_rule.SingleResultsRule[_State,_ConvertResult]":
         AdapterState = TypeVar("AdapterState")
         AdapterResult = TypeVar("AdapterResult")
+        AdapterChildResult = TypeVar("AdapterChildResult")
 
         @dataclass(frozen=True)
         class Converter(
             single_results_rule.SingleResultsRule[AdapterState, AdapterResult],
-            unary_rule.UnaryRule[AdapterState, AdapterResult],
+            unary_rule.UnaryRule[AdapterState, AdapterResult, AdapterChildResult],
         ):
             func: Callable[[], AdapterResult]
 
@@ -34,7 +36,7 @@ class NoResultsRule(rule.Rule[_State, _Result]):
             ) -> states.StateAndSingleResults[AdapterState, AdapterResult]:
                 return self._call_child(state).no().convert(self.func)
 
-        return Converter[_State, _Result](self, func)
+        return Converter[_State, _ConvertResult, _Result](self, func)
 
 
 from pysh.core.parser.rules import single_results_rule, unary_rule
