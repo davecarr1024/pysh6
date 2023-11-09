@@ -20,6 +20,9 @@ class Scope(
         ]()
     )
 
+    def __str__(self) -> str:
+        return f'Scope({",".join(f"{name} = {rule}" for name, rule in self.items())})'
+
     def __len__(self) -> int:
         return len(self._rules)
 

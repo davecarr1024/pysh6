@@ -11,6 +11,9 @@ _ConvertResult = TypeVar("_ConvertResult")
 class SingleResults(results.Results[_Result]):
     value: _Result
 
+    def __str__(self) -> str:
+        return str(self.value)
+
     def no(self) -> "no_results.NoResults[_Result]":
         return no_results.NoResults[_Result]()
 

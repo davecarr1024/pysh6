@@ -14,6 +14,9 @@ class StateAndResults(ABC, Generic[_State, _Result]):
     state: _State
     results: results.Results[_Result]
 
+    def __str__(self) -> str:
+        return f"StateAndResults(state={self.state},results={self.results})"
+
     def _error(self, msg: Optional[str] = None) -> "error.Error":
         return error.Error(state_and_results=self, msg=msg)
 

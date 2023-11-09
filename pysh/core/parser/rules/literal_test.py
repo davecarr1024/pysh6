@@ -13,14 +13,10 @@ class LiteralTest(TestCase):
 
             @staticmethod
             def lexer_result_setter() -> states.StateValueSetter["State", lexer.Result]:
-                class Setter(states.StateValueSetter[State, lexer.Result]):
-                    def get(self, state: State) -> lexer.Result:
-                        return state.lexer_result
-
-                    def set(self, state: State, value: lexer.Result) -> State:
-                        return State(value)
-
-                return Setter()
+                return states.StateValueSetter[State, lexer.Result].load(
+                    lambda state: state.lexer_result,
+                    lambda _, lexer_result: State(lexer_result),
+                )
 
             @staticmethod
             def literal(lexer_rule: lexer.Rule) -> rules.Literal["State"]:

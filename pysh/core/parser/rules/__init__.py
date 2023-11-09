@@ -8,3 +8,4 @@ from pysh.core.parser.rules.rule import Rule
 from pysh.core.parser.rules.scope import Scope
 from pysh.core.parser.rules.unary_rule import UnaryRule
 from pysh.core.parser.rules.literal import Literal
+from pysh.core.parser.rules.ref import Ref
