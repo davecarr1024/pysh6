@@ -1,3 +1,4 @@
+from typing import Sequence
 from unittest import TestCase
 from pysh.core import errors
 from pysh.core.parser import results
@@ -156,3 +157,29 @@ class MultipleResultsTest(TestCase):
             results.MultipleResults[int]([1]) | results.NamedResults[int]({"a": 2}),
             results.NamedResults[int]({"": 1, "a": 2}),
         )
+
+    def test_convert(self):
+        for lhs, expected in list[
+            tuple[results.MultipleResults[str], results.SingleResults[int]]
+        ](
+            [
+                (
+                    results.MultipleResults[str](),
+                    results.SingleResults[int](0),
+                ),
+                (
+                    results.MultipleResults[str](["1"]),
+                    results.SingleResults[int](1),
+                ),
+                (
+                    results.MultipleResults[str](["1", "2"]),
+                    results.SingleResults[int](3),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, expected=expected):
+
+                def convert(values: Sequence[str]) -> int:
+                    return sum(int(value) for value in values)
+
+                self.assertEqual(lhs.convert(convert), expected)

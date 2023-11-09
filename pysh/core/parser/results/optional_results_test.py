@@ -1,3 +1,4 @@
+from typing import Optional
 from unittest import TestCase
 from pysh.core import errors
 from pysh.core.parser import results
@@ -114,3 +115,28 @@ class OptionalResultsTest(TestCase):
             results.OptionalResults[int](1) | results.NamedResults[int]({"a": 2}),
             results.NamedResults[int]({"": 1, "a": 2}),
         )
+
+    def test_convert(self):
+        for lhs, expected in list[
+            tuple[results.OptionalResults[str], results.SingleResults[int]]
+        ](
+            [
+                (
+                    results.OptionalResults[str](),
+                    results.SingleResults[int](-1),
+                ),
+                (
+                    results.OptionalResults[str]("1"),
+                    results.SingleResults[int](1),
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, expected=expected):
+
+                def convert(value: Optional[str]) -> int:
+                    if value is None:
+                        return -1
+                    else:
+                        return int(value)
+
+                self.assertEqual(lhs.convert(convert), expected)

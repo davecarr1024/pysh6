@@ -71,3 +71,8 @@ class SingleResultsTest(TestCase):
             results.SingleResults[int](1) | results.NamedResults[int]({"a": 2}),
             results.NamedResults[int]({"": 1, "a": 2}),
         )
+
+    def test_convert(self):
+        self.assertEqual(
+            results.SingleResults[str]("1").convert(int), results.SingleResults[int](1)
+        )

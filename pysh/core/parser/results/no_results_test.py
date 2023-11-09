@@ -68,3 +68,8 @@ class NoResultsTest(TestCase):
             results.NoResults[int]() | results.NamedResults[int]({"a": 1}),
             results.NamedResults[int]({"a": 1}),
         )
+
+    def test_convert(self):
+        self.assertEqual(
+            results.NoResults[str]().convert(lambda: 1), results.SingleResults[int](1)
+        )

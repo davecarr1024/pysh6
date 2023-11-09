@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from unittest import TestCase
 from pysh.core import errors
 from pysh.core.parser import results
@@ -161,4 +162,15 @@ class NamedResultsTest(TestCase):
         self.assertEqual(
             results.NamedResults[int]({"a": 1}) | results.NamedResults[int]({"b": 2}),
             results.NamedResults[int]({"a": 1, "b": 2}),
+        )
+
+    def test_convert(self) -> None:
+        @dataclass(frozen=True)
+        class Decl:
+            name: str
+            value: int
+
+        self.assertEqual(
+            results.NamedResults[int | str]({"name": "a", "value": 1}).convert(Decl),
+            results.SingleResults[Decl](Decl("a", 1)),
         )
