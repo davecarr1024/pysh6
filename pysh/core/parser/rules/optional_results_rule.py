@@ -2,7 +2,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Callable, Optional, TypeVar, Union, overload
 from pysh.core.parser import states
-from pysh.core.parser.rules import rule
+from pysh.core.parser.rules import ands, rule
 
 
 _State = TypeVar("_State")
@@ -43,31 +43,31 @@ class OptionalResultsRule(rule.Rule[_State, _Result]):
     @overload
     def __and__(
         self, rhs: "no_results_rule.NoResultsRule[_State,_Result]"
-    ) -> "optional_results_and.OptionalResultsAnd[_State,_Result]":
+    ) -> "ands.OptionalResultsAnd[_State,_Result]":
         ...
 
     @overload
     def __and__(
         self, rhs: "single_results_rule.SingleResultsRule[_State,_Result]"
-    ) -> "multiple_results_and.MultipleResultsAnd[_State,_Result]":
+    ) -> "ands.MultipleResultsAnd[_State,_Result]":
         ...
 
     @overload
     def __and__(
         self, rhs: "OptionalResultsRule[_State,_Result]"
-    ) -> "multiple_results_and.MultipleResultsAnd[_State,_Result]":
+    ) -> "ands.MultipleResultsAnd[_State,_Result]":
         ...
 
     @overload
     def __and__(
         self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_Result]"
-    ) -> "multiple_results_and.MultipleResultsAnd[_State,_Result]":
+    ) -> "ands.MultipleResultsAnd[_State,_Result]":
         ...
 
     @overload
     def __and__(
         self, rhs: "named_results_rule.NamedResultsRule[_State,_Result]"
-    ) -> "named_results_and.NamedResultsAnd[_State,_Result]":
+    ) -> "ands.NamedResultsAnd[_State,_Result]":
         ...
 
     def __and__(
@@ -79,18 +79,14 @@ class OptionalResultsRule(rule.Rule[_State, _Result]):
             "multiple_results_rule.MultipleResultsRule[_State,_Result]",
             "named_results_rule.NamedResultsRule[_State,_Result]",
         ],
-    ) -> "and_.And[_State,_Result, rule.Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result, rule.Rule[_State,_Result]]":
         match rhs:
             case no_results_rule.NoResultsRule():
-                return optional_results_and.OptionalResultsAnd[_State, _Result](
-                    [self, rhs]
-                )
+                return ands.OptionalResultsAnd[_State, _Result]([self, rhs])
             case single_results_rule.SingleResultsRule() | OptionalResultsRule() | multiple_results_rule.MultipleResultsRule():
-                return multiple_results_and.MultipleResultsAnd[_State, _Result](
-                    [self, rhs]
-                )
+                return ands.MultipleResultsAnd[_State, _Result]([self, rhs])
             case named_results_rule.NamedResultsRule():
-                return named_results_and.NamedResultsAnd[_State, _Result]([self, rhs])
+                return ands.NamedResultsAnd[_State, _Result]([self, rhs])
             case _:
                 raise self._error("invalid and rhs {rhs}")
 

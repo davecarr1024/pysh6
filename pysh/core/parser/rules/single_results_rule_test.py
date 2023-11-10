@@ -2,12 +2,6 @@ from dataclasses import dataclass
 from typing import Type, Union
 from unittest import TestCase
 from pysh.core.parser import results, rules, states
-from pysh.core.parser.rules.ands import (
-    and_,
-    multiple_results_and,
-    named_results_and,
-    single_results_and,
-)
 
 
 class NoResultsRuleTest(TestCase):
@@ -37,34 +31,34 @@ class NoResultsRuleTest(TestCase):
                     rules.MultipleResultsRule[State, int],
                     rules.NamedResultsRule[State, int],
                 ],
-                Type[and_.And[State, int, rules.Rule[State, int]]],
+                Type[rules.ands.And[State, int, rules.Rule[State, int]]],
             ]
         ](
             [
                 (
                     rules.Constant[State, int](1).no(),
-                    single_results_and.SingleResultsAnd,
+                    rules.ands.SingleResultsAnd,
                 ),
                 (
                     rules.Constant[State, int](1).single(),
-                    multiple_results_and.MultipleResultsAnd,
+                    rules.ands.MultipleResultsAnd,
                 ),
                 (
                     rules.Constant[State, int](1).optional(),
-                    multiple_results_and.MultipleResultsAnd,
+                    rules.ands.MultipleResultsAnd,
                 ),
                 (
                     rules.Constant[State, int](1).multiple(),
-                    multiple_results_and.MultipleResultsAnd,
+                    rules.ands.MultipleResultsAnd,
                 ),
                 (
                     rules.Constant[State, int](1).named(),
-                    named_results_and.NamedResultsAnd,
+                    rules.ands.NamedResultsAnd,
                 ),
             ]
         ):
             with self.subTest(rhs=rhs, expected_type=expected_type):
                 lhs: rules.SingleResultsRule[State, int] = rules.Constant[State, int](1)
-                actual: and_.And[State, int, rules.Rule[State, int]] = lhs & rhs
+                actual: rules.ands.And[State, int, rules.Rule[State, int]] = lhs & rhs
                 self.assertSequenceEqual(list(actual), [lhs, rhs])
                 self.assertIsInstance(actual, expected_type)

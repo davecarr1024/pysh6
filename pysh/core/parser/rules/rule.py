@@ -205,35 +205,35 @@ class Rule(ABC, Generic[_State, _Result]):
     @abstractmethod
     def __and__(
         self, rhs: "no_results_rule.NoResultsRule[_State,_Result]"
-    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
         self, rhs: "single_results_rule.SingleResultsRule[_State,_Result]"
-    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
         self, rhs: "optional_results_rule.OptionalResultsRule[_State,_Result]"
-    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
         self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_Result]"
-    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
         self, rhs: "named_results_rule.NamedResultsRule[_State,_Result]"
-    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
         ...
 
     @abstractmethod
@@ -246,11 +246,12 @@ class Rule(ABC, Generic[_State, _Result]):
             "multiple_results_rule.MultipleResultsRule[_State,_Result]",
             "named_results_rule.NamedResultsRule[_State,_Result]",
         ],
-    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
         ...
 
 
 from pysh.core.parser.rules import (
+    ands,
     no_results_rule,
     single_results_rule,
     optional_results_rule,
@@ -258,4 +259,3 @@ from pysh.core.parser.rules import (
     named_results_rule,
     unary_rule,
 )
-from pysh.core.parser.rules.ands import and_
