@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Type, Union
 from unittest import TestCase
-from pysh.core.parser import rules
+from pysh.core.parser import results, rules, states
 from pysh.core.parser.rules.ands import (
     and_,
     named_results_and,
@@ -57,3 +57,21 @@ class NamedResultsRuleTest(TestCase):
                 actual: and_.And[State, int, rules.Rule[State, int]] = lhs & rhs
                 self.assertSequenceEqual(list(actual), [lhs, rhs])
                 self.assertIsInstance(actual, expected_type)
+
+    def test_convert(self) -> None:
+        @dataclass(frozen=True)
+        class State:
+            ...
+
+        def convert(*, a: int, b: int) -> int:
+            return a * 10 + b
+
+        self.assertEqual(
+            (
+                rules.Constant[State, int](1).named("a")
+                & rules.Constant[State, int](2).named("b")
+            ).convert(convert)(State()),
+            states.StateAndSingleResults[State, int](
+                State(), results.SingleResults[int](12)
+            ),
+        )

@@ -47,10 +47,10 @@ class StateAndResults(ABC, Generic[_State, _Result]):
         )
 
     def named(
-        self,
+        self, name: str = ""
     ) -> "state_and_named_results.StateAndNamedResults[_State,_Result]":
         return state_and_named_results.StateAndNamedResults[_State, _Result](
-            self.state, self.results.named()
+            self.state, self.results.named(name)
         )
 
 

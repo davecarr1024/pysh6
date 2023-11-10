@@ -184,7 +184,9 @@ class Rule(ABC, Generic[_State, _Result]):
 
         return Adapter[_State, _Result](self)
 
-    def named(self) -> "named_results_rule.NamedResultsRule[_State,_Result]":
+    def named(
+        self, name: str = ""
+    ) -> "named_results_rule.NamedResultsRule[_State,_Result]":
         AdapterState = TypeVar("AdapterState")
         AdapterResult = TypeVar("AdapterResult")
 
@@ -195,7 +197,7 @@ class Rule(ABC, Generic[_State, _Result]):
             def __call__(
                 self, state: AdapterState
             ) -> states.StateAndNamedResults[AdapterState, AdapterResult]:
-                return self._call_child(state).named()
+                return self._call_child(state).named(name)
 
         return Adapter[_State, _Result](self)
 

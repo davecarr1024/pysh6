@@ -1,4 +1,3 @@
-from audioop import mul
 from dataclasses import dataclass
 from typing import Type, Union
 from unittest import TestCase
@@ -7,7 +6,6 @@ from pysh.core.parser.rules.ands import (
     and_,
     multiple_results_and,
     named_results_and,
-    optional_results_and,
 )
 
 
