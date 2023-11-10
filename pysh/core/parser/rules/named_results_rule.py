@@ -6,8 +6,9 @@ from pysh.core.parser.rules import rule
 
 
 _State = TypeVar("_State")
-_Result = TypeVar("_Result")
+_Result = TypeVar("_Result", covariant=True)
 _ConvertResult = TypeVar("_ConvertResult")
+_RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
@@ -18,45 +19,45 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
 
     @overload
     def __and__(
-        self, rhs: "no_results_rule.NoResultsRule[_State,_Result]"
-    ) -> "ands.NamedResultsAnd[_State,_Result]":
+        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
+    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     @overload
     def __and__(
-        self, rhs: "single_results_rule.SingleResultsRule[_State,_Result]"
-    ) -> "ands.NamedResultsAnd[_State,_Result]":
+        self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
+    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     @overload
     def __and__(
-        self, rhs: "optional_results_rule.OptionalResultsRule[_State,_Result]"
-    ) -> "ands.NamedResultsAnd[_State,_Result]":
+        self, rhs: "optional_results_rule.OptionalResultsRule[_State,_RhsResult]"
+    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     @overload
     def __and__(
-        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_Result]"
-    ) -> "ands.NamedResultsAnd[_State,_Result]":
+        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]"
+    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     @overload
     def __and__(
-        self, rhs: "NamedResultsRule[_State,_Result]"
-    ) -> "ands.NamedResultsAnd[_State,_Result]":
+        self, rhs: "NamedResultsRule[_State,_RhsResult]"
+    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     def __and__(
         self,
         rhs: Union[
-            "no_results_rule.NoResultsRule[_State,_Result]",
-            "single_results_rule.SingleResultsRule[_State,_Result]",
-            "optional_results_rule.OptionalResultsRule[_State,_Result]",
-            "multiple_results_rule.MultipleResultsRule[_State,_Result]",
-            "NamedResultsRule[_State,_Result]",
+            "no_results_rule.NoResultsRule[_State,_RhsResult]",
+            "single_results_rule.SingleResultsRule[_State,_RhsResult]",
+            "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
+            "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
+            "NamedResultsRule[_State,_RhsResult]",
         ],
-    ) -> "ands.NamedResultsAnd[_State,_Result]":
-        return ands.NamedResultsAnd[_State, _Result]([self, rhs])
+    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
+        return ands.NamedResultsAnd[_State, _Result, _RhsResult]([self, rhs])
 
     def convert(
         self, func: Callable[..., _ConvertResult]

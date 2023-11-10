@@ -4,7 +4,7 @@ from pysh.core.parser.rules import nary_rule, rule
 
 
 _State = TypeVar("_State")
-_Result = TypeVar("_Result")
+_Result = TypeVar("_Result", covariant=True)
 _ChildRuleType = TypeVar("_ChildRuleType", bound=rule.Rule, covariant=True)
 
 

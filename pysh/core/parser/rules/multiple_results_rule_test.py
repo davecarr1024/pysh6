@@ -24,45 +24,81 @@ class MultipleResultsRuleTest(TestCase):
         class State:
             ...
 
-        for rhs, expected_type in list[
+        for lhs, rhs, expected in list[
             tuple[
+                rules.MultipleResultsRule[State, int],
                 Union[
-                    rules.NoResultsRule[State, int],
-                    rules.SingleResultsRule[State, int],
-                    rules.OptionalResultsRule[State, int],
-                    rules.MultipleResultsRule[State, int],
-                    rules.NamedResultsRule[State, int],
+                    rules.NoResultsRule[State, str],
+                    rules.SingleResultsRule[State, str],
+                    rules.OptionalResultsRule[State, str],
+                    rules.MultipleResultsRule[State, str],
+                    rules.NamedResultsRule[State, str],
                 ],
-                Type[rules.ands.And[State, int, rules.Rule[State, int]]],
+                states.StateAndResults[State, int | str],
             ]
         ](
             [
                 (
-                    rules.Constant[State, int](1).no(),
-                    rules.ands.MultipleResultsAnd,
-                ),
-                (
-                    rules.Constant[State, int](1).single(),
-                    rules.ands.MultipleResultsAnd,
-                ),
-                (
-                    rules.Constant[State, int](1).optional(),
-                    rules.ands.MultipleResultsAnd,
+                    rules.Constant[State, int](1).no().multiple(),
+                    rules.Constant[State, str]("a").no(),
+                    states.StateAndMultipleResults[State, int | str](State()),
                 ),
                 (
                     rules.Constant[State, int](1).multiple(),
-                    rules.ands.MultipleResultsAnd,
+                    rules.Constant[State, str]("a").no(),
+                    states.StateAndMultipleResults[State, int | str](
+                        State(),
+                        results.MultipleResults[int | str]([1]),
+                    ),
                 ),
                 (
-                    rules.Constant[State, int](1).named(),
-                    rules.ands.NamedResultsAnd,
+                    rules.Constant[State, int](1).no().multiple(),
+                    rules.Constant[State, str]("a"),
+                    states.StateAndMultipleResults[State, int | str](
+                        State(),
+                        results.MultipleResults[int | str](["a"]),
+                    ),
+                ),
+                (
+                    rules.Constant[State, int](1).multiple(),
+                    rules.Constant[State, str]("a"),
+                    states.StateAndMultipleResults[State, int | str](
+                        State(),
+                        results.MultipleResults[int | str]([1, "a"]),
+                    ),
+                ),
+                (
+                    rules.Constant[State, int](1).no().multiple(),
+                    rules.Constant[State, str]("a").no().optional(),
+                    states.StateAndMultipleResults[State, int | str](
+                        State(),
+                    ),
+                ),
+                (
+                    rules.Constant[State, int](1).no().multiple(),
+                    rules.Constant[State, str]("a").optional(),
+                    states.StateAndMultipleResults[State, int | str](
+                        State(),
+                        results.MultipleResults[int | str](["a"]),
+                    ),
+                ),
+                (
+                    rules.Constant[State, int](1).multiple(),
+                    rules.Constant[State, str]("a").no().multiple(),
+                    states.StateAndMultipleResults[State, int | str](
+                        State(),
+                        results.MultipleResults[int | str]([1]),
+                    ),
+                ),
+                (
+                    rules.Constant[State, int](1).multiple(),
+                    rules.Constant[State, str]("a").multiple(),
+                    states.StateAndMultipleResults[State, int | str](
+                        State(),
+                        results.MultipleResults[int | str]([1, "a"]),
+                    ),
                 ),
             ]
         ):
-            with self.subTest(rhs=rhs, expected_type=expected_type):
-                lhs: rules.MultipleResultsRule[State, int] = rules.Constant[State, int](
-                    1
-                ).multiple()
-                actual: rules.ands.And[State, int, rules.Rule[State, int]] = lhs & rhs
-                self.assertSequenceEqual(list(actual), [lhs, rhs])
-                self.assertIsInstance(actual, expected_type)
+            with self.subTest(lhs=lhs, rhs=rhs, expected=expected):
+                self.assertEqual((lhs & rhs)(State()), expected)

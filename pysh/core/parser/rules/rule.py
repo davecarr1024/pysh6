@@ -6,7 +6,8 @@ from pysh.core.parser import results, states
 
 
 _State = TypeVar("_State")
-_Result = TypeVar("_Result")
+_Result = TypeVar("_Result", covariant=True)
+_RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
@@ -204,49 +205,49 @@ class Rule(ABC, Generic[_State, _Result]):
     @overload
     @abstractmethod
     def __and__(
-        self, rhs: "no_results_rule.NoResultsRule[_State,_Result]"
-    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
+        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
+    ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
-        self, rhs: "single_results_rule.SingleResultsRule[_State,_Result]"
-    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
+        self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
+    ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
-        self, rhs: "optional_results_rule.OptionalResultsRule[_State,_Result]"
-    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
+        self, rhs: "optional_results_rule.OptionalResultsRule[_State,_RhsResult]"
+    ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
-        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_Result]"
-    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
+        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]"
+    ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...
 
     @overload
     @abstractmethod
     def __and__(
-        self, rhs: "named_results_rule.NamedResultsRule[_State,_Result]"
-    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
+        self, rhs: "named_results_rule.NamedResultsRule[_State,_RhsResult]"
+    ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...
 
     @abstractmethod
     def __and__(
         self,
         rhs: Union[
-            "no_results_rule.NoResultsRule[_State,_Result]",
-            "single_results_rule.SingleResultsRule[_State,_Result]",
-            "optional_results_rule.OptionalResultsRule[_State,_Result]",
-            "multiple_results_rule.MultipleResultsRule[_State,_Result]",
-            "named_results_rule.NamedResultsRule[_State,_Result]",
+            "no_results_rule.NoResultsRule[_State,_RhsResult]",
+            "single_results_rule.SingleResultsRule[_State,_RhsResult]",
+            "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
+            "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
+            "named_results_rule.NamedResultsRule[_State,_RhsResult]",
         ],
-    ) -> "ands.And[_State,_Result, Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...
 
 

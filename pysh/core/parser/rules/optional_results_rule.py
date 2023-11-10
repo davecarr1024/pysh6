@@ -6,8 +6,9 @@ from pysh.core.parser.rules import ands, rule
 
 
 _State = TypeVar("_State")
-_Result = TypeVar("_Result")
+_Result = TypeVar("_Result", covariant=True)
 _ConvertResult = TypeVar("_ConvertResult")
+_RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
@@ -42,51 +43,51 @@ class OptionalResultsRule(rule.Rule[_State, _Result]):
 
     @overload
     def __and__(
-        self, rhs: "no_results_rule.NoResultsRule[_State,_Result]"
-    ) -> "ands.OptionalResultsAnd[_State,_Result]":
+        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
+    ) -> "ands.OptionalResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     @overload
     def __and__(
-        self, rhs: "single_results_rule.SingleResultsRule[_State,_Result]"
-    ) -> "ands.MultipleResultsAnd[_State,_Result]":
+        self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
+    ) -> "ands.MultipleResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     @overload
     def __and__(
-        self, rhs: "OptionalResultsRule[_State,_Result]"
-    ) -> "ands.MultipleResultsAnd[_State,_Result]":
+        self, rhs: "OptionalResultsRule[_State,_RhsResult]"
+    ) -> "ands.MultipleResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     @overload
     def __and__(
-        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_Result]"
-    ) -> "ands.MultipleResultsAnd[_State,_Result]":
+        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]"
+    ) -> "ands.MultipleResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     @overload
     def __and__(
-        self, rhs: "named_results_rule.NamedResultsRule[_State,_Result]"
-    ) -> "ands.NamedResultsAnd[_State,_Result]":
+        self, rhs: "named_results_rule.NamedResultsRule[_State,_RhsResult]"
+    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
         ...
 
     def __and__(
         self,
         rhs: Union[
-            "no_results_rule.NoResultsRule[_State,_Result]",
-            "single_results_rule.SingleResultsRule[_State,_Result]",
-            "OptionalResultsRule[_State,_Result]",
-            "multiple_results_rule.MultipleResultsRule[_State,_Result]",
-            "named_results_rule.NamedResultsRule[_State,_Result]",
+            "no_results_rule.NoResultsRule[_State,_RhsResult]",
+            "single_results_rule.SingleResultsRule[_State,_RhsResult]",
+            "OptionalResultsRule[_State,_RhsResult]",
+            "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
+            "named_results_rule.NamedResultsRule[_State,_RhsResult]",
         ],
-    ) -> "ands.And[_State,_Result, rule.Rule[_State,_Result]]":
+    ) -> "ands.And[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
         match rhs:
             case no_results_rule.NoResultsRule():
-                return ands.OptionalResultsAnd[_State, _Result]([self, rhs])
+                return ands.OptionalResultsAnd[_State, _Result, _RhsResult]([self, rhs])
             case single_results_rule.SingleResultsRule() | OptionalResultsRule() | multiple_results_rule.MultipleResultsRule():
-                return ands.MultipleResultsAnd[_State, _Result]([self, rhs])
+                return ands.MultipleResultsAnd[_State, _Result, _RhsResult]([self, rhs])
             case named_results_rule.NamedResultsRule():
-                return ands.NamedResultsAnd[_State, _Result]([self, rhs])
+                return ands.NamedResultsAnd[_State, _Result, _RhsResult]([self, rhs])
             case _:
                 raise self._error("invalid and rhs {rhs}")
 

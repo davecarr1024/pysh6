@@ -6,7 +6,7 @@ from pysh.core.parser.rules import rule
 
 
 _State = TypeVar("_State")
-_Result = TypeVar("_Result")
+_Result = TypeVar("_Result", covariant=True)
 _ChildResult = TypeVar("_ChildResult")
 
 

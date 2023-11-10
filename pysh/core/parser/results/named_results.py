@@ -3,7 +3,7 @@ from typing import Callable, Iterator, Mapping, Sequence, TypeVar, Union, overlo
 from pysh.core.parser.results import results
 
 
-_Result = TypeVar("_Result")
+_Result = TypeVar("_Result", covariant=True)
 _RhsResult = TypeVar("_RhsResult")
 
 

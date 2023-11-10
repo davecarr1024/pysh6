@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Callable, Generic, Optional, TypeVar, Union, overload
 
 
-_Result = TypeVar("_Result")
+_Result = TypeVar("_Result", covariant=True)
 _RhsResult = TypeVar("_RhsResult")
 
 

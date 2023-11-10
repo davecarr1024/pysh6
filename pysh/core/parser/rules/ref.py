@@ -6,7 +6,7 @@ from pysh.core.parser.rules import scope, single_results_rule, state_value_gette
 
 
 _State = TypeVar("_State")
-_Result = TypeVar("_Result")
+_Result = TypeVar("_Result", covariant=True)
 
 
 @dataclass(frozen=True)
