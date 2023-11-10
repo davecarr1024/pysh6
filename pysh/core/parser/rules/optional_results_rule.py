@@ -91,17 +91,63 @@ class OptionalResultsRule(rule.Rule[_State, _Result]):
             case _:
                 raise self._error("invalid and rhs {rhs}")
 
+    @overload
+    def __or__(
+        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
+    ) -> "ors.OptionalResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
+    ) -> "ors.OptionalResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "OptionalResultsRule[_State,_RhsResult]"
+    ) -> "ors.OptionalResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]"
+    ) -> "ors.MultipleResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "named_results_rule.NamedResultsRule[_State,_RhsResult]"
+    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    def __or__(
+        self,
+        rhs: Union[
+            "no_results_rule.NoResultsRule[_State,_RhsResult]",
+            "single_results_rule.SingleResultsRule[_State,_RhsResult]",
+            "OptionalResultsRule[_State,_RhsResult]",
+            "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
+            "named_results_rule.NamedResultsRule[_State,_RhsResult]",
+        ],
+    ) -> "ors.Or[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
+        match rhs:
+            case no_results_rule.NoResultsRule() | single_results_rule.SingleResultsRule() | OptionalResultsRule():
+                return ors.OptionalResultsOr[_State, _Result, _RhsResult]([self, rhs])
+            case multiple_results_rule.MultipleResultsRule():
+                return ors.MultipleResultsOr[_State, _Result, _RhsResult]([self, rhs])
+            case named_results_rule.NamedResultsRule():
+                return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
+            case _:
+                raise self._error("invalid or rhs {rhs}")
+
 
 from pysh.core.parser.rules import (
+    ands,
+    ors,
     no_results_rule,
     single_results_rule,
     multiple_results_rule,
     named_results_rule,
     unary_rule,
-)
-from pysh.core.parser.rules.ands import (
-    and_,
-    optional_results_and,
-    multiple_results_and,
-    named_results_and,
 )

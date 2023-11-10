@@ -81,9 +81,52 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
 
         return Converter[_State, _ConvertResult, _Result](self, func)
 
+    @overload
+    def __or__(
+        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
+    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
+    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "optional_results_rule.OptionalResultsRule[_State,_RhsResult]"
+    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]"
+    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "NamedResultsRule[_State,_RhsResult]"
+    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    def __or__(
+        self,
+        rhs: Union[
+            "no_results_rule.NoResultsRule[_State,_RhsResult]",
+            "single_results_rule.SingleResultsRule[_State,_RhsResult]",
+            "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
+            "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
+            "NamedResultsRule[_State,_RhsResult]",
+        ],
+    ) -> "ors.NamedResultsOr[_State, _Result, _RhsResult]":
+        return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
+
 
 from pysh.core.parser.rules import (
     ands,
+    ors,
     no_results_rule,
     single_results_rule,
     optional_results_rule,

@@ -250,9 +250,70 @@ class Rule(ABC, Generic[_State, _Result]):
     ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...
 
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
+    ) -> (
+        "ors.Or[_State,_Result|_RhsResult,Rule[_State,_Result]|Rule[_State,_RhsResult]]"
+    ):
+        ...
+
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
+    ) -> (
+        "ors.Or[_State,_Result|_RhsResult,Rule[_State,_Result]|Rule[_State,_RhsResult]]"
+    ):
+        ...
+
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "optional_results_rule.OptionalResultsRule[_State,_RhsResult]"
+    ) -> (
+        "ors.Or[_State,_Result|_RhsResult,Rule[_State,_Result]|Rule[_State,_RhsResult]]"
+    ):
+        ...
+
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]"
+    ) -> (
+        "ors.Or[_State,_Result|_RhsResult,Rule[_State,_Result]|Rule[_State,_RhsResult]]"
+    ):
+        ...
+
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "named_results_rule.NamedResultsRule[_State,_RhsResult]"
+    ) -> (
+        "ors.Or[_State,_Result|_RhsResult,Rule[_State,_Result]|Rule[_State,_RhsResult]]"
+    ):
+        ...
+
+    @abstractmethod
+    def __or__(
+        self,
+        rhs: Union[
+            "no_results_rule.NoResultsRule[_State,_RhsResult]",
+            "single_results_rule.SingleResultsRule[_State,_RhsResult]",
+            "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
+            "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
+            "named_results_rule.NamedResultsRule[_State,_RhsResult]",
+        ],
+    ) -> (
+        "ors.Or[_State,_Result|_RhsResult,Rule[_State,_Result]|Rule[_State,_RhsResult]]"
+    ):
+        ...
+
 
 from pysh.core.parser.rules import (
     ands,
+    ors,
     no_results_rule,
     single_results_rule,
     optional_results_rule,

@@ -94,9 +94,58 @@ class MultipleResultsRule(rule.Rule[_State, _Result]):
 
         return Converter[_State, _ConvertResult, _Result](self, func)
 
+    @overload
+    def __or__(
+        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
+    ) -> "ors.MultipleResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
+    ) -> "ors.MultipleResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "optional_results_rule.OptionalResultsRule[_State,_RhsResult]"
+    ) -> "ors.MultipleResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "MultipleResultsRule[_State,_RhsResult]"
+    ) -> "ors.MultipleResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    @overload
+    def __or__(
+        self, rhs: "named_results_rule.NamedResultsRule[_State,_RhsResult]"
+    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+        ...
+
+    def __or__(
+        self,
+        rhs: Union[
+            "no_results_rule.NoResultsRule[_State,_RhsResult]",
+            "single_results_rule.SingleResultsRule[_State,_RhsResult]",
+            "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
+            "MultipleResultsRule[_State,_RhsResult]",
+            "named_results_rule.NamedResultsRule[_State,_RhsResult]",
+        ],
+    ) -> "ors.Or[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
+        match rhs:
+            case no_results_rule.NoResultsRule() | single_results_rule.SingleResultsRule() | optional_results_rule.OptionalResultsRule() | MultipleResultsRule():
+                return ors.MultipleResultsOr[_State, _Result, _RhsResult]([self, rhs])
+            case named_results_rule.NamedResultsRule():
+                return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
+            case _:
+                raise self._error("invalid or rhs {rhs}")
+
 
 from pysh.core.parser.rules import (
     ands,
+    ors,
     no_results_rule,
     single_results_rule,
     optional_results_rule,
