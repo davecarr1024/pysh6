@@ -2,7 +2,7 @@ from audioop import mul
 from dataclasses import dataclass
 from typing import Type, Union
 from unittest import TestCase
-from pysh.core.parser import rules
+from pysh.core.parser import results, rules, states
 from pysh.core.parser.rules.ands import (
     and_,
     multiple_results_and,
@@ -12,6 +12,20 @@ from pysh.core.parser.rules.ands import (
 
 
 class MultipleResultsRuleTest(TestCase):
+    def test_convert(self) -> None:
+        @dataclass(frozen=True)
+        class State:
+            ...
+
+        self.assertEqual(
+            (rules.Constant[State, str]("1") & rules.Constant[State, str]("2")).convert(
+                lambda values: sum(map(int, values))
+            )(State()),
+            states.StateAndSingleResults[State, int](
+                State(), results.SingleResults[int](3)
+            ),
+        )
+
     def test_and(self) -> None:
         @dataclass(frozen=True)
         class State:
