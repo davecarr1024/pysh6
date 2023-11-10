@@ -26,8 +26,8 @@ class Ref(
     def __call__(self, state: _State) -> states.StateAndSingleResults[_State, _Result]:
         scope = self._get_state_value(state)
         if self.name not in scope:
-            raise self._error(state, msg=f"unknown rule {self.name}")
+            raise self._state_error(state, msg=f"unknown rule {self.name}")
         try:
             return scope[self.name](state)
         except errors.Error as error:
-            raise self._error(state, children=[error])
+            raise self._state_error(state, children=[error])

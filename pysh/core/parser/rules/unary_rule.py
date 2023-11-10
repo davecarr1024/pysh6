@@ -23,7 +23,7 @@ class UnaryRule(
         try:
             return self.child(state)
         except errors.Error as error:
-            raise self._error(state, children=[error])
+            raise self._state_error(state, children=[error])
 
     def lexer(self) -> lexer.Lexer:
         return self.child.lexer()

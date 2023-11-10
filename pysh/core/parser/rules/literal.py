@@ -37,5 +37,7 @@ class Literal(
                     results.SingleResults[tokens.Token](lexer_result.head()),
                 )
         except errors.Error as error:
-            raise self._error(state, children=[error])
-        raise self._error(state, msg=f"failed to get expected token {self.lexer_rule}")
+            raise self._state_error(state, children=[error])
+        raise self._state_error(
+            state, msg=f"failed to get expected token {self.lexer_rule}"
+        )

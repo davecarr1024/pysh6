@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Optional, Sequence, TypeVar
+from typing import Generic, Optional, Sequence, TypeVar, Union, overload
 from pysh.core import errors, lexer
 from pysh.core.parser import results, states
 
@@ -18,16 +18,26 @@ class Rule(ABC, Generic[_State, _Result]):
     def lexer(self) -> lexer.Lexer:
         return lexer.Lexer()
 
-    def _error(
+    def _state_error(
         self,
         state: _State,
         *,
         msg: Optional[str] = None,
         children: Sequence[errors.Error] = []
-    ) -> "error.Error[_State,_Result]":
-        return error.Error[_State, _Result](
-            rule=self, state=state, msg=msg, _children=children
-        )
+    ) -> errors.Error:
+        @dataclass(kw_only=True)
+        class Error(errors.NaryError):
+            rule: Rule
+            state: _State
+
+        return Error(rule=self, state=state, msg=msg, _children=children)
+
+    def _error(self, msg: str) -> errors.Error:
+        @dataclass(kw_only=True)
+        class Error(errors.Error):
+            rule: Rule
+
+        return Error(rule=self, msg=msg)
 
     def zero_or_more(
         self,
@@ -77,7 +87,7 @@ class Rule(ABC, Generic[_State, _Result]):
                     state = child_state_and_results.state
                     results_ = child_state_and_results.results.multiple()
                 except errors.Error as error:
-                    raise self._error(state, children=[error])
+                    raise self._state_error(state, children=[error])
                 while True:
                     try:
                         child_state_and_results = self._call_child(state)
@@ -189,9 +199,56 @@ class Rule(ABC, Generic[_State, _Result]):
 
         return Adapter[_State, _Result](self)
 
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "no_results_rule.NoResultsRule[_State,_Result]"
+    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "single_results_rule.SingleResultsRule[_State,_Result]"
+    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "optional_results_rule.OptionalResultsRule[_State,_Result]"
+    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_Result]"
+    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: "named_results_rule.NamedResultsRule[_State,_Result]"
+    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+        ...
+
+    @abstractmethod
+    def __and__(
+        self,
+        rhs: Union[
+            "no_results_rule.NoResultsRule[_State,_Result]",
+            "single_results_rule.SingleResultsRule[_State,_Result]",
+            "optional_results_rule.OptionalResultsRule[_State,_Result]",
+            "multiple_results_rule.MultipleResultsRule[_State,_Result]",
+            "named_results_rule.NamedResultsRule[_State,_Result]",
+        ],
+    ) -> "and_.And[_State,_Result, Rule[_State,_Result]]":
+        ...
+
 
 from pysh.core.parser.rules import (
-    error,
     no_results_rule,
     single_results_rule,
     optional_results_rule,
@@ -199,3 +256,4 @@ from pysh.core.parser.rules import (
     named_results_rule,
     unary_rule,
 )
+from pysh.core.parser.rules.ands import and_

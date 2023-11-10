@@ -1,4 +1,3 @@
-from pysh.core.parser.rules.error import Error
 from pysh.core.parser.rules.no_results_rule import NoResultsRule
 from pysh.core.parser.rules.single_results_rule import SingleResultsRule
 from pysh.core.parser.rules.optional_results_rule import OptionalResultsRule
