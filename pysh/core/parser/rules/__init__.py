@@ -9,4 +9,6 @@ from pysh.core.parser.rules.single_results_rule import SingleResultsRule
 from pysh.core.parser.rules.optional_results_rule import OptionalResultsRule
 from pysh.core.parser.rules.multiple_results_rule import MultipleResultsRule
 from pysh.core.parser.rules.named_results_rule import NamedResultsRule
+from pysh.core.parser.rules.parsable import Parsable
 from pysh.core.parser.rules import ands
+from pysh.core.parser.rules import ors
