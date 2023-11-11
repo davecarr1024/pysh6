@@ -42,31 +42,31 @@ class NoResultsRule(rule.Rule[_State, _Result]):
     @overload
     def __and__(
         self, rhs: "NoResultsRule[_State,_RhsResult]"
-    ) -> "ands.NoResultsAnd[_State,_Result,_RhsResult]":
+    ) -> "ands.NoResultsAnd[_State,_RhsResult,_RhsResult]":
         ...
 
     @overload
     def __and__(
         self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
-    ) -> "ands.SingleResultsAnd[_State,_Result,_RhsResult]":
+    ) -> "ands.SingleResultsAnd[_State,_RhsResult,_RhsResult]":
         ...
 
     @overload
     def __and__(
         self, rhs: "optional_results_rule.OptionalResultsRule[_State,_RhsResult]"
-    ) -> "ands.OptionalResultsAnd[_State,_Result,_RhsResult]":
+    ) -> "ands.OptionalResultsAnd[_State,_RhsResult,_RhsResult]":
         ...
 
     @overload
     def __and__(
         self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]"
-    ) -> "ands.MultipleResultsAnd[_State,_Result,_RhsResult]":
+    ) -> "ands.MultipleResultsAnd[_State,_RhsResult,_RhsResult]":
         ...
 
     @overload
     def __and__(
         self, rhs: "named_results_rule.NamedResultsRule[_State,_RhsResult]"
-    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
+    ) -> "ands.NamedResultsAnd[_State,_RhsResult,_RhsResult]":
         ...
 
     def __and__(
@@ -78,49 +78,62 @@ class NoResultsRule(rule.Rule[_State, _Result]):
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "named_results_rule.NamedResultsRule[_State,_RhsResult]",
         ],
-    ) -> "ands.And[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
+    ) -> "ands.And[_State,_RhsResult, rule.Rule[_State,_RhsResult]]":
+        rhs_result_self = no_results_unary_rule.NoResultsUnaryRule[
+            _State, _RhsResult, _Result
+        ](self)
         match rhs:
             case NoResultsRule():
-                return ands.NoResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+                return ands.NoResultsAnd[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case single_results_rule.SingleResultsRule():
-                return ands.SingleResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+                return ands.SingleResultsAnd[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case optional_results_rule.OptionalResultsRule():
-                return ands.OptionalResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+                return ands.OptionalResultsAnd[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case multiple_results_rule.MultipleResultsRule():
-                return ands.MultipleResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+                return ands.MultipleResultsAnd[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case named_results_rule.NamedResultsRule():
-                return ands.NamedResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+                return ands.NamedResultsAnd[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case _:
                 raise self._error("invalid and rhs {rhs}")
 
     @overload
     def __or__(
         self, rhs: "NoResultsRule[_State,_RhsResult]"
-    ) -> "ors.NoResultsOr[_State,_Result,_RhsResult]":
+    ) -> "ors.NoResultsOr[_State,_RhsResult,_RhsResult]":
         ...
 
     @overload
     def __or__(
         self, rhs: "single_results_rule.SingleResultsRule[_State,_RhsResult]"
-    ) -> "ors.SingleResultsOr[_State,_Result,_RhsResult]":
+    ) -> "ors.SingleResultsOr[_State,_RhsResult,_RhsResult]":
         ...
 
     @overload
     def __or__(
         self, rhs: "optional_results_rule.OptionalResultsRule[_State,_RhsResult]"
-    ) -> "ors.OptionalResultsOr[_State,_Result,_RhsResult]":
+    ) -> "ors.OptionalResultsOr[_State,_RhsResult,_RhsResult]":
         ...
 
     @overload
     def __or__(
         self, rhs: "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]"
-    ) -> "ors.MultipleResultsOr[_State,_Result,_RhsResult]":
+    ) -> "ors.MultipleResultsOr[_State,_RhsResult,_RhsResult]":
         ...
 
     @overload
     def __or__(
         self, rhs: "named_results_rule.NamedResultsRule[_State,_RhsResult]"
-    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+    ) -> "ors.NamedResultsOr[_State,_RhsResult,_RhsResult]":
         ...
 
     def __or__(
@@ -132,18 +145,31 @@ class NoResultsRule(rule.Rule[_State, _Result]):
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "named_results_rule.NamedResultsRule[_State,_RhsResult]",
         ],
-    ) -> "ors.Or[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
+    ) -> "ors.Or[_State,_RhsResult, rule.Rule[_State,_RhsResult]]":
+        rhs_result_self = no_results_unary_rule.NoResultsUnaryRule[
+            _State, _RhsResult, _Result
+        ](self)
         match rhs:
             case NoResultsRule():
-                return ors.NoResultsOr[_State, _Result, _RhsResult]([self, rhs])
+                return ors.NoResultsOr[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case single_results_rule.SingleResultsRule():
-                return ors.OptionalResultsOr[_State, _Result, _RhsResult]([self, rhs])
+                return ors.OptionalResultsOr[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case optional_results_rule.OptionalResultsRule():
-                return ors.OptionalResultsOr[_State, _Result, _RhsResult]([self, rhs])
+                return ors.OptionalResultsOr[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case multiple_results_rule.MultipleResultsRule():
-                return ors.MultipleResultsOr[_State, _Result, _RhsResult]([self, rhs])
+                return ors.MultipleResultsOr[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case named_results_rule.NamedResultsRule():
-                return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
+                return ors.NamedResultsOr[_State, _RhsResult, _RhsResult](
+                    [rhs_result_self, rhs]
+                )
             case _:
                 raise self._error("invalid or rhs {rhs}")
 
@@ -156,4 +182,5 @@ from pysh.core.parser.rules import (
     multiple_results_rule,
     named_results_rule,
     unary_rule,
+    no_results_unary_rule,
 )

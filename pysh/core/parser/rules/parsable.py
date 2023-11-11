@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, Self, Sequence, Type, TypeVar
-from pysh.core.parser.rules import ref, scope, single_results_rule
+from pysh.core.parser.rules import ref, scope as scope_lib, single_results_rule
 from pysh.core.parser.states import state_value_getter
 
 _State = TypeVar("_State")
@@ -25,16 +25,23 @@ class Parsable(ABC, Generic[_State, _T]):
         return cls.__name__
 
     @classmethod
-    def scope(cls) -> scope.Scope[_State, _T]:
-        return scope.Scope[_State, _T]({t.name(): t.parser_rule() for t in cls.types()})
+    def scope(cls) -> scope_lib.Scope[_State, _T]:
+        return scope_lib.Scope[_State, _T](
+            {t.name(): t.parser_rule() for t in cls.types()}
+        )
+
+    @classmethod
+    @abstractmethod
+    def scope_getter(
+        cls,
+    ) -> state_value_getter.StateValueGetter[_State, scope_lib.Scope[_State, _T]]:
+        ...
 
     @classmethod
     def ref(
         cls,
     ) -> ref.Ref[_State, _T]:
         return ref.Ref[_State, _T](
-            state_value_getter.StateValueGetter[_State, scope.Scope[_State, _T]].load(
-                lambda _: cls.scope()
-            ),
+            cls.scope_getter(),
             cls.name(),
         )

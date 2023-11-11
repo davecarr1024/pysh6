@@ -7,7 +7,7 @@ from pysh.core.parser.rules import rule
 
 _State = TypeVar("_State")
 _Result = TypeVar("_Result", covariant=True)
-_ChildResult = TypeVar("_ChildResult")
+_ChildResult = TypeVar("_ChildResult", covariant=True)
 
 
 @dataclass(frozen=True)
@@ -16,6 +16,9 @@ class UnaryRule(
     rule.Rule[_State, _Result],
 ):
     child: rule.Rule[_State, _ChildResult]
+
+    def __str__(self) -> str:
+        return str(self.child)
 
     def _call_child(
         self, state: _State

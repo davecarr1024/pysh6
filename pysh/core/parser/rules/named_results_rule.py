@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, TypeVar, Union, overload
+from typing import Any, Callable, TypeVar, Union, overload
 from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
@@ -19,8 +19,8 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
 
     @overload
     def __and__(
-        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
-    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
+        self, rhs: "no_results_rule.NoResultsRule[_State,Any]"
+    ) -> "ands.NamedResultsAnd[_State,_Result,_Result]":
         ...
 
     @overload
@@ -56,8 +56,19 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "NamedResultsRule[_State,_RhsResult]",
         ],
-    ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
-        return ands.NamedResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+    ) -> "ands.And[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
+        match rhs:
+            case no_results_rule.NoResultsRule():
+                return ands.NamedResultsAnd[_State, _Result, _Result](
+                    [
+                        self,
+                        no_results_unary_rule.NoResultsUnaryRule[
+                            _State, _Result, _RhsResult
+                        ](rhs),
+                    ]
+                )
+            case _:
+                return ands.NamedResultsAnd[_State, _Result, _RhsResult]([self, rhs])
 
     def convert(
         self, func: Callable[..., _ConvertResult]
@@ -83,8 +94,8 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
 
     @overload
     def __or__(
-        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
-    ) -> "ors.NamedResultsOr[_State,_Result,_RhsResult]":
+        self, rhs: "no_results_rule.NoResultsRule[_State,Any]"
+    ) -> "ors.NamedResultsOr[_State,_Result,_Result]":
         ...
 
     @overload
@@ -120,8 +131,19 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "NamedResultsRule[_State,_RhsResult]",
         ],
-    ) -> "ors.NamedResultsOr[_State, _Result, _RhsResult]":
-        return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
+    ) -> "ors.Or[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
+        match rhs:
+            case no_results_rule.NoResultsRule():
+                return ors.NamedResultsOr[_State, _Result, _Result](
+                    [
+                        self,
+                        no_results_unary_rule.NoResultsUnaryRule[
+                            _State, _Result, _RhsResult
+                        ](rhs),
+                    ]
+                )
+            case _:
+                return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
 
 
 from pysh.core.parser.rules import (
@@ -132,4 +154,5 @@ from pysh.core.parser.rules import (
     optional_results_rule,
     multiple_results_rule,
     unary_rule,
+    no_results_unary_rule,
 )

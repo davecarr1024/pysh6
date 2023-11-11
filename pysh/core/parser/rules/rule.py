@@ -24,19 +24,25 @@ class Rule(ABC, Generic[_State, _Result]):
         state: _State,
         *,
         msg: Optional[str] = None,
-        children: Sequence[errors.Error] = []
+        children: Sequence[errors.Error] = [],
     ) -> errors.Error:
-        @dataclass(kw_only=True)
+        @dataclass(kw_only=True, repr=False)
         class Error(errors.NaryError):
             rule: Rule
             state: _State
 
+            def _repr_line(self) -> str:
+                return f"StateError(rule={self.rule},state={self.state},msg={repr(self.msg)})"
+
         return Error(rule=self, state=state, msg=msg, _children=children)
 
     def _error(self, msg: str) -> errors.Error:
-        @dataclass(kw_only=True)
+        @dataclass(kw_only=True, repr=False)
         class Error(errors.Error):
             rule: Rule
+
+            def _repr_line(self) -> str:
+                return f"StateError(rule={self.rule},msg={repr(self.msg)})"
 
         return Error(rule=self, msg=msg)
 
@@ -126,19 +132,7 @@ class Rule(ABC, Generic[_State, _Result]):
         return ZeroOrOne[_State, _Result](self)
 
     def no(self) -> "no_results_rule.NoResultsRule[_State,_Result]":
-        AdapterState = TypeVar("AdapterState")
-        AdapterResult = TypeVar("AdapterResult")
-
-        class Adapter(
-            unary_rule.UnaryRule[AdapterState, AdapterResult, AdapterResult],
-            no_results_rule.NoResultsRule[AdapterState, AdapterResult],
-        ):
-            def __call__(
-                self, state: AdapterState
-            ) -> states.StateAndNoResults[AdapterState, AdapterResult]:
-                return self._call_child(state).no()
-
-        return Adapter[_State, _Result](self)
+        return no_results_unary_rule.NoResultsUnaryRule[_State, _Result, _Result](self)
 
     def single(self) -> "single_results_rule.SingleResultsRule[_State,_Result]":
         AdapterState = TypeVar("AdapterState")
@@ -320,4 +314,5 @@ from pysh.core.parser.rules import (
     multiple_results_rule,
     named_results_rule,
     unary_rule,
+    no_results_unary_rule,
 )

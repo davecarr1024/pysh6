@@ -114,7 +114,7 @@ class MultipleResults(results.Results[_Result], Sequence[_Result]):
     def convert(
         self, func: Callable[[Sequence[_Result]], _RhsResult]
     ) -> "single_results.SingleResults[_RhsResult]":
-        return single_results.SingleResults[_RhsResult](func(self))
+        return single_results.SingleResults[_RhsResult](func(list(self)))
 
 
 from pysh.core.parser.results import (

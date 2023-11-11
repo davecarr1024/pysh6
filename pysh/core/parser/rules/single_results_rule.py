@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Callable, TypeVar, Union, overload
+from typing import Any, Callable, TypeVar, Union, overload
 from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
@@ -41,8 +41,8 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
 
     @overload
     def __and__(
-        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
-    ) -> "ands.SingleResultsAnd[_State,_Result,_RhsResult]":
+        self, rhs: "no_results_rule.NoResultsRule[_State,Any]"
+    ) -> "ands.SingleResultsAnd[_State,_Result,_Result]":
         ...
 
     @overload
@@ -81,7 +81,14 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
     ) -> "ands.And[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
         match rhs:
             case no_results_rule.NoResultsRule():
-                return ands.SingleResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+                return ands.SingleResultsAnd[_State, _Result, _Result](
+                    [
+                        self,
+                        no_results_unary_rule.NoResultsUnaryRule[
+                            _State, _Result, _RhsResult
+                        ](rhs),
+                    ]
+                )
             case SingleResultsRule() | optional_results_rule.OptionalResultsRule() | multiple_results_rule.MultipleResultsRule():
                 return ands.MultipleResultsAnd[_State, _Result, _RhsResult]([self, rhs])
             case named_results_rule.NamedResultsRule():
@@ -91,8 +98,8 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
 
     @overload
     def __or__(
-        self, rhs: "no_results_rule.NoResultsRule[_State,_RhsResult]"
-    ) -> "ors.OptionalResultsOr[_State,_Result,_RhsResult]":
+        self, rhs: "no_results_rule.NoResultsRule[_State,Any]"
+    ) -> "ors.OptionalResultsOr[_State,_Result,_Result]":
         ...
 
     @overload
@@ -130,7 +137,16 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
         ],
     ) -> "ors.Or[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
         match rhs:
-            case no_results_rule.NoResultsRule() | optional_results_rule.OptionalResultsRule():
+            case no_results_rule.NoResultsRule():
+                return ors.OptionalResultsOr[_State, _Result, _Result](
+                    [
+                        self,
+                        no_results_unary_rule.NoResultsUnaryRule[
+                            _State, _Result, _RhsResult
+                        ](rhs),
+                    ]
+                )
+            case optional_results_rule.OptionalResultsRule():
                 return ors.OptionalResultsOr[_State, _Result, _RhsResult]([self, rhs])
             case SingleResultsRule():
                 return ors.SingleResultsOr[_State, _Result, _RhsResult]([self, rhs])
@@ -150,4 +166,5 @@ from pysh.core.parser.rules import (
     optional_results_rule,
     multiple_results_rule,
     named_results_rule,
+    no_results_unary_rule,
 )
