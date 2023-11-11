@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, TypeVar, Union, overload
+from pysh.core import lexer as lexer_lib
 from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
@@ -144,6 +145,27 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
                 )
             case _:
                 return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
+
+    def with_lexer(self, lexer: lexer_lib.Lexer) -> "NamedResultsRule[_State,_Result]":
+        State = TypeVar("State")
+        Result = TypeVar("Result")
+
+        @dataclass(frozen=True)
+        class WithLexer(
+            unary_rule.UnaryRule[State, Result, Result],
+            NamedResultsRule[State, Result],
+        ):
+            _lexer: lexer_lib.Lexer
+
+            def lexer(self) -> lexer_lib.Lexer:
+                return self._lexer | self.child.lexer()
+
+            def __call__(
+                self, state: State
+            ) -> states.StateAndNamedResults[State, Result]:
+                return self._call_child(state).named()
+
+        return WithLexer[_State, _Result](child=self, _lexer=lexer)
 
 
 from pysh.core.parser.rules import (

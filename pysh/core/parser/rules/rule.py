@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Generic, Optional, Sequence, TypeVar, Union, overload
-from pysh.core import errors, lexer
+from typing import Any, Generic, Optional, Self, Sequence, TypeVar, Union, overload
+from pysh.core import errors, lexer as lexer_lib
 from pysh.core.parser import results, states
 
 
@@ -16,8 +16,8 @@ class Rule(ABC, Generic[_State, _Result]):
     def __call__(self, state: _State) -> states.StateAndResults[_State, _Result]:
         ...
 
-    def lexer(self) -> lexer.Lexer:
-        return lexer.Lexer()
+    def lexer(self) -> lexer_lib.Lexer:
+        return lexer_lib.Lexer()
 
     def _state_error(
         self,
@@ -209,7 +209,7 @@ class Rule(ABC, Generic[_State, _Result]):
             iter_rule: Rule[AdapterState, AdapterResult]
             term_rule: Rule[AdapterState, AdapterResult]
 
-            def lexer(self) -> lexer.Lexer:
+            def lexer(self) -> lexer_lib.Lexer:
                 return self.iter_rule.lexer() | self.term_rule.lexer()
 
             def __call__(
@@ -231,6 +231,40 @@ class Rule(ABC, Generic[_State, _Result]):
                         raise self._state_error(state, children=[term_error])
 
         return Adapter[_State, _Result](self, term_rule)
+
+    def until_empty(
+        self, lexer_result_setter: states.StateValueSetter[_State, lexer_lib.Result]
+    ) -> "multiple_results_rule.MultipleResultsRule[_State,_Result]":
+        AdapterState = TypeVar("AdapterState")
+        AdapterResult = TypeVar("AdapterResult")
+
+        @dataclass(frozen=True)
+        class Adapter(
+            multiple_results_rule.MultipleResultsRule[AdapterState, AdapterResult],
+            unary_rule.UnaryRule[AdapterState, AdapterResult, AdapterResult],
+            state_value_setter_rule.StateValueSetterRule[
+                AdapterState, AdapterResult, lexer_lib.Result
+            ],
+        ):
+            def __call__(
+                self, state: AdapterState
+            ) -> states.StateAndMultipleResults[AdapterState, AdapterResult]:
+                results_ = results.MultipleResults[AdapterResult]()
+                while self._get_state_value(state).tokens:
+                    child_state_and_results = self._call_child(state).multiple()
+                    state = child_state_and_results.state
+                    results_ |= child_state_and_results.results
+                return states.StateAndMultipleResults[AdapterState, AdapterResult](
+                    state, results_
+                )
+
+        return Adapter[_State, _Result](
+            child=self, state_value_setter=lexer_result_setter
+        )
+
+    @abstractmethod
+    def with_lexer(self, lexer: lexer_lib.Lexer) -> Self:
+        ...
 
     @overload
     @abstractmethod
@@ -349,6 +383,7 @@ from pysh.core.parser.rules import (
     optional_results_rule,
     multiple_results_rule,
     named_results_rule,
+    state_value_setter_rule,
     unary_rule,
     no_results_unary_rule,
 )

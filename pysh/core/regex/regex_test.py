@@ -1,12 +1,24 @@
 from unittest import TestCase
-from pysh.core.regex import and_, literal, regex
+from pysh.core import regex
 
 
 class RegexTest(TestCase):
     def test_load(self):
-        self.assertEqual(regex.Regex.load(""), and_.And([]))
-        self.assertEqual(regex.Regex.load("a"), literal.Literal("a"))
-        self.assertEqual(
-            regex.Regex.load("ab"),
-            and_.And([literal.Literal("a"), literal.Literal("b")]),
-        )
+        for value, expected in list[tuple[str, regex.Regex]](
+            [
+                (
+                    "a",
+                    regex.Literal("a"),
+                ),
+                (
+                    "",
+                    regex.And([]),
+                ),
+                (
+                    "ab",
+                    regex.And([regex.Literal("a"), regex.Literal("b")]),
+                ),
+            ]
+        ):
+            with self.subTest(value=value, expected=expected):
+                self.assertEqual(regex.Regex.load(value), expected)

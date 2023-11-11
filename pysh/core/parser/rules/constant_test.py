@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from unittest import TestCase
 from pysh.core.parser import results, states
-
 from pysh.core.parser.rules import constant
 
 

@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from typing import TypeVar
-from pysh.core import errors, lexer, tokens
+from pysh.core import errors, lexer as lexer_lib, tokens
 from pysh.core.parser import results, states
-
-from pysh.core.parser.rules import single_results_rule, state_value_setter_rule
+from pysh.core.parser.rules import (
+    single_results_rule,
+    state_value_setter_rule,
+)
 
 
 _State = TypeVar("_State")
@@ -14,17 +16,17 @@ class Literal(
     state_value_setter_rule.StateValueSetterRule[
         _State,
         tokens.Token,
-        lexer.Result,
+        lexer_lib.Result,
     ],
     single_results_rule.SingleResultsRule[_State, tokens.Token],
 ):
-    lexer_rule: lexer.Rule
+    lexer_rule: lexer_lib.Rule
 
     def __str__(self) -> str:
         return f"Literal({self.lexer_rule})"
 
-    def lexer(self) -> lexer.Lexer:
-        return lexer.Lexer([self.lexer_rule])
+    def lexer(self) -> lexer_lib.Lexer:
+        return lexer_lib.Lexer([self.lexer_rule])
 
     def __call__(
         self, state: _State
@@ -41,3 +43,16 @@ class Literal(
         raise self._state_error(
             state, msg=f"failed to get expected token {self.lexer_rule}"
         )
+
+    @classmethod
+    def load(
+        cls,
+        lexer_result_setter: states.StateValueSetter[_State, lexer_lib.Result],
+        value: str | lexer_lib.Rule,
+    ) -> "Literal[_State]":
+        if isinstance(value, str):
+            value = lexer_lib.Rule.load(value)
+        return Literal[_State](lexer_result_setter, value)
+
+    def token_value(self) -> single_results_rule.SingleResultsRule[_State, str]:
+        return self.convert(lambda token: token.value)

@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Sequence, TypeVar, Union, overload
+from pysh.core import lexer as lexer_lib
 from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
@@ -158,6 +159,29 @@ class MultipleResultsRule(rule.Rule[_State, _Result]):
                 return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
             case _:
                 raise self._error("invalid or rhs {rhs}")
+
+    def with_lexer(
+        self, lexer: lexer_lib.Lexer
+    ) -> "MultipleResultsRule[_State,_Result]":
+        State = TypeVar("State")
+        Result = TypeVar("Result")
+
+        @dataclass(frozen=True)
+        class WithLexer(
+            unary_rule.UnaryRule[State, Result, Result],
+            MultipleResultsRule[State, Result],
+        ):
+            _lexer: lexer_lib.Lexer
+
+            def lexer(self) -> lexer_lib.Lexer:
+                return self._lexer | self.child.lexer()
+
+            def __call__(
+                self, state: State
+            ) -> states.StateAndMultipleResults[State, Result]:
+                return self._call_child(state).multiple()
+
+        return WithLexer[_State, _Result](child=self, _lexer=lexer)
 
 
 from pysh.core.parser.rules import (
