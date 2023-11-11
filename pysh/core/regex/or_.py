@@ -1,11 +1,13 @@
 from dataclasses import dataclass
-from typing import MutableSequence
+from typing import MutableSequence, TypeVar
 from pysh.core import errors
-from pysh.core.regex import nary_regex, state, state_and_result
+from pysh.core.regex import nary_regex, regex, state, state_and_result
+
+_Child = TypeVar("_Child", bound=regex.Regex)
 
 
 @dataclass(frozen=True)
-class Or(nary_regex.NaryRegex):
+class Or(nary_regex.NaryRegex[_Child]):
     def __str__(self) -> str:
         return f"({'|'.join([str(child) for child in self])})"
 

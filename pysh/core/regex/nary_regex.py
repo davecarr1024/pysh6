@@ -1,14 +1,21 @@
 from dataclasses import dataclass
-from typing import Iterable, Iterator, Sequence, Sized
+from typing import Generic, Iterable, Iterator, Sequence, Sized, TypeVar
 from pysh.core.regex import regex
+
+_Child = TypeVar("_Child", bound=regex.Regex)
 
 
 @dataclass(frozen=True)
-class NaryRegex(regex.Regex, Sized, Iterable[regex.Regex]):
-    _children: Sequence[regex.Regex]
+class NaryRegex(
+    Generic[_Child],
+    regex.Regex,
+    Sized,
+    Iterable[_Child],
+):
+    _children: Sequence[_Child]
 
     def __len__(self) -> int:
         return len(self._children)
 
-    def __iter__(self) -> Iterator[regex.Regex]:
+    def __iter__(self) -> Iterator[_Child]:
         return iter(self._children)

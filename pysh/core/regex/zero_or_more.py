@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from pysh.core import errors
-from pysh.core.regex import unary_regex, state, state_and_result, result
+from pysh.core.regex import regex, unary_regex, state, state_and_result, result
 
 
 @dataclass(frozen=True)
-class ZeroOrMore(unary_regex.UnaryRegex):
+class ZeroOrMore(unary_regex.UnaryRegex[regex.Regex]):
     def __str__(self) -> str:
         return f"{self.child}*"
 
@@ -12,7 +12,7 @@ class ZeroOrMore(unary_regex.UnaryRegex):
         result_ = result.Result()
         while True:
             try:
-                child_state_and_result = super().__call__(state)
+                child_state_and_result = self._call_child(state)
                 state = child_state_and_result.state
                 result_ += child_state_and_result.result
             except errors.Error:

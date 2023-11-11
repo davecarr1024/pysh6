@@ -11,3 +11,4 @@ from pysh.core.regex.result import Result
 from pysh.core.regex.state_and_result import StateAndResult
 from pysh.core.regex.zero_or_more import ZeroOrMore
 from pysh.core.regex.zero_or_one import ZeroOrOne
+from pysh.core.regex.not_ import Not
