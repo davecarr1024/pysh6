@@ -89,7 +89,7 @@ class List(Val, Sized, Iterable[Val]):
     @classmethod
     def parser_rule(cls) -> rules.SingleResultsRule[State, "List"]:
         return (
-            State.literal("(").no() & Val.ref().zero_or_more() & State.literal(")").no()
+            State.literal("(").no() & Val.ref().until(State.literal(")").no())
         ).convert(List)
 
 
@@ -153,22 +153,6 @@ class ParsableTest(TestCase):
                         lexer.Result(
                             tokens.Stream(
                                 [
-                                    tokens.Token("(", "("),
-                                    tokens.Token(")", ")"),
-                                ]
-                            )
-                        )
-                    ),
-                    states.StateAndSingleResults[State, Val](
-                        State(),
-                        results.SingleResults[Val](List()),
-                    ),
-                ),
-                (
-                    State(
-                        lexer.Result(
-                            tokens.Stream(
-                                [
                                     tokens.Token("int", "1"),
                                     tokens.Token("s", "b"),
                                 ]
@@ -210,6 +194,56 @@ class ParsableTest(TestCase):
                             )
                         ),
                         results.SingleResults[Val](Str("a")),
+                    ),
+                ),
+                (
+                    State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("(", "("),
+                                    tokens.Token(")", ")"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndSingleResults[State, Val](
+                        State(),
+                        results.SingleResults[Val](List()),
+                    ),
+                ),
+                (
+                    State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("(", "("),
+                                    tokens.Token("int", "1"),
+                                    tokens.Token(")", ")"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndSingleResults[State, Val](
+                        State(),
+                        results.SingleResults[Val](List([Int(1)])),
+                    ),
+                ),
+                (
+                    State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("(", "("),
+                                    tokens.Token("str", '"a"'),
+                                    tokens.Token(")", ")"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndSingleResults[State, Val](
+                        State(),
+                        results.SingleResults[Val](List([Str("a")])),
                     ),
                 ),
             ]

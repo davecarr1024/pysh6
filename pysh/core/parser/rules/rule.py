@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, Optional, Sequence, TypeVar, Union, overload
+from typing import Any, Generic, Optional, Sequence, TypeVar, Union, overload
 from pysh.core import errors, lexer
 from pysh.core.parser import results, states
 
@@ -195,6 +195,42 @@ class Rule(ABC, Generic[_State, _Result]):
                 return self._call_child(state).named(name)
 
         return Adapter[_State, _Result](self)
+
+    def until(
+        self, term_rule: "no_results_rule.NoResultsRule[_State,Any]"
+    ) -> "multiple_results_rule.MultipleResultsRule[_State,_Result]":
+        AdapterState = TypeVar("AdapterState")
+        AdapterResult = TypeVar("AdapterResult")
+
+        @dataclass(frozen=True)
+        class Adapter(
+            multiple_results_rule.MultipleResultsRule[AdapterState, AdapterResult],
+        ):
+            iter_rule: Rule[AdapterState, AdapterResult]
+            term_rule: Rule[AdapterState, AdapterResult]
+
+            def lexer(self) -> lexer.Lexer:
+                return self.iter_rule.lexer() | self.term_rule.lexer()
+
+            def __call__(
+                self, state: AdapterState
+            ) -> states.StateAndMultipleResults[AdapterState, AdapterResult]:
+                results_ = results.MultipleResults[AdapterResult]()
+                while True:
+                    try:
+                        return states.StateAndMultipleResults[
+                            AdapterState, AdapterResult
+                        ](self.term_rule(state).state, results_)
+                    except errors.Error as error:
+                        term_error = error
+                    try:
+                        child_results_and_state = self.iter_rule(state)
+                        results_ |= child_results_and_state.results.multiple()
+                        state = child_results_and_state.state
+                    except errors.Error as error:
+                        raise self._state_error(state, children=[term_error])
+
+        return Adapter[_State, _Result](self, term_rule)
 
     @overload
     @abstractmethod
