@@ -9,7 +9,7 @@ class LexerError(errors.NaryError):
     state: state.State
 
     def _repr_line(self) -> str:
-        return f"LexError(lexer={self.lexer},state={self.state},msg={self.msg})"
+        return f"LexerError(lexer={self.lexer},state={self.state},msg={self.msg})"
 
 
 from pysh.core.lexer import lexer

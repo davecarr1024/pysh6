@@ -7,6 +7,9 @@ from pysh.core import chars as chars_lib
 class State:
     chars: chars_lib.Stream = field(default_factory=chars_lib.Stream)
 
+    def __str__(self) -> str:
+        return str(self.chars)
+
     @staticmethod
     def load(value: str, position: Optional[chars_lib.Position] = None) -> "State":
         return State(chars_lib.Stream.load(value, position))

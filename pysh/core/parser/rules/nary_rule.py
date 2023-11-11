@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Generic, Iterable, Iterator, Sequence, Sized, Type, TypeVar
+from pysh.core import lexer
 from pysh.core.parser.rules import rule
 
 
@@ -27,3 +28,9 @@ class NaryRule(
         self, child_type: Type[rule.Rule[_State, _Result]]
     ) -> int:
         return sum(isinstance(child, child_type) for child in self)
+
+    def lexer(self) -> lexer.Lexer:
+        lexer_ = lexer.Lexer()
+        for child in self:
+            lexer_ |= child.lexer()
+        return lexer_

@@ -8,6 +8,9 @@ from pysh.core.regex import result
 class State:
     chars: chars_lib.Stream = field(default_factory=chars_lib.Stream)
 
+    def __str__(self) -> str:
+        return str(self.chars)
+
     def head(self) -> "chars_lib.Char":
         return self.chars.head()
 

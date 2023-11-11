@@ -25,7 +25,7 @@ class Parsable(ABC, Generic[_State, _T]):
     @abstractmethod
     def scope_getter(
         cls,
-    ) -> state_value_getter.StateValueGetter[_State, scope_lib.Scope[_State, _T]]:
+    ) -> state_value_getter.StateValueGetter[_State, scope_lib.Scope[_State, Self]]:
         ...
 
     @classmethod
@@ -41,8 +41,8 @@ class Parsable(ABC, Generic[_State, _T]):
     @classmethod
     def ref(
         cls,
-    ) -> ref.Ref[_State, _T]:
-        return ref.Ref[_State, _T](
+    ) -> ref.Ref[_State, Self]:
+        return ref.Ref[_State, Self](
             cls.scope_getter(),
             cls.name(),
         )

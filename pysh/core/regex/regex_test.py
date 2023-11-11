@@ -30,6 +30,10 @@ class RegexTest(TestCase):
                     r"\s",
                     regex.Regex.whitespace(),
                 ),
+                (
+                    "^a",
+                    regex.Not(regex.Literal("a")),
+                ),
             ]
         ):
             with self.subTest(value=value, expected=expected):
