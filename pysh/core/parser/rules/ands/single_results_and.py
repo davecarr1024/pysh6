@@ -38,18 +38,18 @@ class SingleResultsAnd(
             try:
                 child_state_and_result = child(state)
             except errors.Error as error:
-                raise self._state_error(state, children=[error])
+                raise self._parse_error(state, children=[error])
             state = child_state_and_result.state
             child_result = child_state_and_result.results.optional().value
             if child_result is not None:
                 if result is not None:
-                    raise self._state_error(
+                    raise self._parse_error(
                         state,
                         msg=f"too many SingleResultsAnd results {result} {child_result}",
                     )
                 result = child_result
         if result is None:
-            raise self._state_error(state, msg="no SingleResultsAnd result")
+            raise self._parse_error(state, msg="no SingleResultsAnd result")
         return states.StateAndSingleResults[_State, _Result | _RhsResult](
             state, results.SingleResults[_Result | _RhsResult](result)
         )

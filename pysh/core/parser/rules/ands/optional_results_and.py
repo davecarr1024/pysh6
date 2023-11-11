@@ -38,12 +38,12 @@ class OptionalResultsAnd(
             try:
                 child_state_and_result = child(state)
             except errors.Error as error:
-                raise self._state_error(state, children=[error])
+                raise self._parse_error(state, children=[error])
             state = child_state_and_result.state
             child_result = child_state_and_result.results.optional().value
             if child_result is not None:
                 if result is not None:
-                    raise self._state_error(
+                    raise self._parse_error(
                         state,
                         msg=f"too many OptionalResultsAnd results {result} {child_result}",
                     )

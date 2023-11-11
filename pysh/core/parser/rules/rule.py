@@ -19,7 +19,7 @@ class Rule(ABC, Generic[_State, _Result]):
     def lexer(self) -> lexer_lib.Lexer:
         return lexer_lib.Lexer()
 
-    def _state_error(
+    def _parse_error(
         self,
         state: _State,
         *,
@@ -32,7 +32,7 @@ class Rule(ABC, Generic[_State, _Result]):
             state: _State
 
             def _repr_line(self) -> str:
-                return f"StateError(rule={self.rule},state={self.state},msg={repr(self.msg)})"
+                return f"ParseError(rule={self.rule},state={self.state},msg={repr(self.msg)})"
 
         return Error(rule=self, state=state, msg=msg, _children=children)
 
@@ -42,7 +42,7 @@ class Rule(ABC, Generic[_State, _Result]):
             rule: Rule
 
             def _repr_line(self) -> str:
-                return f"StateError(rule={self.rule},msg={repr(self.msg)})"
+                return f"ParserRuleError(rule={self.rule},msg={repr(self.msg)})"
 
         return Error(rule=self, msg=msg)
 
@@ -94,7 +94,7 @@ class Rule(ABC, Generic[_State, _Result]):
                     state = child_state_and_results.state
                     results_ = child_state_and_results.results.multiple()
                 except errors.Error as error:
-                    raise self._state_error(state, children=[error])
+                    raise self._parse_error(state, children=[error])
                 while True:
                     try:
                         child_state_and_results = self._call_child(state)
@@ -228,7 +228,7 @@ class Rule(ABC, Generic[_State, _Result]):
                         results_ |= child_results_and_state.results.multiple()
                         state = child_results_and_state.state
                     except errors.Error as error:
-                        raise self._state_error(state, children=[term_error])
+                        raise self._parse_error(state, children=[term_error])
 
         return Adapter[_State, _Result](self, term_rule)
 

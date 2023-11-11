@@ -41,4 +41,4 @@ class OptionalResultsOr(
                 return child(state).optional()
             except errors.Error as error:
                 errors_.append(error)
-        raise self._state_error(state, children=errors_)
+        raise self._parse_error(state, children=errors_)

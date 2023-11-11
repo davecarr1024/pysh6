@@ -29,5 +29,5 @@ class NoResultsAnd(
             try:
                 state = child(state).state
             except errors.Error as error:
-                raise self._state_error(state, children=[error])
+                raise self._parse_error(state, children=[error])
         return states.StateAndNoResults[_State, _Result | _RhsResult](state)

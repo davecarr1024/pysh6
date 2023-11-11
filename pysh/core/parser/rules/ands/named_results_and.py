@@ -31,7 +31,7 @@ class NamedResultsAnd(
                 state = child_state_and_result.state
                 results_ |= child_state_and_result.results.named()
             except errors.Error as error:
-                raise self._state_error(state, children=[error])
+                raise self._parse_error(state, children=[error])
         return states.StateAndNamedResults[_State, _Result | _RhsResult](
             state, results_
         )

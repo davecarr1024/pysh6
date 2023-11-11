@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+import string
 from typing import Optional, Sequence, Type
 from pysh.core import errors
 from pysh.core.regex import error, state, state_and_result
@@ -20,16 +21,36 @@ class Regex(ABC):
         return and_.And(literals)
 
     @staticmethod
+    def _or(values: Sequence[str]) -> "Regex":
+        from pysh.core.regex import literal, or_
+
+        return or_.Or([literal.Literal(value) for value in values])
+
+    @staticmethod
+    def digits() -> "Regex":
+        return Regex._or(string.digits)
+
+    @staticmethod
+    def whitespace() -> "Regex":
+        return Regex._or(string.whitespace)
+
+    @staticmethod
     def load(value: str) -> "Regex":
         from pysh.core import lexer, parser
-        from pysh.core.regex import and_, any, literal
+        from pysh.core.regex import and_, any, literal, or_
 
         @dataclass(frozen=True)
         class State:
             lexer_result: lexer.Result = field(default_factory=lexer.Result)
             scope: parser.rules.Scope["State", "_Regex"] = field(
-                default_factory=lambda: _Regex.scope()
+                default_factory=lambda: _Regex.scope(),
+                compare=False,
+                hash=False,
+                repr=False,
             )
+
+            def __str__(self) -> str:
+                return str(self.lexer_result)
 
             @staticmethod
             def lexer_result_setter() -> (
@@ -63,7 +84,7 @@ class Regex(ABC):
 
             @classmethod
             def types(cls) -> Sequence[Type["_Regex"]]:
-                return [_Regex, _Literal]
+                return [_Regex, _Special, _Literal]
 
             @classmethod
             def scope_getter(
@@ -75,7 +96,7 @@ class Regex(ABC):
 
             @classmethod
             def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Regex"]:
-                return _Literal.ref()
+                return _Special.ref() | _Literal.ref()
 
         @dataclass(frozen=True)
         class _Literal(_Regex):
@@ -85,6 +106,32 @@ class Regex(ABC):
             def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Literal"]:
                 return State.literal(lexer.Rule("literal", any.Any())).convert(
                     lambda token: _Literal(literal.Literal(token.value))
+                )
+
+        @dataclass(frozen=True)
+        class _Special(_Regex):
+            regex: Regex
+
+            @classmethod
+            def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Special"]:
+                def special(value: str) -> _Special:
+                    match value:
+                        case "d":
+                            return _Special(Regex.digits())
+                        case "s":
+                            return _Special(Regex.whitespace())
+                        case _:
+                            return _Special(literal.Literal(value))
+
+                return (
+                    State.literal(
+                        lexer.Rule(
+                            "special", and_.And([literal.Literal("\\"), any.Any()])
+                        )
+                    )
+                    .token_value()
+                    .convert(lambda value: value[1:])
+                    .convert(special)
                 )
 
         def to_and(regexes: Sequence[_Regex]) -> Regex:
