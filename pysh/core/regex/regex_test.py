@@ -34,6 +34,14 @@ class RegexTest(TestCase):
                     "^a",
                     regex.Not(regex.Literal("a")),
                 ),
+                (
+                    "[a-z]",
+                    regex.Range("a", "z"),
+                ),
+                (
+                    "^[a-z]",
+                    regex.Not(regex.Range("a", "z")),
+                ),
             ]
         ):
             with self.subTest(value=value, expected=expected):

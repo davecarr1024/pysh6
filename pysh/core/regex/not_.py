@@ -1,10 +1,32 @@
 from dataclasses import dataclass
+from typing import Union
 from pysh.core import errors
-from pysh.core.regex import literal, or_, result, state, state_and_result, unary_regex
+from pysh.core.regex import (
+    literal,
+    or_,
+    range,
+    result,
+    state,
+    state_and_result,
+    unary_regex,
+)
 
 
 @dataclass(frozen=True)
-class Not(unary_regex.UnaryRegex[literal.Literal | or_.Or[literal.Literal]]):
+class Not(
+    unary_regex.UnaryRegex[
+        Union[
+            literal.Literal,
+            range.Range,
+            or_.Or[
+                Union[
+                    literal.Literal,
+                    range.Range,
+                ]
+            ],
+        ]
+    ]
+):
     def __str__(self) -> str:
         return f"^{self.child}"
 
