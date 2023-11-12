@@ -86,7 +86,7 @@ class Regex(ABC):
 
             @classmethod
             def types(cls) -> Sequence[Type["_Regex"]]:
-                return [cls, _Not, _Special, _Literal, _Range, _Any]
+                return [cls, _Not, _Special, _Literal, _Range, _Any, _And, _Or]
 
             @classmethod
             def scope_getter(
@@ -113,7 +113,7 @@ class Regex(ABC):
                     lexer.Rule(
                         "literal",
                         not_.Not(
-                            or_.Or([literal.Literal(value) for value in r"\^[].()*?+"])
+                            or_.Or([literal.Literal(value) for value in r"\^[].()*?+|"])
                         ),
                     )
                 ).convert(lambda token: _Literal(literal.Literal(token.value)))
@@ -188,6 +188,35 @@ class Regex(ABC):
             @classmethod
             def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Any"]:
                 return State.literal(".").no().convert(lambda: _Any())
+
+        @dataclass(frozen=True)
+        class _And(_Regex):
+            regex: and_.And
+
+            @classmethod
+            def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_And"]:
+                return (
+                    State.literal("(").no()
+                    & _Regex.ref().one_or_more().until(State.literal(")").no())
+                ).convert(
+                    lambda regexes: _And(and_.And([regex.regex for regex in regexes]))
+                )
+
+        @dataclass(frozen=True)
+        class _Or(_Regex):
+            regex: or_.Or
+
+            @classmethod
+            def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Or"]:
+                return (
+                    State.literal("(").no()
+                    & _Regex.ref()
+                    & (State.literal("|").no() & _Regex.ref())
+                    .one_or_more()
+                    .until(State.literal(")").no())
+                ).convert(
+                    lambda regexes: _Or(or_.Or([regex.regex for regex in regexes]))
+                )
 
         def to_and(regexes: Sequence[_Regex]) -> Regex:
             match len(regexes):

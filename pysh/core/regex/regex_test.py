@@ -46,6 +46,14 @@ class RegexTest(TestCase):
                     ".",
                     regex.Any(),
                 ),
+                (
+                    "(ab)",
+                    regex.And([regex.Literal("a"), regex.Literal("b")]),
+                ),
+                (
+                    "(a|b)",
+                    regex.Or([regex.Literal("a"), regex.Literal("b")]),
+                ),
             ]
         ):
             with self.subTest(value=value, expected=expected):
