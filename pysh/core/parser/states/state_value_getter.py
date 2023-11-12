@@ -4,7 +4,7 @@ from typing import Callable, Generic, TypeVar
 
 
 _State = TypeVar("_State")
-_Value = TypeVar("_Value")
+_Value = TypeVar("_Value", covariant=True)
 
 
 class StateValueGetter(ABC, Generic[_State, _Value]):

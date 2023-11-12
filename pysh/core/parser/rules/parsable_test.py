@@ -89,7 +89,7 @@ class List(Val, Sized, Iterable[Val]):
     @classmethod
     def parser_rule(cls) -> rules.SingleResultsRule[State, "List"]:
         return (
-            State.literal("(").no() & Val.ref().until(State.literal(")").no())
+            State.literal(r"\(").no() & Val.ref().until(State.literal(r"\)").no())
         ).convert(List)
 
 
@@ -201,8 +201,8 @@ class ParsableTest(TestCase):
                         lexer.Result(
                             tokens.Stream(
                                 [
-                                    tokens.Token("(", "("),
-                                    tokens.Token(")", ")"),
+                                    tokens.Token(r"\(", "("),
+                                    tokens.Token(r"\)", ")"),
                                 ]
                             )
                         )
@@ -217,9 +217,9 @@ class ParsableTest(TestCase):
                         lexer.Result(
                             tokens.Stream(
                                 [
-                                    tokens.Token("(", "("),
+                                    tokens.Token(r"\(", "("),
                                     tokens.Token("int", "1"),
-                                    tokens.Token(")", ")"),
+                                    tokens.Token(r"\)", ")"),
                                 ]
                             )
                         )
@@ -234,9 +234,9 @@ class ParsableTest(TestCase):
                         lexer.Result(
                             tokens.Stream(
                                 [
-                                    tokens.Token("(", "("),
+                                    tokens.Token(r"\(", "("),
                                     tokens.Token("str", '"a"'),
-                                    tokens.Token(")", ")"),
+                                    tokens.Token(r"\)", ")"),
                                 ]
                             )
                         )

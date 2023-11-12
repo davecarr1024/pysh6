@@ -16,7 +16,12 @@ class RegexTest(TestCase):
                 ),
                 (
                     "ab",
-                    regex.And([regex.Literal("a"), regex.Literal("b")]),
+                    regex.And(
+                        [
+                            regex.Literal("a"),
+                            regex.Literal("b"),
+                        ]
+                    ),
                 ),
                 (
                     r"\a",
@@ -47,12 +52,119 @@ class RegexTest(TestCase):
                     regex.Any(),
                 ),
                 (
+                    "(a)",
+                    regex.Literal("a"),
+                ),
+                (
                     "(ab)",
-                    regex.And([regex.Literal("a"), regex.Literal("b")]),
+                    regex.And(
+                        [
+                            regex.Literal("a"),
+                            regex.Literal("b"),
+                        ]
+                    ),
                 ),
                 (
                     "(a|b)",
-                    regex.Or([regex.Literal("a"), regex.Literal("b")]),
+                    regex.Or(
+                        [
+                            regex.Literal("a"),
+                            regex.Literal("b"),
+                        ]
+                    ),
+                ),
+                (
+                    "a*",
+                    regex.ZeroOrMore(regex.Literal("a")),
+                ),
+                (
+                    "(a)*",
+                    regex.ZeroOrMore(regex.Literal("a")),
+                ),
+                (
+                    "(a|b)*",
+                    regex.ZeroOrMore(
+                        regex.Or(
+                            [
+                                regex.Literal("a"),
+                                regex.Literal("b"),
+                            ]
+                        )
+                    ),
+                ),
+                (
+                    "[a-z]*",
+                    regex.ZeroOrMore(regex.Range("a", "z")),
+                ),
+                (
+                    ".*",
+                    regex.ZeroOrMore(regex.Any()),
+                ),
+                (
+                    r"\d*",
+                    regex.ZeroOrMore(regex.Regex.digits()),
+                ),
+                (
+                    "a+",
+                    regex.OneOrMore(regex.Literal("a")),
+                ),
+                (
+                    "(a)+",
+                    regex.OneOrMore(regex.Literal("a")),
+                ),
+                (
+                    "(a|b)+",
+                    regex.OneOrMore(
+                        regex.Or(
+                            [
+                                regex.Literal("a"),
+                                regex.Literal("b"),
+                            ]
+                        )
+                    ),
+                ),
+                (
+                    "[a-z]+",
+                    regex.OneOrMore(regex.Range("a", "z")),
+                ),
+                (
+                    ".+",
+                    regex.OneOrMore(regex.Any()),
+                ),
+                (
+                    r"\d+",
+                    regex.OneOrMore(regex.Regex.digits()),
+                ),
+                (
+                    "a?",
+                    regex.ZeroOrOne(regex.Literal("a")),
+                ),
+                (
+                    "(a)?",
+                    regex.ZeroOrOne(regex.Literal("a")),
+                ),
+                (
+                    "(a|b)?",
+                    regex.ZeroOrOne(
+                        regex.Or(
+                            [
+                                regex.Literal("a"),
+                                regex.Literal("b"),
+                            ]
+                        )
+                    ),
+                ),
+                (
+                    "[a-z]?",
+                    regex.ZeroOrOne(regex.Range("a", "z")),
+                ),
+                (
+                    ".?",
+                    regex.ZeroOrOne(regex.Any()),
+                ),
+                (
+                    r"\d?",
+                    regex.ZeroOrOne(regex.Regex.digits()),
                 ),
             ]
         ):

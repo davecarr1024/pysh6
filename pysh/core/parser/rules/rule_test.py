@@ -26,11 +26,11 @@ class State:
 class RuleTest(TestCase):
     def test_until(self) -> None:
         rule: parser.rules.MultipleResultsRule[State, int] = State.literal(
-            "("
+            r"\("
         ).no() & State.literal(lexer.Rule.load("int", r"\d+")).token_value().convert(
             int
         ).until(
-            State.literal(")").no()
+            State.literal(r"\)").no()
         )
         for state, expected in list[
             tuple[
@@ -48,7 +48,7 @@ class RuleTest(TestCase):
                         lexer.Result(
                             tokens.Stream(
                                 [
-                                    tokens.Token("(", "("),
+                                    tokens.Token(r"\(", "("),
                                 ]
                             )
                         )
@@ -60,8 +60,8 @@ class RuleTest(TestCase):
                         lexer.Result(
                             tokens.Stream(
                                 [
-                                    tokens.Token("(", "("),
-                                    tokens.Token(")", ")"),
+                                    tokens.Token(r"\(", "("),
+                                    tokens.Token(r"\)", ")"),
                                 ]
                             )
                         )
@@ -73,9 +73,9 @@ class RuleTest(TestCase):
                         lexer.Result(
                             tokens.Stream(
                                 [
-                                    tokens.Token("(", "("),
+                                    tokens.Token(r"\(", "("),
                                     tokens.Token("int", "1"),
-                                    tokens.Token(")", ")"),
+                                    tokens.Token(r"\)", ")"),
                                 ]
                             )
                         )
@@ -90,7 +90,7 @@ class RuleTest(TestCase):
                         lexer.Result(
                             tokens.Stream(
                                 [
-                                    tokens.Token("(", "("),
+                                    tokens.Token(r"\(", "("),
                                     tokens.Token("int", "1"),
                                 ]
                             )
