@@ -18,7 +18,14 @@ class Lexer(Sized, Iterable[rule.Rule]):
         return iter(self._rules)
 
     def __or__(self, rhs: "Lexer") -> "Lexer":
-        return Lexer(list(self._rules) + list(rhs._rules))
+        return Lexer(
+            list[rule.Rule](
+                (
+                    {rule.name: rule for rule in self._rules}
+                    | {rule.name: rule for rule in rhs._rules}
+                ).values()
+            )
+        )
 
     def _apply_any(self, state: state.State) -> state_and_result.StateAndResult:
         errors_: MutableSequence[errors.Error] = []
