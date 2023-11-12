@@ -86,7 +86,7 @@ class Regex(ABC):
 
             @classmethod
             def types(cls) -> Sequence[Type["_Regex"]]:
-                return [cls, _Not, _Special, _Literal, _Range]
+                return [cls, _Not, _Special, _Literal, _Range, _Any]
 
             @classmethod
             def scope_getter(
@@ -112,7 +112,9 @@ class Regex(ABC):
                 return State.literal(
                     lexer.Rule(
                         "literal",
-                        not_.Not(or_.Or([literal.Literal(value) for value in r"\^[]"])),
+                        not_.Not(
+                            or_.Or([literal.Literal(value) for value in r"\^[].()*?+"])
+                        ),
                     )
                 ).convert(lambda token: _Literal(literal.Literal(token.value)))
 
@@ -178,6 +180,14 @@ class Regex(ABC):
                         lambda value: _Range(range.Range(*value.strip("[]").split("-")))
                     )
                 )
+
+        @dataclass(frozen=True)
+        class _Any(_Regex):
+            regex: any.Any = field(default_factory=any.Any)
+
+            @classmethod
+            def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Any"]:
+                return State.literal(".").no().convert(lambda: _Any())
 
         def to_and(regexes: Sequence[_Regex]) -> Regex:
             match len(regexes):
