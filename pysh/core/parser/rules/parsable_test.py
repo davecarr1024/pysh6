@@ -5,6 +5,12 @@ from unittest import TestCase
 from pysh.core import errors, lexer, tokens
 from pysh.core.parser import results, rules, states
 
+_scope_getter: states.StateValueGetter[
+    "State", rules.Scope["State", "Val"]
+] = states.StateValueGetter["State", rules.Scope["State", "Val"]].load(
+    lambda state: state.scope
+)
+
 
 @dataclass(frozen=True)
 class State:
@@ -23,7 +29,10 @@ class State:
     def lexer_result_setter() -> states.StateValueSetter["State", lexer.Result]:
         return states.StateValueSetter[State, lexer.Result].load(
             lambda state: state.lexer_result,
-            lambda state, lexer_result: State(lexer_result, state.scope),
+            lambda state, lexer_result: State(
+                lexer_result,
+                state.scope,
+            ),
         )
 
     @staticmethod
@@ -34,9 +43,7 @@ class State:
 
     @staticmethod
     def scope_getter() -> states.StateValueGetter["State", rules.Scope["State", "Val"]]:
-        return states.StateValueGetter[State, rules.Scope[State, Val]].load(
-            lambda state: state.scope
-        )
+        return _scope_getter
 
 
 @dataclass(frozen=True)
@@ -47,11 +54,7 @@ class Val(rules.Parsable[State, "Val"]):
 
     @classmethod
     def types(cls) -> Sequence[Type["Val"]]:
-        return [Val, Int, Str, List]
-
-    @classmethod
-    def parser_rule(cls) -> rules.SingleResultsRule[State, "Val"]:
-        return Int.ref() | Str.ref() | List.ref()
+        return [cls, Int, Str, List]
 
 
 @dataclass(frozen=True)

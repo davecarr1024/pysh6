@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, Self, Sequence, Type, TypeVar
 from pysh.core import lexer
-from pysh.core.parser.rules import ref, scope as scope_lib, single_results_rule
+from pysh.core.parser.rules import ors, ref, scope as scope_lib, single_results_rule
 from pysh.core.parser.states import state_value_getter
 
 _State = TypeVar("_State")
@@ -14,7 +14,9 @@ class Parsable(ABC, Generic[_State, _T]):
     @classmethod
     @abstractmethod
     def parser_rule(cls) -> single_results_rule.SingleResultsRule[_State, Self]:
-        ...
+        return ors.SingleResultsOr[_State, Self, Self](
+            [type.ref() for type in cls.types() if type != cls]
+        )
 
     @classmethod
     @abstractmethod
@@ -35,7 +37,7 @@ class Parsable(ABC, Generic[_State, _T]):
     @classmethod
     def scope(cls) -> scope_lib.Scope[_State, _T]:
         return scope_lib.Scope[_State, _T](
-            {t.name(): t.parser_rule() for t in cls.types()}
+            {type.name(): type.parser_rule() for type in cls.types()}
         )
 
     @classmethod
