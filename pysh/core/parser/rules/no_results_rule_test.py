@@ -24,6 +24,7 @@ class NoResultsRuleTest(TestCase):
                     rules.OptionalResultsRule[states.State, str],
                     rules.MultipleResultsRule[states.State, str],
                     rules.NamedResultsRule[states.State, str],
+                    lexer.Rule,
                     str,
                 ],
                 states.State,
@@ -100,14 +101,119 @@ class NoResultsRuleTest(TestCase):
                     states.StateAndNoResults[states.State, int | str](states.State()),
                 ),
                 (
-                    "b",
+                    "a",
+                    states.State(lexer.Result(tokens.Stream([tokens.Token("b", "b")]))),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
                     states.State(lexer.Result(tokens.Stream([tokens.Token("a", "a")]))),
+                    states.StateAndNoResults[states.State, int | str](states.State()),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(lexer.Result(tokens.Stream([tokens.Token("b", "b")]))),
                     None,
                 ),
             ]
         ):
             with self.subTest(rhs=rhs, state=state, expected=expected):
                 lhs: rules.NoResultsRule[states.State, int] = rules.Constant[
+                    states.State, int
+                ](1).no()
+                if expected is None:
+                    with self.assertRaises(errors.Error):
+                        (lhs & rhs)(state)
+                else:
+                    self.assertEqual((lhs & rhs)(state), expected)
+
+    def test_rand(self) -> None:
+        for lhs, state, expected in list[
+            tuple[
+                Union[
+                    str,
+                    lexer.Rule,
+                ],
+                states.State,
+                Optional[states.StateAndResults[states.State, int]],
+            ]
+        ](
+            [
+                (
+                    "a",
+                    states.State(),
+                    None,
+                ),
+                (
+                    "a",
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndNoResults[states.State, int](
+                        states.State(),
+                    ),
+                ),
+                (
+                    "a",
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndNoResults[states.State, int](
+                        states.State(),
+                    ),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, state=state, expected=expected):
+                rhs: rules.NoResultsRule[states.State, int] = rules.Constant[
                     states.State, int
                 ](1).no()
                 if expected is None:

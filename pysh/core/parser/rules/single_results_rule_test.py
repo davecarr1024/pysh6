@@ -22,6 +22,7 @@ class NoResultsRuleTest(TestCase):
                     rules.OptionalResultsRule[states.State, str],
                     rules.MultipleResultsRule[states.State, str],
                     rules.NamedResultsRule[states.State, str],
+                    lexer.Rule,
                     str,
                 ],
                 states.State,
@@ -127,12 +128,138 @@ class NoResultsRuleTest(TestCase):
                     ),
                     None,
                 ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndSingleResults[states.State, int | str](
+                        states.State(),
+                        results.SingleResults[int | str](1),
+                    ),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
             ]
         ):
             with self.subTest(rhs=rhs, state=state, expected=expected):
                 lhs: rules.SingleResultsRule[states.State, int] = rules.Constant[
                     states.State, int
                 ](1)
+                if expected is None:
+                    with self.assertRaises(errors.Error):
+                        (lhs & rhs)(state)
+                else:
+                    self.assertEqual((lhs & rhs)(state), expected)
+
+    def test_rand(self) -> None:
+        for lhs, state, expected in list[
+            tuple[
+                Union[
+                    str,
+                    lexer.Rule,
+                ],
+                states.State,
+                Optional[states.StateAndResults[states.State, int]],
+            ]
+        ](
+            [
+                (
+                    "a",
+                    states.State(),
+                    None,
+                ),
+                (
+                    "a",
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndSingleResults[states.State, int](
+                        states.State(),
+                        results.SingleResults[int](1),
+                    ),
+                ),
+                (
+                    "a",
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndSingleResults[states.State, int](
+                        states.State(),
+                        results.SingleResults[int](1),
+                    ),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, state=state, expected=expected):
+                rhs: rules.SingleResultsRule[states.State, int] = rules.Constant[
+                    states.State, int
+                ](1).single()
                 if expected is None:
                     with self.assertRaises(errors.Error):
                         (lhs & rhs)(state)

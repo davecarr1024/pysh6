@@ -74,6 +74,12 @@ class NoResultsRule(rule.Rule[_State, _Result]):
     def __and__(self, rhs: str) -> "ands.NoResultsAnd[_State,_Result,_Result]":
         ...
 
+    @overload
+    def __and__(
+        self, rhs: lexer_lib.Rule
+    ) -> "ands.NoResultsAnd[_State,_Result,_Result]":
+        ...
+
     def __and__(
         self,
         rhs: Union[
@@ -82,6 +88,7 @@ class NoResultsRule(rule.Rule[_State, _Result]):
             "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "named_results_rule.NamedResultsRule[_State,_RhsResult]",
+            lexer_lib.Rule,
             str,
         ],
     ) -> "ands.And[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
@@ -109,17 +116,43 @@ class NoResultsRule(rule.Rule[_State, _Result]):
                 return ands.NamedResultsAnd[_State, _RhsResult, _RhsResult](
                     [rhs_result_self, rhs]
                 )
-            case str():
+            case str() | lexer_lib.Rule():
                 return ands.NoResultsAnd[_State, _Result, _Result](
                     [
                         self,
                         no_results_unary_rule.NoResultsUnaryRule[
                             _State, _Result, tokens.Token
-                        ](literal.Literal(lexer_lib.Rule.load(rhs))),
+                        ](literal.Literal[_State].load(rhs)),
                     ]
                 )
             case _:
                 raise self._error("invalid and rhs {rhs}")
+
+    @overload
+    def __rand__(self, rhs: str) -> "ands.NoResultsAnd[_State, _Result, _Result]":
+        ...
+
+    @overload
+    def __rand__(
+        self, rhs: lexer_lib.Rule
+    ) -> "ands.NoResultsAnd[_State, _Result, _Result]":
+        ...
+
+    def __rand__(
+        self,
+        rhs: Union[
+            str,
+            lexer_lib.Rule,
+        ],
+    ) -> "ands.NoResultsAnd[_State, _Result, _Result]":
+        return ands.NoResultsAnd[_State, _Result, _Result](
+            [
+                no_results_unary_rule.NoResultsUnaryRule[_State, _Result, tokens.Token](
+                    literal.Literal.load(rhs)
+                ),
+                self,
+            ]
+        )
 
     @overload
     def __or__(

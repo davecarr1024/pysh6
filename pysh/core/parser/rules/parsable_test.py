@@ -73,10 +73,7 @@ class List(Val, Sized, Iterable[Val]):
 
     @classmethod
     def parser_rule(cls) -> rules.SingleResultsRule[State, "List"]:
-        return (
-            rules.Literal[State](lexer.Rule.load(r"\(")).no()
-            & Val.ref().until(rules.Literal[State](lexer.Rule.load(r"\)")).no())
-        ).convert(List)
+        return (r"\(" & Val.ref().until(r"\)")).convert(List)
 
 
 class ParsableTest(TestCase):

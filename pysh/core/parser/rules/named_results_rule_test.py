@@ -32,6 +32,7 @@ class NamedResultsRuleTest(TestCase):
                     rules.OptionalResultsRule[states.State, str],
                     rules.NamedResultsRule[states.State, str],
                     rules.NamedResultsRule[states.State, str],
+                    lexer.Rule,
                     str,
                 ],
                 states.State,
@@ -149,9 +150,141 @@ class NamedResultsRuleTest(TestCase):
                     ),
                     None,
                 ),
+                (
+                    rules.Constant[states.State, int](1).named("a")
+                    & rules.Constant[states.State, int](2).named("b"),
+                    lexer.Rule.load("a"),
+                    states.State(),
+                    None,
+                ),
+                (
+                    rules.Constant[states.State, int](1).named("a")
+                    & rules.Constant[states.State, int](2).named("b"),
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndNamedResults[states.State, int](
+                        states.State(),
+                        results.NamedResults[int]({"a": 1, "b": 2}),
+                    ),
+                ),
+                (
+                    rules.Constant[states.State, int](1).named("a")
+                    & rules.Constant[states.State, int](2).named("b"),
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
             ]
         ):
             with self.subTest(lhs=lhs, rhs=rhs, state=state, expected=expected):
+                if expected is None:
+                    with self.assertRaises(errors.Error):
+                        (lhs & rhs)(state)
+                else:
+                    self.assertEqual((lhs & rhs)(state), expected)
+
+    def test_rand(self) -> None:
+        for lhs, state, expected in list[
+            tuple[
+                Union[
+                    str,
+                    lexer.Rule,
+                ],
+                states.State,
+                Optional[states.StateAndResults[states.State, int]],
+            ]
+        ](
+            [
+                (
+                    "a",
+                    states.State(),
+                    None,
+                ),
+                (
+                    "a",
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndNamedResults[states.State, int](
+                        states.State(),
+                        results.NamedResults[int]({"c": 1}),
+                    ),
+                ),
+                (
+                    "a",
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(),
+                    None,
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndNamedResults[states.State, int](
+                        states.State(),
+                        results.NamedResults[int]({"c": 1}),
+                    ),
+                ),
+                (
+                    lexer.Rule.load("a"),
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
+            ]
+        ):
+            with self.subTest(lhs=lhs, state=state, expected=expected):
+                rhs: rules.NamedResultsRule[states.State, int] = rules.Constant[
+                    states.State, int
+                ](1).named("c")
                 if expected is None:
                     with self.assertRaises(errors.Error):
                         (lhs & rhs)(state)

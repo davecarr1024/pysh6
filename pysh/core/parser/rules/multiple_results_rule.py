@@ -54,6 +54,12 @@ class MultipleResultsRule(rule.Rule[_State, _Result]):
     def __and__(self, rhs: str) -> "ands.MultipleResultsAnd[_State,_Result,_Result]":
         ...
 
+    @overload
+    def __and__(
+        self, rhs: lexer_lib.Rule
+    ) -> "ands.MultipleResultsAnd[_State,_Result,_Result]":
+        ...
+
     def __and__(
         self,
         rhs: Union[
@@ -62,6 +68,7 @@ class MultipleResultsRule(rule.Rule[_State, _Result]):
             "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
             "MultipleResultsRule[_State,_RhsResult]",
             "named_results_rule.NamedResultsRule[_State,_RhsResult]",
+            lexer_lib.Rule,
             str,
         ],
     ) -> "ands.And[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
@@ -83,17 +90,43 @@ class MultipleResultsRule(rule.Rule[_State, _Result]):
                 return ands.MultipleResultsAnd[_State, _Result, _RhsResult]([self, rhs])
             case named_results_rule.NamedResultsRule():
                 return ands.NamedResultsAnd[_State, _Result, _RhsResult]([self, rhs])
-            case str():
+            case str() | lexer_lib.Rule():
                 return ands.MultipleResultsAnd[_State, _Result, _Result](
                     [
                         self,
                         no_results_unary_rule.NoResultsUnaryRule[
                             _State, _Result, tokens.Token
-                        ](literal.Literal[_State](lexer_lib.Rule.load(rhs))),
+                        ](literal.Literal[_State].load(rhs)),
                     ]
                 )
             case _:
                 raise self._error("invalid and rhs {rhs}")
+
+    @overload
+    def __rand__(self, rhs: str) -> "ands.MultipleResultsAnd[_State, _Result, _Result]":
+        ...
+
+    @overload
+    def __rand__(
+        self, rhs: lexer_lib.Rule
+    ) -> "ands.MultipleResultsAnd[_State, _Result, _Result]":
+        ...
+
+    def __rand__(
+        self,
+        rhs: Union[
+            str,
+            lexer_lib.Rule,
+        ],
+    ) -> "ands.MultipleResultsAnd[_State, _Result, _Result]":
+        return ands.MultipleResultsAnd[_State, _Result, _Result](
+            [
+                no_results_unary_rule.NoResultsUnaryRule[_State, _Result, tokens.Token](
+                    literal.Literal.load(rhs)
+                ),
+                self,
+            ]
+        )
 
     def convert(
         self, func: Callable[[Sequence[_Result]], _ConvertResult]

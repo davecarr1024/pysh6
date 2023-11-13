@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Generic, Optional, Self, Sequence, TypeVar, Union, overload
-from pysh.core import errors, lexer as lexer_lib
+from pysh.core import errors, lexer as lexer_lib, tokens
 from pysh.core.parser import results, states
 
 
@@ -197,8 +197,17 @@ class Rule(ABC, Generic[_State, _Result]):
         return Adapter[_State, _Result](self)
 
     def until(
-        self, term_rule: "no_results_rule.NoResultsRule[_State,Any]"
+        self,
+        term_rule: Union[
+            "no_results_rule.NoResultsRule[_State,Any]",
+            lexer_lib.Rule,
+            str,
+        ],
     ) -> "multiple_results_rule.MultipleResultsRule[_State,_Result]":
+        match term_rule:
+            case str() | lexer_lib.Rule():
+                term_rule = literal.Literal[_State].load(term_rule).no()
+
         AdapterState = TypeVar("AdapterState", bound=states.State)
         AdapterResult = TypeVar("AdapterResult")
 
@@ -207,7 +216,7 @@ class Rule(ABC, Generic[_State, _Result]):
             multiple_results_rule.MultipleResultsRule[AdapterState, AdapterResult],
         ):
             iter_rule: Rule[AdapterState, AdapterResult]
-            term_rule: Rule[AdapterState, AdapterResult]
+            term_rule: Rule[AdapterState, Any]
 
             def lexer(self) -> lexer_lib.Lexer:
                 return self.iter_rule.lexer() | self.term_rule.lexer()
@@ -301,6 +310,13 @@ class Rule(ABC, Generic[_State, _Result]):
     def __and__(self, rhs: str) -> "ands.And[_State,_Result,Rule[_State,_Result]]":
         ...
 
+    @overload
+    @abstractmethod
+    def __and__(
+        self, rhs: lexer_lib.Rule
+    ) -> "ands.And[_State,_Result,Rule[_State,_Result]]":
+        ...
+
     @abstractmethod
     def __and__(
         self,
@@ -310,9 +326,32 @@ class Rule(ABC, Generic[_State, _Result]):
             "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "named_results_rule.NamedResultsRule[_State,_RhsResult]",
+            lexer_lib.Rule,
             str,
         ],
     ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __rand__(self, rhs: str) -> "ands.And[_State,_Result,Rule[_State,_Result]]":
+        ...
+
+    @overload
+    @abstractmethod
+    def __rand__(
+        self, rhs: lexer_lib.Rule
+    ) -> "ands.And[_State,_Result,Rule[_State,_Result]]":
+        ...
+
+    @abstractmethod
+    def __rand__(
+        self,
+        rhs: Union[
+            str,
+            lexer_lib.Rule,
+        ],
+    ) -> "ands.And[_State,_Result,Rule[_State,_Result]]":
         ...
 
     @overload
@@ -386,4 +425,5 @@ from pysh.core.parser.rules import (
     named_results_rule,
     unary_rule,
     no_results_unary_rule,
+    literal,
 )
