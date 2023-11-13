@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
 from typing import Generic, Iterable, Iterator, Sequence, Sized, Type, TypeVar
 from pysh.core import lexer
+from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _Result = TypeVar("_Result", covariant=True)
 _ChildRuleType = TypeVar("_ChildRuleType", bound=rule.Rule, covariant=True)
 

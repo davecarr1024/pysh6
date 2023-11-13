@@ -10,7 +10,7 @@ from pysh.core.parser.rules import (
 from pysh.core.parser.rules.ors import or_
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _Result = TypeVar("_Result", covariant=True)
 _RhsResult = TypeVar("_RhsResult")
 

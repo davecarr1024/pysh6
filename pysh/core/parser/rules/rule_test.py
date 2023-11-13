@@ -4,47 +4,36 @@ from unittest import TestCase
 from pysh.core import errors, lexer, parser, regex, tokens
 
 
-@dataclass(frozen=True)
-class State:
-    lexer_result: lexer.Result = field(default_factory=lexer.Result)
-
-    @staticmethod
-    def lexer_result_setter() -> parser.states.StateValueSetter["State", lexer.Result]:
-        return parser.states.StateValueSetter[State, lexer.Result].load(
-            lambda state: state.lexer_result,
-            lambda _, lexer_result: State(lexer_result),
-        )
-
-    @staticmethod
-    def literal(value: str | lexer.Rule) -> parser.rules.Literal["State"]:
-        return parser.rules.Literal[State].load(
-            State.lexer_result_setter(),
-            value,
-        )
-
-
 class RuleTest(TestCase):
     def test_until(self) -> None:
-        rule: parser.rules.MultipleResultsRule[State, int] = State.literal(
+        rule: parser.rules.MultipleResultsRule[
+            parser.states.State, int
+        ] = parser.rules.Literal[parser.states.State].load(
             r"\("
-        ).no() & State.literal(lexer.Rule.load("int", r"\d+")).token_value().convert(
+        ).no() & parser.rules.Literal[
+            parser.states.State
+        ](
+            lexer.Rule.load("int", r"\d+")
+        ).token_value().convert(
             int
         ).until(
-            State.literal(r"\)").no()
+            parser.rules.Literal[parser.states.State].load(r"\)").no()
         )
         for state, expected in list[
             tuple[
-                State,
-                Optional[parser.states.StateAndMultipleResults[State, int]],
+                parser.states.State,
+                Optional[
+                    parser.states.StateAndMultipleResults[parser.states.State, int]
+                ],
             ]
         ](
             [
                 (
-                    State(),
+                    parser.states.State(),
                     None,
                 ),
                 (
-                    State(
+                    parser.states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -56,7 +45,7 @@ class RuleTest(TestCase):
                     None,
                 ),
                 (
-                    State(
+                    parser.states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -66,10 +55,12 @@ class RuleTest(TestCase):
                             )
                         )
                     ),
-                    parser.states.StateAndMultipleResults[State, int](State()),
+                    parser.states.StateAndMultipleResults[parser.states.State, int](
+                        parser.states.State()
+                    ),
                 ),
                 (
-                    State(
+                    parser.states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -80,13 +71,13 @@ class RuleTest(TestCase):
                             )
                         )
                     ),
-                    parser.states.StateAndMultipleResults[State, int](
-                        State(),
+                    parser.states.StateAndMultipleResults[parser.states.State, int](
+                        parser.states.State(),
                         parser.results.MultipleResults[int]([1]),
                     ),
                 ),
                 (
-                    State(
+                    parser.states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -108,22 +99,28 @@ class RuleTest(TestCase):
                     self.assertEqual(rule(state), expected)
 
     def test_until_empty(self) -> None:
-        rule: parser.rules.MultipleResultsRule[State, int] = (
-            State.literal(lexer.Rule.load("int", r"\d+")).token_value().convert(int)
-        ).until_empty(State.lexer_result_setter())
+        rule: parser.rules.MultipleResultsRule[parser.states.State, int] = (
+            parser.rules.Literal[parser.states.State](lexer.Rule.load("int", r"\d+"))
+            .token_value()
+            .convert(int)
+        ).until_empty()
         for state, expected in list[
             tuple[
-                State,
-                Optional[parser.states.StateAndMultipleResults[State, int]],
+                parser.states.State,
+                Optional[
+                    parser.states.StateAndMultipleResults[parser.states.State, int]
+                ],
             ]
         ](
             [
                 (
-                    State(),
-                    parser.states.StateAndMultipleResults[State, int](State()),
+                    parser.states.State(),
+                    parser.states.StateAndMultipleResults[parser.states.State, int](
+                        parser.states.State()
+                    ),
                 ),
                 (
-                    State(
+                    parser.states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -135,7 +132,7 @@ class RuleTest(TestCase):
                     None,
                 ),
                 (
-                    State(
+                    parser.states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -144,13 +141,13 @@ class RuleTest(TestCase):
                             )
                         )
                     ),
-                    parser.states.StateAndMultipleResults[State, int](
-                        State(),
+                    parser.states.StateAndMultipleResults[parser.states.State, int](
+                        parser.states.State(),
                         parser.results.MultipleResults[int]([1]),
                     ),
                 ),
                 (
-                    State(
+                    parser.states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -160,13 +157,13 @@ class RuleTest(TestCase):
                             )
                         )
                     ),
-                    parser.states.StateAndMultipleResults[State, int](
-                        State(),
+                    parser.states.StateAndMultipleResults[parser.states.State, int](
+                        parser.states.State(),
                         parser.results.MultipleResults[int]([1, 2]),
                     ),
                 ),
                 (
-                    State(
+                    parser.states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [

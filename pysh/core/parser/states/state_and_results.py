@@ -1,16 +1,16 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Callable, Generic, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 from pysh.core.parser import results
+from pysh.core.parser.states import state
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=state.State)
 _Result = TypeVar("_Result", covariant=True)
 _RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
-class StateAndResults(ABC, Generic[_State, _Result]):
+class StateAndResults(Generic[_State, _Result]):
     state: _State
     results: results.Results[_Result]
 

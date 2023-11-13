@@ -6,7 +6,7 @@ from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _Result = TypeVar("_Result", covariant=True)
 _ConvertResult = TypeVar("_ConvertResult")
 _RhsResult = TypeVar("_RhsResult")
@@ -74,7 +74,7 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
     def convert(
         self, func: Callable[..., _ConvertResult]
     ) -> "single_results_rule.SingleResultsRule[_State,_ConvertResult]":
-        AdapterState = TypeVar("AdapterState")
+        AdapterState = TypeVar("AdapterState", bound=states.State)
         AdapterResult = TypeVar("AdapterResult")
         AdapterChildResult = TypeVar("AdapterChildResult")
 
@@ -147,7 +147,7 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
                 return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
 
     def with_lexer(self, lexer: lexer_lib.Lexer) -> "NamedResultsRule[_State,_Result]":
-        State = TypeVar("State")
+        State = TypeVar("State", bound=states.State)
         Result = TypeVar("Result")
 
         @dataclass(frozen=True)

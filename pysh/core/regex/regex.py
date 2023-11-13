@@ -54,8 +54,7 @@ class Regex(ABC):
         ].load(lambda state: state.scope)
 
         @dataclass(frozen=True)
-        class State:
-            lexer_result: lexer.Result = field(default_factory=lexer.Result)
+        class State(parser.states.State):
             scope: parser.rules.Scope["State", "_Regex"] = field(
                 default_factory=lambda: _Regex.scope(),
                 compare=False,
@@ -63,34 +62,13 @@ class Regex(ABC):
                 repr=False,
             )
 
-            def __str__(self) -> str:
-                return str(self.lexer_result)
+            def with_lexer_result(self, lexer_result: lexer.Result) -> "State":
+                return State(lexer_result, self.scope)
 
-            @staticmethod
-            def lexer_result_setter() -> (
-                parser.states.StateValueSetter["State", lexer.Result]
-            ):
-                return parser.states.StateValueSetter["State", lexer.Result].load(
-                    lambda state: state.lexer_result,
-                    lambda state, lexer_result: State(lexer_result, state.scope),
-                )
-
-            @staticmethod
-            def literal(rule: str | lexer.Rule) -> parser.rules.Literal["State"]:
-                if isinstance(rule, str):
-                    rule = lexer.Rule(rule, Regex._literal(rule))
-                return parser.rules.Literal[State](
-                    State.lexer_result_setter(),
-                    rule,
-                )
-
-            @staticmethod
-            def scope_getter() -> (
-                parser.states.StateValueGetter[
-                    "State", parser.rules.Scope["State", "_Regex"]
-                ]
-            ):
-                return scope_getter
+        def _literal(value: str | lexer.Rule) -> parser.rules.Literal[State]:
+            if isinstance(value, str):
+                value = lexer.Rule(value, Regex._literal(value))
+            return parser.rules.Literal[State](value)
 
         @dataclass(frozen=True)
         class _Regex(parser.rules.Parsable[State, "_Regex"]):
@@ -118,7 +96,7 @@ class Regex(ABC):
             ) -> parser.states.StateValueGetter[
                 State, parser.rules.Scope[State, "_Regex"]
             ]:
-                return State.scope_getter()
+                return scope_getter
 
         @dataclass(frozen=True)
         class _Literal(_Regex):
@@ -126,7 +104,7 @@ class Regex(ABC):
 
             @classmethod
             def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Literal"]:
-                return State.literal(
+                return _literal(
                     lexer.Rule(
                         "literal",
                         not_.Not(
@@ -153,7 +131,7 @@ class Regex(ABC):
                             return _Special(literal.Literal(value))
 
                 return (
-                    State.literal(
+                    _literal(
                         lexer.Rule(
                             "special", and_.And([literal.Literal("\\"), any.Any()])
                         )
@@ -169,9 +147,9 @@ class Regex(ABC):
 
             @classmethod
             def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Not"]:
-                return (
-                    State.literal("^").no() & (_Literal.ref() | _Range.ref())
-                ).convert(lambda regex: _Not(not_.Not(regex.regex)))
+                return (_literal("^").no() & (_Literal.ref() | _Range.ref())).convert(
+                    lambda regex: _Not(not_.Not(regex.regex))
+                )
 
         @dataclass(frozen=True)
         class _Range(_Regex):
@@ -180,7 +158,7 @@ class Regex(ABC):
             @classmethod
             def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Range"]:
                 return (
-                    State.literal(
+                    _literal(
                         lexer.Rule(
                             "range",
                             and_.And(
@@ -206,7 +184,7 @@ class Regex(ABC):
 
             @classmethod
             def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Any"]:
-                return State.literal(".").no().convert(lambda: _Any())
+                return _literal(".").no().convert(lambda: _Any())
 
         @dataclass(frozen=True)
         class _And(_Regex):
@@ -223,8 +201,8 @@ class Regex(ABC):
                             return _And(and_.And(values))
 
                 return (
-                    State.literal("(").no()
-                    & _Regex.ref().one_or_more().until(State.literal(")").no())
+                    _literal("(").no()
+                    & _Regex.ref().one_or_more().until(_literal(")").no())
                 ).convert(load)
 
         @dataclass(frozen=True)
@@ -234,11 +212,11 @@ class Regex(ABC):
             @classmethod
             def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Or"]:
                 return (
-                    State.literal("(").no()
+                    _literal("(").no()
                     & _Regex.ref()
-                    & (State.literal("|").no() & _Regex.ref())
+                    & (_literal("|").no() & _Regex.ref())
                     .one_or_more()
-                    .until(State.literal(")").no())
+                    .until(_literal(")").no())
                 ).convert(
                     lambda regexes: _Or(or_.Or([regex.regex for regex in regexes]))
                 )
@@ -260,7 +238,7 @@ class Regex(ABC):
                         | _Any.ref()
                         | _Special.ref()
                     )
-                    & State.literal("*").no()
+                    & _literal("*").no()
                 ).convert(
                     lambda regex: _ZeroOrMore(zero_or_more.ZeroOrMore(regex.regex))
                 )
@@ -282,7 +260,7 @@ class Regex(ABC):
                         | _Any.ref()
                         | _Special.ref()
                     )
-                    & State.literal("+").no()
+                    & _literal("+").no()
                 ).convert(lambda regex: _OneOrMore(one_or_more.OneOrMore(regex.regex)))
 
         @dataclass(frozen=True)
@@ -302,7 +280,7 @@ class Regex(ABC):
                         | _Any.ref()
                         | _Special.ref()
                     )
-                    & State.literal("?").no()
+                    & _literal("?").no()
                 ).convert(lambda regex: _ZeroOrOne(zero_or_one.ZeroOrOne(regex.regex)))
 
         def to_and(regexes: Sequence[_Regex]) -> Regex:
@@ -312,12 +290,7 @@ class Regex(ABC):
                 case _:
                     return and_.And([regex.regex for regex in regexes])
 
-        rule = (
-            _Regex.ref()
-            .until_empty(State.lexer_result_setter())
-            .convert(to_and)
-            .with_lexer(_Regex.lexer())
-        )
+        rule = _Regex.ref().until_empty().convert(to_and).with_lexer(_Regex.lexer())
         state = State(rule.lexer()(lexer.State.load(value)))
         try:
             return rule(state).results.value

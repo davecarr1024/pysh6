@@ -7,29 +7,14 @@ from pysh.core.parser import results, rules, states
 
 class RefTest(TestCase):
     def test_call(self) -> None:
-        @dataclass(frozen=True, kw_only=True)
-        class State:
-            lexer_result: lexer.Result = field(default_factory=lexer.Result)
+        @dataclass(frozen=True)
+        class State(states.State):
             scope: rules.Scope["State", tokens.Token] = field(
                 default_factory=rules.Scope["State", tokens.Token]
             )
 
-            def __str__(self) -> str:
-                return f"State(lexer_result={self.lexer_result}, scope={self.scope})"
-
-            @staticmethod
-            def lexer_result_setter() -> states.StateValueSetter["State", lexer.Result]:
-                return states.StateValueSetter[State, lexer.Result].load(
-                    lambda state: state.lexer_result,
-                    lambda state, lexer_result: State(
-                        lexer_result=lexer_result,
-                        scope=state.scope,
-                    ),
-                )
-
-            @staticmethod
-            def literal(lexer_rule: lexer.Rule) -> rules.Literal["State"]:
-                return rules.Literal[State](State.lexer_result_setter(), lexer_rule)
+            def with_lexer_result(self, lexer_result: lexer.Result) -> "State":
+                return State(lexer_result, self.scope)
 
             @staticmethod
             def scope_getter() -> (
@@ -58,7 +43,7 @@ class RefTest(TestCase):
                     State(
                         scope=rules.Scope[State, tokens.Token](
                             {
-                                "s": State.literal(lexer.Rule.load("b")),
+                                "s": rules.Literal[State](lexer.Rule.load("b")),
                             }
                         )
                     ),
@@ -68,7 +53,7 @@ class RefTest(TestCase):
                     State(
                         scope=rules.Scope[State, tokens.Token](
                             {
-                                "r": State.literal(lexer.Rule.load("a")),
+                                "r": rules.Literal[State](lexer.Rule.load("a")),
                             }
                         )
                     ),
@@ -85,7 +70,7 @@ class RefTest(TestCase):
                         ),
                         scope=rules.Scope[State, tokens.Token](
                             {
-                                "r": State.literal(lexer.Rule.load("a")),
+                                "r": rules.Literal[State](lexer.Rule.load("a")),
                             }
                         ),
                     ),
@@ -102,7 +87,7 @@ class RefTest(TestCase):
                         ),
                         scope=rules.Scope[State, tokens.Token](
                             {
-                                "r": State.literal(lexer.Rule.load("a")),
+                                "r": rules.Literal[State](lexer.Rule.load("a")),
                             }
                         ),
                     ),
@@ -110,7 +95,7 @@ class RefTest(TestCase):
                         State(
                             scope=rules.Scope[State, tokens.Token](
                                 {
-                                    "r": State.literal(lexer.Rule.load("a")),
+                                    "r": rules.Literal[State](lexer.Rule.load("a")),
                                 }
                             ),
                         ),
@@ -129,7 +114,7 @@ class RefTest(TestCase):
                         ),
                         scope=rules.Scope[State, tokens.Token](
                             {
-                                "r": State.literal(lexer.Rule.load("a")),
+                                "r": rules.Literal[State](lexer.Rule.load("a")),
                             }
                         ),
                     ),
@@ -144,7 +129,7 @@ class RefTest(TestCase):
                             ),
                             scope=rules.Scope[State, tokens.Token](
                                 {
-                                    "r": State.literal(lexer.Rule.load("a")),
+                                    "r": rules.Literal[State](lexer.Rule.load("a")),
                                 }
                             ),
                         ),
