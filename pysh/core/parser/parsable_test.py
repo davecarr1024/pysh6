@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Optional, Sequence, Sized, Type
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
+from pysh.core import parser
 from pysh.core.parser import results, rules, states
 
 _scope_getter: states.StateValueGetter[
@@ -29,7 +30,7 @@ class State(states.State):
 
 
 @dataclass(frozen=True)
-class Val(rules.Parsable[State, "Val"]):
+class Val(parser.Parsable[State, "Val"]):
     @classmethod
     def scope_getter(cls) -> states.StateValueGetter[State, rules.Scope[State, "Val"]]:
         return State.scope_getter()

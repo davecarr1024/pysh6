@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, overload
 from pysh.core import errors
 from pysh.core.parser import states
 from pysh.core.parser.rules import no_results_rule

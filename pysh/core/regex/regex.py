@@ -71,7 +71,7 @@ class Regex(ABC):
             return parser.rules.Literal[State](value)
 
         @dataclass(frozen=True)
-        class _Regex(parser.rules.Parsable[State, "_Regex"]):
+        class _Regex(parser.Parsable[State, "_Regex"]):
             regex: Regex
 
             @classmethod
