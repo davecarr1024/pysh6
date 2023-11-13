@@ -49,6 +49,10 @@ class Regex(ABC):
             zero_or_one,
         )
 
+        scope_getter = parser.states.StateValueGetter[
+            "State", parser.rules.Scope["State", "_Regex"]
+        ].load(lambda state: state.scope)
+
         @dataclass(frozen=True)
         class State:
             lexer_result: lexer.Result = field(default_factory=lexer.Result)
@@ -86,9 +90,7 @@ class Regex(ABC):
                     "State", parser.rules.Scope["State", "_Regex"]
                 ]
             ):
-                return parser.states.StateValueGetter[
-                    "State", parser.rules.Scope["State", "_Regex"]
-                ].load(lambda state: state.scope)
+                return scope_getter
 
         @dataclass(frozen=True)
         class _Regex(parser.rules.Parsable[State, "_Regex"]):
@@ -117,13 +119,6 @@ class Regex(ABC):
                 State, parser.rules.Scope[State, "_Regex"]
             ]:
                 return State.scope_getter()
-
-            @classmethod
-            @abstractmethod
-            def parser_rule(cls) -> parser.rules.SingleResultsRule[State, "_Regex"]:
-                return parser.rules.ors.SingleResultsOr[State, _Regex, _Regex](
-                    [type.ref() for type in cls.types() if type != cls]
-                )
 
         @dataclass(frozen=True)
         class _Literal(_Regex):
