@@ -1,6 +1,6 @@
-from dataclasses import dataclass
-from typing import Type, Union
+from typing import Optional, Union
 from unittest import TestCase
+from pysh.core import errors, lexer, tokens
 from pysh.core.parser import results, rules, states
 
 
@@ -14,7 +14,7 @@ class NoResultsRuleTest(TestCase):
         )
 
     def test_and(self) -> None:
-        for rhs, expected in list[
+        for rhs, state, expected in list[
             tuple[
                 Union[
                     rules.NoResultsRule[states.State, str],
@@ -22,13 +22,16 @@ class NoResultsRuleTest(TestCase):
                     rules.OptionalResultsRule[states.State, str],
                     rules.MultipleResultsRule[states.State, str],
                     rules.NamedResultsRule[states.State, str],
+                    str,
                 ],
-                states.StateAndResults[states.State, int | str],
+                states.State,
+                Optional[states.StateAndResults[states.State, int | str]],
             ]
         ](
             [
                 (
                     rules.Constant[states.State, str]("a").no(),
+                    states.State(),
                     states.StateAndSingleResults[states.State, int | str](
                         states.State(),
                         results.SingleResults[int | str](1),
@@ -36,6 +39,7 @@ class NoResultsRuleTest(TestCase):
                 ),
                 (
                     rules.Constant[states.State, str]("a"),
+                    states.State(),
                     states.StateAndMultipleResults[states.State, int | str](
                         states.State(),
                         results.MultipleResults[int | str]([1, "a"]),
@@ -43,6 +47,7 @@ class NoResultsRuleTest(TestCase):
                 ),
                 (
                     rules.Constant[states.State, str]("a").no().optional(),
+                    states.State(),
                     states.StateAndMultipleResults[states.State, int | str](
                         states.State(),
                         results.MultipleResults[int | str]([1]),
@@ -50,6 +55,7 @@ class NoResultsRuleTest(TestCase):
                 ),
                 (
                     rules.Constant[states.State, str]("a").optional(),
+                    states.State(),
                     states.StateAndMultipleResults[states.State, int | str](
                         states.State(),
                         results.MultipleResults[int | str]([1, "a"]),
@@ -57,6 +63,7 @@ class NoResultsRuleTest(TestCase):
                 ),
                 (
                     rules.Constant[states.State, str]("a").no().multiple(),
+                    states.State(),
                     states.StateAndMultipleResults[states.State, int | str](
                         states.State(),
                         results.MultipleResults[int | str]([1]),
@@ -64,6 +71,7 @@ class NoResultsRuleTest(TestCase):
                 ),
                 (
                     rules.Constant[states.State, str]("a").multiple(),
+                    states.State(),
                     states.StateAndMultipleResults[states.State, int | str](
                         states.State(),
                         results.MultipleResults[int | str]([1, "a"]),
@@ -71,6 +79,7 @@ class NoResultsRuleTest(TestCase):
                 ),
                 (
                     rules.Constant[states.State, str]("a").no().named(),
+                    states.State(),
                     states.StateAndNamedResults[states.State, int | str](
                         states.State(),
                         results.NamedResults[int | str]({"": 1}),
@@ -78,15 +87,54 @@ class NoResultsRuleTest(TestCase):
                 ),
                 (
                     rules.Constant[states.State, str]("a").named("v"),
+                    states.State(),
                     states.StateAndNamedResults[states.State, int | str](
                         states.State(),
                         results.NamedResults[int | str]({"v": "a", "": 1}),
                     ),
                 ),
+                (
+                    "a",
+                    states.State(),
+                    None,
+                ),
+                (
+                    "a",
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("a", "a"),
+                                ]
+                            )
+                        )
+                    ),
+                    states.StateAndSingleResults[states.State, int | str](
+                        states.State(),
+                        results.SingleResults[int | str](1),
+                    ),
+                ),
+                (
+                    "a",
+                    states.State(
+                        lexer.Result(
+                            tokens.Stream(
+                                [
+                                    tokens.Token("b", "b"),
+                                ]
+                            )
+                        )
+                    ),
+                    None,
+                ),
             ]
         ):
-            with self.subTest(rhs=rhs, expected=expected):
+            with self.subTest(rhs=rhs, state=state, expected=expected):
                 lhs: rules.SingleResultsRule[states.State, int] = rules.Constant[
                     states.State, int
                 ](1)
-                self.assertEqual((lhs & rhs)(states.State()), expected)
+                if expected is None:
+                    with self.assertRaises(errors.Error):
+                        (lhs & rhs)(state)
+                else:
+                    self.assertEqual((lhs & rhs)(state), expected)

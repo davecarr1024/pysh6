@@ -296,6 +296,11 @@ class Rule(ABC, Generic[_State, _Result]):
     ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...
 
+    @overload
+    @abstractmethod
+    def __and__(self, rhs: str) -> "ands.And[_State,_Result,Rule[_State,_Result]]":
+        ...
+
     @abstractmethod
     def __and__(
         self,
@@ -305,6 +310,7 @@ class Rule(ABC, Generic[_State, _Result]):
             "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "named_results_rule.NamedResultsRule[_State,_RhsResult]",
+            str,
         ],
     ) -> "ands.And[_State,_Result|_RhsResult, Rule[_State,_Result]|Rule[_State,_RhsResult]]":
         ...

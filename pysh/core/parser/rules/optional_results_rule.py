@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Optional, TypeVar, Union, overload
-from pysh.core import lexer as lexer_lib
+from pysh.core import lexer as lexer_lib, tokens
 from pysh.core.parser import states
 from pysh.core.parser.rules import ands, rule
 
@@ -72,6 +72,10 @@ class OptionalResultsRule(rule.Rule[_State, _Result]):
     ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
         ...
 
+    @overload
+    def __and__(self, rhs: str) -> "ands.OptionalResultsAnd[_State,_Result,_Result]":
+        ...
+
     def __and__(
         self,
         rhs: Union[
@@ -80,6 +84,7 @@ class OptionalResultsRule(rule.Rule[_State, _Result]):
             "OptionalResultsRule[_State,_RhsResult]",
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "named_results_rule.NamedResultsRule[_State,_RhsResult]",
+            str,
         ],
     ) -> "ands.And[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
         match rhs:
@@ -96,6 +101,17 @@ class OptionalResultsRule(rule.Rule[_State, _Result]):
                 return ands.MultipleResultsAnd[_State, _Result, _RhsResult]([self, rhs])
             case named_results_rule.NamedResultsRule():
                 return ands.NamedResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+            case str():
+                return ands.OptionalResultsAnd[_State, _Result, _Result](
+                    [
+                        self,
+                        no_results_unary_rule.NoResultsUnaryRule[
+                            _State,
+                            _Result,
+                            tokens.Token,
+                        ](literal.Literal[_State](lexer_lib.Rule.load(rhs))),
+                    ]
+                )
             case _:
                 raise self._error("invalid and rhs {rhs}")
 
@@ -191,4 +207,5 @@ from pysh.core.parser.rules import (
     named_results_rule,
     unary_rule,
     no_results_unary_rule,
+    literal,
 )
