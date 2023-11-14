@@ -1,8 +1,8 @@
-from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Optional, Sequence, Sized, Type
 from unittest import TestCase
 from pysh.core import errors, lexer, tokens
+from pysh.core import parser
 from pysh.core.parser import results, rules, states
 
 _scope_getter: states.StateValueGetter[
@@ -13,8 +13,7 @@ _scope_getter: states.StateValueGetter[
 
 
 @dataclass(frozen=True)
-class State:
-    lexer_result: lexer.Result = field(default_factory=lexer.Result)
+class State(states.State):
     scope: rules.Scope["State", "Val"] = field(
         default_factory=lambda: Val.scope(),
         compare=False,
@@ -22,24 +21,8 @@ class State:
         repr=False,
     )
 
-    def __str__(self) -> str:
-        return str(self.lexer_result)
-
-    @staticmethod
-    def lexer_result_setter() -> states.StateValueSetter["State", lexer.Result]:
-        return states.StateValueSetter[State, lexer.Result].load(
-            lambda state: state.lexer_result,
-            lambda state, lexer_result: State(
-                lexer_result,
-                state.scope,
-            ),
-        )
-
-    @staticmethod
-    def literal(lexer_rule: lexer.Rule | str) -> rules.Literal["State"]:
-        if isinstance(lexer_rule, str):
-            lexer_rule = lexer.Rule.load(lexer_rule)
-        return rules.Literal[State](State.lexer_result_setter(), lexer_rule)
+    def with_lexer_result(self, lexer_result: lexer.Result) -> "State":
+        return State(lexer_result, self.scope)
 
     @staticmethod
     def scope_getter() -> states.StateValueGetter["State", rules.Scope["State", "Val"]]:
@@ -47,7 +30,7 @@ class State:
 
 
 @dataclass(frozen=True)
-class Val(rules.Parsable[State, "Val"]):
+class Val(parser.Parsable[State, "Val"]):
     @classmethod
     def scope_getter(cls) -> states.StateValueGetter[State, rules.Scope[State, "Val"]]:
         return State.scope_getter()
@@ -63,7 +46,7 @@ class Int(Val):
 
     @classmethod
     def parser_rule(cls) -> rules.SingleResultsRule[State, "Int"]:
-        return State.literal(lexer.Rule.load("int", r"\d+")).convert(
+        return rules.Literal[State](lexer.Rule.load("int", r"\d+")).convert(
             lambda token: Int(int(token.value))
         )
 
@@ -74,7 +57,7 @@ class Str(Val):
 
     @classmethod
     def parser_rule(cls) -> rules.SingleResultsRule[State, "Str"]:
-        return State.literal(lexer.Rule.load("str", r'"(^")*"')).convert(
+        return rules.Literal[State](lexer.Rule.load("str", r'"(^")*"')).convert(
             lambda token: Str(token.value.strip('"'))
         )
 
@@ -91,9 +74,7 @@ class List(Val, Sized, Iterable[Val]):
 
     @classmethod
     def parser_rule(cls) -> rules.SingleResultsRule[State, "List"]:
-        return (
-            State.literal(r"\(").no() & Val.ref().until(State.literal(r"\)").no())
-        ).convert(List)
+        return (r"\(" & Val.ref().until(r"\)")).convert(List)
 
 
 class ParsableTest(TestCase):

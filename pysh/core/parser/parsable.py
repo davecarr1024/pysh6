@@ -2,10 +2,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, Self, Sequence, Type, TypeVar
 from pysh.core import lexer
+from pysh.core.parser import states
 from pysh.core.parser.rules import ors, ref, scope as scope_lib, single_results_rule
 from pysh.core.parser.states import state_value_getter
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _T = TypeVar("_T", bound="Parsable")
 
 

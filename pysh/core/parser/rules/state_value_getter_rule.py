@@ -4,7 +4,7 @@ from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _Result = TypeVar("_Result", covariant=True)
 _Value = TypeVar("_Value", covariant=True)
 

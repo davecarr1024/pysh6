@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Callable, Generic, TypeVar
+from pysh.core.parser.states import state
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=state.State)
 _Value = TypeVar("_Value", covariant=True)
 
 
@@ -16,7 +17,7 @@ class StateValueGetter(ABC, Generic[_State, _Value]):
     def load(
         cls, get_func: Callable[[_State], _Value]
     ) -> "StateValueGetter[_State,_Value]":
-        GetterState = TypeVar("GetterState")
+        GetterState = TypeVar("GetterState", bound=state.State)
         GetterValue = TypeVar("GetterValue")
 
         @dataclass(frozen=True)

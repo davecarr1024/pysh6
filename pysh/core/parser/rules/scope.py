@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from typing import Generic, Iterator, Mapping, TypeVar
+from typing import Iterator, Mapping, TypeVar
 from pysh.core import errors
-from pysh.core.parser import results
+from pysh.core.parser import states
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _Result = TypeVar("_Result", covariant=True)
 
 

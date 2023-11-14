@@ -1,15 +1,15 @@
 from dataclasses import dataclass
-from typing import Union
 from unittest import TestCase
-from pysh.core import errors
+from pysh.core import lexer
 from pysh.core.parser import results, rules, states
 
 
 class NamedResultsAndTest(TestCase):
     def test_call(self) -> None:
         @dataclass(frozen=True)
-        class State:
-            ...
+        class State(states.State):
+            def with_lexer_result(self, lexer_result: lexer.Result) -> "State":
+                return State(lexer_result)
 
         for lhs, rhs, expected in list[
             tuple[

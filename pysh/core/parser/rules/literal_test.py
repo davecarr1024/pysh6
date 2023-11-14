@@ -7,34 +7,19 @@ from pysh.core.parser import results, rules, states
 
 class LiteralTest(TestCase):
     def test_call(self) -> None:
-        @dataclass(frozen=True)
-        class State:
-            lexer_result: lexer.Result = field(default_factory=lexer.Result)
-
-            @staticmethod
-            def lexer_result_setter() -> states.StateValueSetter["State", lexer.Result]:
-                return states.StateValueSetter[State, lexer.Result].load(
-                    lambda state: state.lexer_result,
-                    lambda _, lexer_result: State(lexer_result),
-                )
-
-            @staticmethod
-            def literal(lexer_rule: lexer.Rule) -> rules.Literal["State"]:
-                return rules.Literal[State](State.lexer_result_setter(), lexer_rule)
-
         for state, expected in list[
             tuple[
-                State,
-                Optional[states.StateAndSingleResults[State, tokens.Token]],
+                states.State,
+                Optional[states.StateAndSingleResults[states.State, tokens.Token]],
             ]
         ](
             [
                 (
-                    State(),
+                    states.State(),
                     None,
                 ),
                 (
-                    State(
+                    states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -46,7 +31,7 @@ class LiteralTest(TestCase):
                     None,
                 ),
                 (
-                    State(
+                    states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -55,13 +40,13 @@ class LiteralTest(TestCase):
                             )
                         )
                     ),
-                    states.StateAndSingleResults[State, tokens.Token](
-                        State(),
+                    states.StateAndSingleResults[states.State, tokens.Token](
+                        states.State(),
                         results.SingleResults[tokens.Token](tokens.Token("r", "a")),
                     ),
                 ),
                 (
-                    State(
+                    states.State(
                         lexer.Result(
                             tokens.Stream(
                                 [
@@ -71,8 +56,8 @@ class LiteralTest(TestCase):
                             )
                         )
                     ),
-                    states.StateAndSingleResults[State, tokens.Token](
-                        State(
+                    states.StateAndSingleResults[states.State, tokens.Token](
+                        states.State(
                             lexer.Result(
                                 tokens.Stream(
                                     [
@@ -86,7 +71,7 @@ class LiteralTest(TestCase):
                 ),
             ]
         ):
-            rule = State.literal(lexer.Rule.load("r", "a"))
+            rule = rules.Literal[states.State](lexer.Rule.load("r", "a"))
             with self.subTest(state=state, expected=expected):
                 if expected is None:
                     with self.assertRaises(errors.Error):

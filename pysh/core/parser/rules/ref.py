@@ -5,7 +5,7 @@ from pysh.core.parser import states
 from pysh.core.parser.rules import scope, single_results_rule, state_value_getter_rule
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _Result = TypeVar("_Result", covariant=True)
 
 

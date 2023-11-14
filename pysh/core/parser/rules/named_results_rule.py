@@ -1,12 +1,12 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, TypeVar, Union, overload
-from pysh.core import lexer as lexer_lib
+from pysh.core import lexer as lexer_lib, tokens
 from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _Result = TypeVar("_Result", covariant=True)
 _ConvertResult = TypeVar("_ConvertResult")
 _RhsResult = TypeVar("_RhsResult")
@@ -48,6 +48,16 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
     ) -> "ands.NamedResultsAnd[_State,_Result,_RhsResult]":
         ...
 
+    @overload
+    def __and__(self, rhs: str) -> "ands.NamedResultsAnd[_State,_Result,_Result]":
+        ...
+
+    @overload
+    def __and__(
+        self, rhs: lexer_lib.Rule
+    ) -> "ands.NamedResultsAnd[_State,_Result,_Result]":
+        ...
+
     def __and__(
         self,
         rhs: Union[
@@ -56,6 +66,8 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
             "optional_results_rule.OptionalResultsRule[_State,_RhsResult]",
             "multiple_results_rule.MultipleResultsRule[_State,_RhsResult]",
             "NamedResultsRule[_State,_RhsResult]",
+            lexer_lib.Rule,
+            str,
         ],
     ) -> "ands.And[_State,_Result|_RhsResult, rule.Rule[_State,_Result]|rule.Rule[_State,_RhsResult]]":
         match rhs:
@@ -68,13 +80,48 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
                         ](rhs),
                     ]
                 )
+            case str() | lexer_lib.Rule():
+                return ands.NamedResultsAnd[_State, _Result, _Result](
+                    [
+                        self,
+                        no_results_unary_rule.NoResultsUnaryRule[
+                            _State, _Result, tokens.Token
+                        ](literal.Literal[_State].load(rhs)),
+                    ]
+                )
             case _:
                 return ands.NamedResultsAnd[_State, _Result, _RhsResult]([self, rhs])
+
+    @overload
+    def __rand__(self, rhs: str) -> "ands.NamedResultsAnd[_State, _Result, _Result]":
+        ...
+
+    @overload
+    def __rand__(
+        self, rhs: lexer_lib.Rule
+    ) -> "ands.NamedResultsAnd[_State, _Result, _Result]":
+        ...
+
+    def __rand__(
+        self,
+        rhs: Union[
+            str,
+            lexer_lib.Rule,
+        ],
+    ) -> "ands.NamedResultsAnd[_State, _Result, _Result]":
+        return ands.NamedResultsAnd[_State, _Result, _Result](
+            [
+                no_results_unary_rule.NoResultsUnaryRule[_State, _Result, tokens.Token](
+                    literal.Literal.load(rhs)
+                ),
+                self,
+            ]
+        )
 
     def convert(
         self, func: Callable[..., _ConvertResult]
     ) -> "single_results_rule.SingleResultsRule[_State,_ConvertResult]":
-        AdapterState = TypeVar("AdapterState")
+        AdapterState = TypeVar("AdapterState", bound=states.State)
         AdapterResult = TypeVar("AdapterResult")
         AdapterChildResult = TypeVar("AdapterChildResult")
 
@@ -147,7 +194,7 @@ class NamedResultsRule(rule.Rule[_State, _Result]):
                 return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
 
     def with_lexer(self, lexer: lexer_lib.Lexer) -> "NamedResultsRule[_State,_Result]":
-        State = TypeVar("State")
+        State = TypeVar("State", bound=states.State)
         Result = TypeVar("Result")
 
         @dataclass(frozen=True)
@@ -177,4 +224,5 @@ from pysh.core.parser.rules import (
     multiple_results_rule,
     unary_rule,
     no_results_unary_rule,
+    literal,
 )

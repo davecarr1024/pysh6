@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Callable, Optional, TypeVar
 from pysh.core.parser import results
-from pysh.core.parser.states import state_and_results
+from pysh.core.parser.states import state, state_and_results
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=state.State)
 _Result = TypeVar("_Result", covariant=True)
 _RhsResult = TypeVar("_RhsResult")
 

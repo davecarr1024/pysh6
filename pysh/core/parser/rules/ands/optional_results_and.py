@@ -6,7 +6,7 @@ from pysh.core.parser.rules.ands import and_
 from pysh.core.parser.rules import optional_results_rule
 
 
-_State = TypeVar("_State")
+_State = TypeVar("_State", bound=states.State)
 _Result = TypeVar("_Result", covariant=True)
 _RhsResult = TypeVar("_RhsResult")
 
