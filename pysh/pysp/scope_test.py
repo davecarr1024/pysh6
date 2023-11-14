@@ -73,3 +73,37 @@ class ScopeTest(TestCase):
                         scope[name]
                 else:
                     self.assertEqual(scope[name], expected)
+
+    def test_set(self) -> None:
+        for scope, name, val, expected in list[
+            tuple[
+                pysp.Scope,
+                str,
+                pysp.Val,
+                pysp.Scope,
+            ]
+        ](
+            [
+                (
+                    pysp.Scope(),
+                    "a",
+                    pysp.Int(1),
+                    pysp.Scope({"a": pysp.Int(1)}),
+                ),
+                (
+                    pysp.Scope({"a": pysp.Int(1)}),
+                    "a",
+                    pysp.Int(2),
+                    pysp.Scope({"a": pysp.Int(2)}),
+                ),
+                (
+                    pysp.Scope({}, pysp.Scope({"a": pysp.Int(1)})),
+                    "a",
+                    pysp.Int(2),
+                    pysp.Scope({"a": pysp.Int(2)}, pysp.Scope({"a": pysp.Int(1)})),
+                ),
+            ]
+        ):
+            with self.subTest(scope=scope, name=name, val=val, expected=expected):
+                scope[name] = val
+                self.assertEqual(scope, expected)

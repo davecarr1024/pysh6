@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Iterator, Mapping, Optional
+from typing import Iterator, Mapping, MutableMapping, Optional
 from pysh.pysp import error, val
 
 
 @dataclass(frozen=True)
-class Scope(Mapping[str, val.Val]):
-    _vals: Mapping[str, val.Val] = field(default_factory=dict[str, val.Val])
+class Scope(MutableMapping[str, val.Val]):
+    _vals: MutableMapping[str, val.Val] = field(default_factory=dict[str, val.Val])
     _parent: Optional["Scope"] = None
 
     def __str__(self) -> str:
@@ -24,6 +24,12 @@ class Scope(Mapping[str, val.Val]):
             return self._parent[name]
         else:
             raise error.Error(msg=f"unknown val {name}")
+
+    def __delitem__(self, name: str) -> None:
+        del self._vals[name]
+
+    def __setitem__(self, name: str, value: val.Val) -> None:
+        self._vals[name] = value
 
     def all_vals(self) -> Mapping[str, val.Val]:
         return (
