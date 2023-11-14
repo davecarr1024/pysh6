@@ -42,7 +42,7 @@ class Lexer(Sized, Iterable[rule.Rule]):
             state_and_result_ = self._apply_any(state)
             state = state_and_result_.state
             for token in state_and_result_.result.tokens:
-                if token.value:
+                if token.value and not token.rule_name.startswith("~"):
                     tokens_.append(token)
         return result.Result(tokens.Stream(tokens_))
 

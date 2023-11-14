@@ -22,12 +22,28 @@ class ParserTest(TestCase):
                     pysp.Int(1),
                 ),
                 (
+                    " 1 ",
+                    pysp.Int(1),
+                ),
+                (
                     '"a"',
                     pysp.Str("a"),
                 ),
                 (
+                    ' "a" ',
+                    pysp.Str("a"),
+                ),
+                (
+                    '" a "',
+                    pysp.Str(" a "),
+                ),
+                (
                     '"',
                     None,
+                ),
+                (
+                    r"( lambda () 1 )",
+                    pysp.Func([], pysp.Literal(pysp.Int(1))),
                 ),
             ]
         ):

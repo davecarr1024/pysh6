@@ -31,6 +31,7 @@ class Parser(core.parser.states.State):
             (expr.Expr.ref() & expr.Expr.ref().until_empty())
             .with_lexer(expr.Expr.lexer())
             .with_lexer(val.Val.lexer())
+            .with_lexer(core.lexer.Lexer([core.lexer.Rule.load("~ws", r"\s+")]))
         )
         state = Parser(rule.lexer()(core.lexer.State.load(input)))
         exprs = list[expr.Expr](rule(state).results)

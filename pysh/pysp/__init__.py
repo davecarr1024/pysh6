@@ -6,3 +6,4 @@ from pysh.pysp.str_ import Str
 from pysh.pysp.scope import Scope
 from pysh.pysp.expr import Expr
 from pysh.pysp.literal import Literal
+from pysh.pysp.func import Func

@@ -127,6 +127,17 @@ class LexerTest(TestCase):
                     ),
                 ),
                 (
+                    lexer.State.load("\na b\t"),
+                    lexer.Result(
+                        tokens.Stream(
+                            [
+                                tokens.Token("r", "a", chars.Position(1, 0)),
+                                tokens.Token("s", "b", chars.Position(1, 2)),
+                            ]
+                        )
+                    ),
+                ),
+                (
                     lexer.State.load("c"),
                     None,
                 ),
@@ -136,7 +147,9 @@ class LexerTest(TestCase):
                 ),
             ]
         ):
-            lexer_ = lexer.Lexer.load(r="a", s="b")
+            lexer_ = lexer.Lexer.load(r="a", s="b") | lexer.Lexer(
+                [lexer.Rule.load("~ws", r"\s+")]
+            )
             with self.subTest(state=state, expected=expected):
                 if expected is None:
                     with self.assertRaises(errors.Error):

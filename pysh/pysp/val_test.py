@@ -32,6 +32,25 @@ class ValTest(TestCase):
                         core.parser.results.SingleResults[pysp.Val](pysp.Str("a")),
                     ),
                 ),
+                (
+                    pysp.Parser.load(
+                        core.tokens.Token(r"\(", "("),
+                        core.tokens.Token("lambda", "lambda"),
+                        core.tokens.Token(r"\(", "("),
+                        core.tokens.Token(r"\)", ")"),
+                        core.tokens.Token("int", "1"),
+                        core.tokens.Token(r"\)", ")"),
+                    ),
+                    core.parser.states.StateAndSingleResults[pysp.Parser, pysp.Val](
+                        pysp.Parser(),
+                        core.parser.results.SingleResults[pysp.Val](
+                            pysp.Func(
+                                [],
+                                pysp.Literal(pysp.Int(1)),
+                            )
+                        ),
+                    ),
+                ),
             ]
         ):
             with self.subTest(state=state, expected=expected):
