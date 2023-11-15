@@ -9,7 +9,12 @@ from pysh.pysp import parser, scope, val
 class Expr(core.parser.Parsable[parser.Parser, "Expr"]):
     @classmethod
     def types(cls) -> Sequence[Type["Expr"]]:
-        return [cls, literal.Literal]
+        return [
+            cls,
+            decl.Decl,
+            literal.Literal,
+            ref.Ref,
+        ]
 
     @classmethod
     def scope_getter(
@@ -26,4 +31,4 @@ class Expr(core.parser.Parsable[parser.Parser, "Expr"]):
         ...
 
 
-from pysh.pysp import literal
+from pysh.pysp import decl, literal, ref

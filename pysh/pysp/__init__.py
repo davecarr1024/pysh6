@@ -7,3 +7,6 @@ from pysh.pysp.scope import Scope
 from pysh.pysp.expr import Expr
 from pysh.pysp.literal import Literal
 from pysh.pysp.func import Func
+from pysh.pysp.id import id_lexer_rule
+from pysh.pysp.decl import Decl
+from pysh.pysp.ref import Ref

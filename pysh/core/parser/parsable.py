@@ -32,13 +32,13 @@ class Parsable(ABC, Generic[_State, _T]):
         ...
 
     @classmethod
-    def name(cls) -> str:
+    def type_name(cls) -> str:
         return cls.__name__
 
     @classmethod
     def scope(cls) -> scope_lib.Scope[_State, _T]:
         return scope_lib.Scope[_State, _T](
-            {type.name(): type.parser_rule() for type in cls.types()}
+            {type.type_name(): type.parser_rule() for type in cls.types()}
         )
 
     @classmethod
@@ -47,7 +47,7 @@ class Parsable(ABC, Generic[_State, _T]):
     ) -> ref.Ref[_State, Self]:
         return ref.Ref[_State, Self](
             cls.scope_getter(),
-            cls.name(),
+            cls.type_name(),
         )
 
     @classmethod

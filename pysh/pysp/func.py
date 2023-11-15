@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Sequence
 from pysh import core
-from pysh.pysp import error, parser, val
+from pysh.pysp import error, id, parser, val
 
 
 @dataclass(frozen=True)
@@ -23,13 +23,12 @@ class Func(val.Val):
 
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Func"]:
-        id_lexer_rule = core.lexer.Rule.load("id", r"([a-z]|[A-Z])+")
         return (
             r"\("
             & core.parser.rules.Literal[parser.Parser].load("lambda").no()
             & (
                 r"\("
-                & core.parser.rules.Literal[parser.Parser](id_lexer_rule)
+                & core.parser.rules.Literal[parser.Parser](id.id_lexer_rule)
                 .token_value()
                 .zero_or_more()
                 & r"\)"

@@ -36,6 +36,31 @@ class ExprTest(TestCase):
                         ),
                     ),
                 ),
+                (
+                    pysp.Parser.load(
+                        core.tokens.Token(r"\(", "("),
+                        core.tokens.Token("def", "def"),
+                        core.tokens.Token("id", "a"),
+                        core.tokens.Token("int", "1"),
+                        core.tokens.Token(r"\)", ")"),
+                    ),
+                    core.parser.states.StateAndSingleResults[pysp.Parser, pysp.Expr](
+                        pysp.Parser(),
+                        core.parser.results.SingleResults[pysp.Expr](
+                            pysp.Decl(
+                                "a",
+                                pysp.Literal(pysp.Int(1)),
+                            )
+                        ),
+                    ),
+                ),
+                (
+                    pysp.Parser.load(core.tokens.Token("id", "a")),
+                    core.parser.states.StateAndSingleResults[pysp.Parser, pysp.Expr](
+                        pysp.Parser(),
+                        core.parser.results.SingleResults[pysp.Expr](pysp.Ref("a")),
+                    ),
+                ),
             ]
         ):
             with self.subTest(state=state, expected=expected):
