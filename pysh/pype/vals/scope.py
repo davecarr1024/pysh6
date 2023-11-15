@@ -1,24 +1,26 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Iterator, Mapping, MutableMapping, Optional
 from pysh.pype import error
 
 
 @dataclass
 class Scope(MutableMapping[str, "val.Val"]):
-    _vals: MutableMapping[str, "val.Val"]
-    _parent: Optional["Scope"]
+    _vals: MutableMapping[str, "val.Val"] = field(default_factory=dict[str, "val.Val"])
+    _parent: Optional["Scope"] = None
 
-    @property
     def vals(self) -> Mapping[str, "val.Val"]:
         return (
             dict(self._parent) | dict(self) if self._parent is not None else dict(self)
         )
 
+    def __str__(self) -> str:
+        return str(self.vals())
+
     def __len__(self) -> int:
-        return len(self.vals)
+        return len(self.vals())
 
     def __iter__(self) -> Iterator[str]:
-        return iter(self.vals)
+        return iter(self.vals())
 
     def __getitem__(self, name: str) -> "val.Val":
         if name in self._vals:
@@ -33,6 +35,14 @@ class Scope(MutableMapping[str, "val.Val"]):
 
     def __delitem__(self, name: str) -> None:
         del self._vals[name]
+
+    def as_child(self, vals: Mapping[str, "val.Val"] = {}) -> "Scope":
+        return Scope(dict(vals), self)
+
+    def bind(self, obj: "val.Val") -> None:
+        for name, val in list(self.items()):
+            if val.can_bind():
+                self[name] = val.bind(obj)
 
 
 from pysh.pype.vals import val

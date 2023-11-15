@@ -36,7 +36,7 @@ class Parsable(ABC, Generic[_State, _T]):
         return cls.__name__
 
     @classmethod
-    def scope(cls) -> scope_lib.Scope[_State, _T]:
+    def parser_scope(cls) -> scope_lib.Scope[_State, _T]:
         return scope_lib.Scope[_State, _T](
             {type.type_name(): type.parser_rule() for type in cls.types()}
         )

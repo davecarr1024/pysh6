@@ -15,7 +15,7 @@ _scope_getter: states.StateValueGetter[
 @dataclass(frozen=True)
 class State(states.State):
     scope: rules.Scope["State", "Val"] = field(
-        default_factory=lambda: Val.scope(),
+        default_factory=lambda: Val.parser_scope(),
         compare=False,
         hash=False,
         repr=False,

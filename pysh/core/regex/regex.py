@@ -56,7 +56,7 @@ class Regex(ABC):
         @dataclass(frozen=True)
         class State(parser.states.State):
             scope: parser.rules.Scope["State", "_Regex"] = field(
-                default_factory=lambda: _Regex.scope(),
+                default_factory=lambda: _Regex.parser_scope(),
                 compare=False,
                 hash=False,
                 repr=False,

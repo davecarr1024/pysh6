@@ -8,14 +8,14 @@ class Parser(core.parser.states.State):
         compare=False,
         repr=False,
         hash=False,
-        default_factory=lambda: val.Val.scope(),
+        default_factory=lambda: val.Val.parser_scope(),
     )
 
     expr_scope: core.parser.rules.Scope["Parser", "expr.Expr"] = field(
         compare=False,
         repr=False,
         hash=False,
-        default_factory=lambda: expr.Expr.scope(),
+        default_factory=lambda: expr.Expr.parser_scope(),
     )
 
     def with_lexer_result(self, lexer_result: core.lexer.Result) -> "Parser":
