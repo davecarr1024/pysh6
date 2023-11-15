@@ -61,6 +61,19 @@ class ExprTest(TestCase):
                         core.parser.results.SingleResults[pysp.Expr](pysp.Ref("a")),
                     ),
                 ),
+                (
+                    pysp.Parser.load(
+                        core.tokens.Token(r"\(", "("),
+                        core.tokens.Token("id", "a"),
+                        core.tokens.Token(r"\)", ")"),
+                    ),
+                    core.parser.states.StateAndSingleResults[pysp.Parser, pysp.Expr](
+                        pysp.Parser(),
+                        core.parser.results.SingleResults[pysp.Expr](
+                            pysp.Call(pysp.Ref("a"))
+                        ),
+                    ),
+                ),
             ]
         ):
             with self.subTest(state=state, expected=expected):

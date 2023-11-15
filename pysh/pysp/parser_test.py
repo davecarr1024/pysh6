@@ -49,6 +49,18 @@ class ParserTest(TestCase):
                     r"(def a 1) a",
                     pysp.Int(1),
                 ),
+                (
+                    r"(def a (lambda () 1)) (a)",
+                    pysp.Int(1),
+                ),
+                (
+                    r"(def a (lambda (b) b)) (a 1)",
+                    pysp.Int(1),
+                ),
+                (
+                    r"(def a (lambda (a) a)) (a 1)",
+                    pysp.Int(1),
+                ),
             ]
         ):
             with self.subTest(input=input, expected=expected):

@@ -10,3 +10,4 @@ from pysh.pysp.func import Func
 from pysh.pysp.id import id_lexer_rule
 from pysh.pysp.decl import Decl
 from pysh.pysp.ref import Ref
+from pysh.pysp.call import Call

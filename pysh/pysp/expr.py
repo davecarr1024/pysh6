@@ -11,6 +11,7 @@ class Expr(core.parser.Parsable[parser.Parser, "Expr"]):
     def types(cls) -> Sequence[Type["Expr"]]:
         return [
             cls,
+            call.Call,
             decl.Decl,
             literal.Literal,
             ref.Ref,
@@ -31,4 +32,4 @@ class Expr(core.parser.Parsable[parser.Parser, "Expr"]):
         ...
 
 
-from pysh.pysp import decl, literal, ref
+from pysh.pysp import call, decl, literal, ref
