@@ -13,7 +13,7 @@ _scope_getter = core.parser.states.StateValueGetter[
 class Expr(core.parser.Parsable[parser.Parser, "Expr"]):
     @classmethod
     def types(cls) -> Sequence[Type["Expr"]]:
-        return [cls]
+        return [cls, literal.Literal]
 
     @classmethod
     def scope_getter(
@@ -26,3 +26,6 @@ class Expr(core.parser.Parsable[parser.Parser, "Expr"]):
     @abstractmethod
     def eval(self, scope: vals.Scope) -> vals.Val:
         ...
+
+
+from pysh.pype.exprs import literal

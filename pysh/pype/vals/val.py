@@ -18,7 +18,7 @@ class Val(
 
     @classmethod
     def types(cls) -> Sequence[Type["Val"]]:
-        return [cls]
+        return [cls, int_.Int]
 
     @classmethod
     def scope_getter(
@@ -62,3 +62,4 @@ class Val(
 
 
 from pysh.pype.vals import args, error, scope
+from pysh.pype.vals.builtins import int_

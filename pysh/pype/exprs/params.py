@@ -14,12 +14,14 @@ class Params(Sized, Iterable[param.Param]):
     def __iter__(self) -> Iterator[param.Param]:
         return iter(self._params)
 
-    def eval(self, args: vals.Args, scope: vals.Scope) -> vals.Scope:
+    def bind(self, args: vals.Args, scope: vals.Scope) -> vals.Scope:
         if len(self) != len(args):
             raise error.Error(
                 msg=f"param count mismatch expected {len(self)} got {len(args)}"
             )
-        scope_ = vals.Scope({}, scope)
-        for param, arg in zip(self, args):
-            param.eval(arg, scope_)
-        return scope_
+        return scope.as_child({param.name: arg.val for param, arg in zip(self, args)})
+
+    def tail(self) -> "Params":
+        if len(self) == 0:
+            raise error.Error(msg=f"unable to get tail of empty params {self}")
+        return Params(self._params[1:])
