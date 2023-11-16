@@ -54,6 +54,11 @@ class ParserTest(TestCase):
                     ),
                     pype.vals.builtins.Int.create(1),
                 ),
+                (
+                    "class c {} c;",
+                    None,
+                    pype.vals.classes.Class(_name="c"),
+                ),
             ]
         ):
             with self.subTest(input=input, scope=scope, expected=expected):
