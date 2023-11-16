@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import cast
 from pysh import core
-from pysh.pype import parser, vals
+from pysh.pype import parser
+from pysh.pype.vals import scope
 from pysh.pype.vals.builtins import class_, value_object
 
 
@@ -9,7 +10,7 @@ from pysh.pype.vals.builtins import class_, value_object
 class Int(value_object.ValueObject[int]):
     @staticmethod
     def create(value: int) -> "Int":
-        return cast(Int, int_class.create(value))
+        return cast(Int, int_class.create(value=value))
 
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Int"]:
@@ -31,5 +32,5 @@ class Int(value_object.ValueObject[int]):
 int_class = class_.Class(
     _name="Int",
     _object_type=Int,
-    members=vals.Scope(),
+    members=scope.Scope(),
 )

@@ -2,7 +2,8 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Sequence, Type
 from pysh import core
-from pysh.pype import parser, vals
+from pysh.pype import parser
+from pysh.pype.vals import scope
 
 _scope_getter = core.parser.states.StateValueGetter[
     parser.Parser, core.parser.rules.Scope[parser.Parser, "Statement"]
@@ -24,7 +25,7 @@ class Statement(core.parser.Parsable[parser.Parser, "Statement"]):
         return _scope_getter
 
     @abstractmethod
-    def eval(self, scope: vals.Scope) -> None:
+    def eval(self, scope: scope.Scope) -> None:
         ...
 
 

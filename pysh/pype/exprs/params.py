@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Sequence, Sized
-from pysh.pype import error, vals
+from pysh.pype import error
+from pysh.pype.vals import args, scope
 from pysh.pype.exprs import param
 
 
@@ -14,7 +15,7 @@ class Params(Sized, Iterable[param.Param]):
     def __iter__(self) -> Iterator[param.Param]:
         return iter(self._params)
 
-    def bind(self, args: vals.Args, scope: vals.Scope) -> vals.Scope:
+    def bind(self, args: args.Args, scope: scope.Scope) -> scope.Scope:
         if len(self) != len(args):
             raise error.Error(
                 msg=f"param count mismatch expected {len(self)} got {len(args)}"

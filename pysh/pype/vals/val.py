@@ -2,16 +2,15 @@ from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Iterator, Mapping, Optional, Sequence, Type
 from pysh import core
-from pysh.pype import parser
 
 _scope_getter = core.parser.states.StateValueGetter[
-    parser.Parser, core.parser.rules.Scope[parser.Parser, "Val"]
+    "parser.Parser", core.parser.rules.Scope["parser.Parser", "Val"]
 ].load(lambda parser: parser.val_scope)
 
 
 @dataclass(frozen=True)
 class Val(
-    core.parser.Parsable[parser.Parser, "Val"],
+    core.parser.Parsable["parser.Parser", "Val"],
     Mapping[str, "Val"],
 ):
     members: "scope.Scope" = field(default_factory=lambda: scope.Scope())
@@ -24,7 +23,7 @@ class Val(
     def scope_getter(
         cls,
     ) -> core.parser.states.StateValueGetter[
-        parser.Parser, core.parser.rules.Scope[parser.Parser, "Val"]
+        "parser.Parser", core.parser.rules.Scope["parser.Parser", "Val"]
     ]:
         return _scope_getter
 
@@ -61,5 +60,6 @@ class Val(
         raise self._error(msg="trying to bind unbindable val")
 
 
+from pysh.pype import parser
 from pysh.pype.vals import args, error, scope
 from pysh.pype.vals.builtins import int_

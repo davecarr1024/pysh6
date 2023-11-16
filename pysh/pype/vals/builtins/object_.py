@@ -1,7 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from pysh.pype import vals
-from pysh.pype.vals import classes
+from pysh.pype.vals import classes, scope
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -11,7 +10,7 @@ class Object(classes.Object):
         hash=False,
         repr=False,
     )
-    members: vals.Scope = field(
+    members: scope.Scope = field(
         compare=False,
         hash=False,
         repr=False,
