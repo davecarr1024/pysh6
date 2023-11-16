@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Sequence, Sized
+from pysh import core
+from pysh.pype import parser
 from pysh.pype.vals import arg
 
 

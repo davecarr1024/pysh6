@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Self
+from pysh import core
+from pysh.pype import parser
 from pysh.pype.vals import args, scope, val
 
 
@@ -23,6 +25,12 @@ class AbstractClass(val.Val):
                 msg=f"unable to apply init args {args} to instance {instance}"
             )
         return instance
+
+    @classmethod
+    def parser_rule(
+        cls,
+    ) -> core.parser.rules.SingleResultsRule[parser.Parser, "AbstractClass"]:
+        raise NotImplementedError()
 
 
 from pysh.pype.vals.classes import object_

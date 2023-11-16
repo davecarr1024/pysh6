@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Optional
 from pysh import core
 
 
@@ -34,7 +35,7 @@ class Parser(core.parser.states.State):
         )
 
     @staticmethod
-    def eval(input: str) -> "val.Val":
+    def eval(input: str, scope_: Optional["scope.Scope"] = None) -> "val.Val":
         rule = (
             (statement.Statement.ref() & statement.Statement.ref().until_empty())
             .with_lexer(statement.Statement.lexer())
@@ -44,7 +45,7 @@ class Parser(core.parser.states.State):
         )
         state = Parser(rule.lexer()(core.lexer.State.load(input)))
         statements = list[statement.Statement](rule(state).results)
-        scope_ = scope.Scope()
+        scope_ = scope_ or scope.Scope()
         for statement_ in statements[:-1]:
             statement_.eval(scope_)
         last_statement = statements[-1]

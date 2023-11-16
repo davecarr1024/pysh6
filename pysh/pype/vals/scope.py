@@ -20,7 +20,7 @@ class Scope(MutableMapping[str, "val.Val"]):
         return len(self.vals())
 
     def __iter__(self) -> Iterator[str]:
-        return iter(self.vals())
+        return iter(self._vals)
 
     def __getitem__(self, name: str) -> "val.Val":
         if name in self._vals:
