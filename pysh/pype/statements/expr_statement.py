@@ -17,4 +17,4 @@ class ExprStatement(statement.Statement):
     def parser_rule(
         cls,
     ) -> core.parser.rules.SingleResultsRule[parser.Parser, "ExprStatement"]:
-        return expr.Expr.ref().convert(ExprStatement)
+        return (expr.Expr.ref() & ";").convert(ExprStatement)
