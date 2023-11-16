@@ -14,7 +14,12 @@ _scope_getter = core.parser.states.StateValueGetter[
 class Statement(core.parser.Parsable[parser.Parser, "Statement"]):
     @classmethod
     def types(cls) -> Sequence[Type["Statement"]]:
-        return [cls, expr_statement.ExprStatement, class_.Class]
+        return [
+            cls,
+            assignment.Assignment,
+            class_.Class,
+            expr_statement.ExprStatement,
+        ]
 
     @classmethod
     def scope_getter(
@@ -29,4 +34,4 @@ class Statement(core.parser.Parsable[parser.Parser, "Statement"]):
         ...
 
 
-from pysh.pype.statements import class_, expr_statement
+from pysh.pype.statements import assignment, class_, expr_statement

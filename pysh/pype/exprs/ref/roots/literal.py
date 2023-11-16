@@ -12,8 +12,11 @@ class Literal(root.Root):
     def __str__(self) -> str:
         return str(self.value)
 
-    def eval(self, scope: scope.Scope) -> "val.Val":
+    def get(self, scope: scope.Scope) -> "val.Val":
         return self.value
+
+    def set(self, scope: scope.Scope, val: val.Val) -> None:
+        raise core.errors.Error(msg=f"unable to set literal ref")
 
     @classmethod
     def parser_rule(

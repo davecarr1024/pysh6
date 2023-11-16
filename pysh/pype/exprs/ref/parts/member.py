@@ -12,8 +12,11 @@ class Member(part.Part):
     def __str__(self) -> str:
         return f".{self.name}"
 
-    def eval(self, scope: scope.Scope, val: val.Val) -> val.Val:
-        return val[self.name]
+    def get(self, scope: scope.Scope, obj: val.Val) -> val.Val:
+        return obj[self.name]
+
+    def set(self, scope: scope.Scope, obj: val.Val, val: val.Val) -> None:
+        obj[self.name] = val
 
     @classmethod
     def parser_rule(

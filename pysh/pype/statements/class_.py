@@ -37,4 +37,5 @@ class Class(statement.Statement):
             .convert(lambda body: body)
             .named("body")
             & "}"
+            & ";"
         ).convert(Class)

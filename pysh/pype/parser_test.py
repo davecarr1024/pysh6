@@ -55,9 +55,23 @@ class ParserTest(TestCase):
                     pype.vals.builtins.Int.create(1),
                 ),
                 (
-                    "class c {} c;",
+                    "class c {}; c;",
                     None,
                     pype.vals.classes.Class(_name="c"),
+                ),
+                (
+                    "a = 1; a;",
+                    None,
+                    pype.vals.builtins.Int.create(1),
+                ),
+                (
+                    r"""
+                        class c {};
+                        c.a = 1;
+                        c.a;
+                    """,
+                    None,
+                    pype.vals.builtins.Int.create(1),
                 ),
             ]
         ):

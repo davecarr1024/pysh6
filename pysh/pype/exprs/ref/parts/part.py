@@ -8,7 +8,11 @@ from pysh.pype.vals import scope, val
 @dataclass(frozen=True)
 class Part(ABC):
     @abstractmethod
-    def eval(self, scope: scope.Scope, val: val.Val) -> val.Val:
+    def get(self, scope: scope.Scope, obj: val.Val) -> val.Val:
+        ...
+
+    @abstractmethod
+    def set(self, scope: scope.Scope, obj: val.Val, val: val.Val) -> None:
         ...
 
     @classmethod

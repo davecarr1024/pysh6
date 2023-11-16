@@ -18,12 +18,21 @@ class Ref(expr.Expr):
 
     def eval(self, scope: scope.Scope) -> val.Val:
         try:
-            val = self.root.eval(scope)
+            obj = self.root.get(scope)
             for part in self.parts:
-                val = part.eval(scope, val)
-            return val
+                obj = part.get(scope, obj)
+            return obj
         except core.errors.Error as error:
             raise self._error(children=[error])
+
+    def set(self, scope: scope.Scope, val: val.Val) -> None:
+        if not self.parts:
+            self.root.set(scope, val)
+        else:
+            obj = self.root.get(scope)
+            for part in self.parts[:-1]:
+                obj = part.get(scope, obj)
+            self.parts[-1].set(scope, obj, val)
 
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Ref"]:

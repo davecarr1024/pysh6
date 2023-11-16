@@ -9,8 +9,11 @@ from pysh.pype.vals import scope, val
 class Name(root.Root):
     name: str
 
-    def eval(self, scope: scope.Scope) -> val.Val:
+    def get(self, scope: scope.Scope) -> val.Val:
         return scope[self.name]
+
+    def set(self, scope: scope.Scope, val: val.Val) -> None:
+        scope[self.name] = val
 
     @classmethod
     def parser_rule(

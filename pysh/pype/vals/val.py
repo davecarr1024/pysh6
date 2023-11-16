@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
-from typing import Iterator, Mapping, Optional, Sequence, Type
+from typing import Iterator, MutableMapping, Optional, Sequence, Type
 from pysh import core
 
 _scope_getter = core.parser.states.StateValueGetter[
@@ -11,7 +11,7 @@ _scope_getter = core.parser.states.StateValueGetter[
 @dataclass(frozen=True)
 class Val(
     core.parser.Parsable["parser.Parser", "Val"],
-    Mapping[str, "Val"],
+    MutableMapping[str, "Val"],
 ):
     members: "scope.Scope" = field(default_factory=lambda: scope.Scope())
 
@@ -52,6 +52,12 @@ class Val(
         if name not in self.members:
             raise self._error(msg=f"unknown member {name}")
         return self.members[name]
+
+    def __setitem__(self, name: str, val: "Val") -> None:
+        self.members[name] = val
+
+    def __delitem__(self, name: str) -> None:
+        del self.members[name]
 
     def can_bind(self) -> bool:
         return False
