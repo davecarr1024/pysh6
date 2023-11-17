@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pysh import core
 from pysh.pype import parser
 from pysh.pype.exprs import expr
-from pysh.pype.exprs.ref import ref
+from pysh.pype.exprs.refs import ref
 from pysh.pype.statements import statement
 from pysh.pype.vals import scope
 
@@ -15,8 +15,9 @@ class Assignment(statement.Statement):
     def __str__(self) -> str:
         return f"{self.lhs} = {self.rhs};"
 
-    def eval(self, scope: scope.Scope) -> None:
+    def eval(self, scope: scope.Scope) -> statement.Statement.Result:
         self.lhs.set(scope, self.rhs.eval(scope))
+        return statement.Statement.Result()
 
     @classmethod
     def parser_rule(

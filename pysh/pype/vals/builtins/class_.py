@@ -24,9 +24,5 @@ class Class(classes.AbstractClass):
     def name(self) -> str:
         return self._name
 
-    @classmethod
-    def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Class"]:
-        raise NotImplementedError()
-
 
 from pysh.pype.vals.builtins import object_

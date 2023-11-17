@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Sequence
+from typing import Sequence, Union
 from pysh import core
 from pysh.pype import parser
 from pysh.pype.vals import scope, val
-from pysh.pype.exprs import expr
-from pysh.pype.exprs.ref.parts import part
-from pysh.pype.exprs.ref.roots import root
+from pysh.pype.exprs import args, expr
+from pysh.pype.exprs.refs.parts import part
+from pysh.pype.exprs.refs.roots import root
 
 
 @dataclass(frozen=True)
@@ -43,3 +43,10 @@ class Ref(expr.Expr):
             .convert(lambda parts: parts)
             .named("parts")
         ).convert(Ref)
+
+    @staticmethod
+    def create(root_: str | val.Val, *parts: str | args.Args) -> "Ref":
+        return Ref(
+            root.Root.create(root_),
+            list(map(part.Part.create, parts)),
+        )

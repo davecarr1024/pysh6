@@ -3,29 +3,17 @@ from dataclasses import dataclass, field
 from typing import Iterator, MutableMapping, Optional, Sequence, Type
 from pysh import core
 
-_scope_getter = core.parser.states.StateValueGetter[
-    "parser.Parser", core.parser.rules.Scope["parser.Parser", "Val"]
-].load(lambda parser: parser.val_scope)
 
-
-@dataclass(frozen=True)
-class Val(
-    core.parser.Parsable["parser.Parser", "Val"],
-    MutableMapping[str, "Val"],
-):
+@dataclass(
+    frozen=True,
+    kw_only=True,
+)
+class Val(MutableMapping[str, "Val"]):
     members: "scope.Scope" = field(default_factory=lambda: scope.Scope())
 
     @classmethod
-    def types(cls) -> Sequence[Type["Val"]]:
-        return [cls, int_.Int]
-
-    @classmethod
-    def scope_getter(
-        cls,
-    ) -> core.parser.states.StateValueGetter[
-        "parser.Parser", core.parser.rules.Scope["parser.Parser", "Val"]
-    ]:
-        return _scope_getter
+    def parser_rule(cls) -> core.parser.rules.SingleResultsRule["parser.Parser", "Val"]:
+        return int_.Int.parser_rule()
 
     def __call__(self, scope: "scope.Scope", args: "args.Args") -> "Val":
         raise self._error(msg="uncallable val")

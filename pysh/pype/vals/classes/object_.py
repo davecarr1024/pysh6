@@ -16,11 +16,5 @@ class Object(val.Val):
                 raise self._error(children=[error])
         raise self._error(msg="no __call__ method")
 
-    @classmethod
-    def parser_rule(
-        cls,
-    ) -> core.parser.rules.SingleResultsRule[parser.Parser, "Object"]:
-        raise NotImplementedError()
-
 
 from pysh.pype.vals.classes import abstract_class

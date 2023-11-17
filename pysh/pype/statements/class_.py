@@ -14,7 +14,7 @@ class Class(statement.Statement):
         default_factory=lambda: list[statement.Statement]()
     )
 
-    def eval(self, scope_: scope.Scope) -> None:
+    def eval(self, scope_: scope.Scope) -> statement.Statement.Result:
         members = scope.Scope()
         for statement_ in self.body:
             statement_.eval(members)
@@ -23,6 +23,7 @@ class Class(statement.Statement):
             members=members,
         )
         scope_[c.name()] = c
+        return statement.Statement.Result()
 
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Class"]:

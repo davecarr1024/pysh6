@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pysh import core
 from pysh.pype import lexer, parser
-from pysh.pype.exprs.ref.parts import part
+from pysh.pype.exprs.refs.parts import part
 from pysh.pype.vals import scope, val
 
 

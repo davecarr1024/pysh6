@@ -10,8 +10,9 @@ from pysh.pype.statements import statement
 class ExprStatement(statement.Statement):
     value: expr.Expr
 
-    def eval(self, scope: scope.Scope) -> None:
+    def eval(self, scope: scope.Scope) -> statement.Statement.Result:
         self.value.eval(scope)
+        return statement.Statement.Result()
 
     @classmethod
     def parser_rule(

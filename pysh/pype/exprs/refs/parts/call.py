@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pysh import core
 from pysh.pype import parser
 from pysh.pype.exprs import args
-from pysh.pype.exprs.ref.parts import part
+from pysh.pype.exprs.refs.parts import part
 from pysh.pype.vals import scope, val
 
 

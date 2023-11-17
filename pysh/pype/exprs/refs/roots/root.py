@@ -19,5 +19,13 @@ class Root(ABC):
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Root"]:
         return literal.Literal.parser_rule() | name.Name.parser_rule()
 
+    @staticmethod
+    def create(value: str | val.Val) -> "Root":
+        match value:
+            case str():
+                return name.Name(value)
+            case val.Val():
+                return literal.Literal(value)
 
-from pysh.pype.exprs.ref.roots import literal, name
+
+from pysh.pype.exprs.refs.roots import literal, name

@@ -26,11 +26,5 @@ class AbstractClass(val.Val):
             )
         return instance
 
-    @classmethod
-    def parser_rule(
-        cls,
-    ) -> core.parser.rules.SingleResultsRule[parser.Parser, "AbstractClass"]:
-        raise NotImplementedError()
-
 
 from pysh.pype.vals.classes import object_

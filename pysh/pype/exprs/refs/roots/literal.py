@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pysh import core
 from pysh.pype import parser
 from pysh.pype.vals import scope, val
-from pysh.pype.exprs.ref.roots import root
+from pysh.pype.exprs.refs.roots import root
 
 
 @dataclass(frozen=True)
@@ -22,4 +22,4 @@ class Literal(root.Root):
     def parser_rule(
         cls,
     ) -> core.parser.rules.SingleResultsRule[parser.Parser, "Literal"]:
-        return val.Val.ref().convert(Literal)
+        return val.Val.parser_rule().convert(Literal)
