@@ -92,13 +92,13 @@ class ParserTest(TestCase):
                 (
                     "def f() {} f;",
                     None,
-                    pype.funcs.Func(name="f"),
+                    pype.funcs.Func(_name="f"),
                 ),
                 (
                     "def f(a) {} f;",
                     None,
                     pype.funcs.Func(
-                        name="f",
+                        _name="f",
                         params=pype.exprs.Params(
                             [
                                 pype.exprs.Param("a"),
@@ -110,7 +110,7 @@ class ParserTest(TestCase):
                     "def f(a, b) {} f;",
                     None,
                     pype.funcs.Func(
-                        name="f",
+                        _name="f",
                         params=pype.exprs.Params(
                             [
                                 pype.exprs.Param("a"),
@@ -123,7 +123,7 @@ class ParserTest(TestCase):
                     "def f() { return 1; } f;",
                     None,
                     pype.funcs.Func(
-                        name="f",
+                        _name="f",
                         body=pype.statements.Block(
                             [
                                 pype.statements.Return(
@@ -140,6 +140,30 @@ class ParserTest(TestCase):
                 ),
                 (
                     "def f(a) { return a; } f(1);",
+                    None,
+                    pype.vals.int_(1),
+                ),
+                (
+                    "class c { def __init__(self) {} } c;",
+                    None,
+                    pype.vals.classes.Class(
+                        _name="c",
+                        members=pype.vals.Scope(
+                            {
+                                "__init__": pype.funcs.BindableFunc(
+                                    func=pype.funcs.Func(
+                                        _name="__init__",
+                                        params=pype.exprs.Params(
+                                            [pype.exprs.Param("self")]
+                                        ),
+                                    )
+                                )
+                            }
+                        ),
+                    ),
+                ),
+                (
+                    "class c { def __init__(self) { self.a = 1; } } c().a;",
                     None,
                     pype.vals.int_(1),
                 ),

@@ -29,8 +29,8 @@ class Results(ABC, Generic[_Result]):
     def named(self, name: str = "") -> "named_results.NamedResults[_Result]":
         ...
 
-    def _error(self, msg: str) -> "ValueError":
-        return ValueError(f"results={self},msg={repr(msg)}")
+    def _error(self, msg: str) -> "error.Error":
+        return error.Error(results=self, msg=msg)
 
     @overload
     @abstractmethod

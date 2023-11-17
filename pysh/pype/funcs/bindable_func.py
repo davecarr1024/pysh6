@@ -7,8 +7,11 @@ from pysh.pype.funcs import abstract_func, bound_func
     frozen=True,
     kw_only=True,
 )
-class BindableFunc(val.Val):
+class BindableFunc(abstract_func.AbstractFunc):
     func: abstract_func.AbstractFunc
+
+    def name(self) -> str:
+        return self.func.name()
 
     def can_bind(self) -> bool:
         return True

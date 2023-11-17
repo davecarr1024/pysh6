@@ -15,7 +15,7 @@ class FuncTest(TestCase):
             [
                 (
                     pype.funcs.Func(
-                        name="f",
+                        _name="f",
                     ),
                     pype.vals.Scope(),
                     pype.vals.Args(),
@@ -23,7 +23,7 @@ class FuncTest(TestCase):
                 ),
                 (
                     pype.funcs.Func(
-                        name="f",
+                        _name="f",
                         body=pype.statements.Block(
                             [
                                 pype.statements.Return(
@@ -40,7 +40,7 @@ class FuncTest(TestCase):
                 ),
                 (
                     pype.funcs.Func(
-                        name="f",
+                        _name="f",
                         body=pype.statements.Block(
                             [
                                 pype.statements.Return(
@@ -57,7 +57,7 @@ class FuncTest(TestCase):
                 ),
                 (
                     pype.funcs.Func(
-                        name="f",
+                        _name="f",
                         body=pype.statements.Block(
                             [
                                 pype.statements.Return(

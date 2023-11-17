@@ -8,9 +8,12 @@ from pysh.pype.funcs import abstract_func
     frozen=True,
     kw_only=True,
 )
-class BoundFunc(val.Val):
+class BoundFunc(abstract_func.AbstractFunc):
     func: abstract_func.AbstractFunc
     obj: val.Val
+
+    def name(self) -> str:
+        return self.func.name()
 
     def __call__(
         self,

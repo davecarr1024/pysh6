@@ -4,15 +4,13 @@ from pysh import core
 from pysh.pype import lexer, parser
 from pysh.pype.vals import scope
 from pysh.pype.vals.classes import class_
-from pysh.pype.statements import result, statement
+from pysh.pype.statements import func, result, statement
 
 
 @dataclass(frozen=True)
 class Class(statement.Statement):
     name: str
-    body: Sequence["statement.Statement"] = field(
-        default_factory=lambda: list[statement.Statement]()
-    )
+    body: Sequence[func.Func] = field(default_factory=list)
 
     def eval(self, scope_: scope.Scope) -> result.Result:
         members = scope.Scope()
@@ -33,7 +31,8 @@ class Class(statement.Statement):
             .token_value()
             .named("name")
             & "{"
-            & statement.Statement.ref()
+            & func.Func.ref()
+            .convert(lambda func: func.as_bindable())
             .zero_or_more()
             .convert(lambda body: body)
             .named("body")

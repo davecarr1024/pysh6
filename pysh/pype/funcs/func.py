@@ -10,8 +10,12 @@ from pysh.pype.funcs import abstract_func
     kw_only=True,
 )
 class Func(abstract_func.AbstractFunc):
+    _name: str
     params: "params.Params" = field(default_factory=lambda: params.Params())
     body: "block.Block" = field(default_factory=lambda: block.Block())
+
+    def name(self) -> str:
+        return self._name
 
     def __call__(self, scope: scope.Scope, args: args.Args) -> val.Val:
         scope = self.params.bind(args, scope)
@@ -24,7 +28,7 @@ class Func(abstract_func.AbstractFunc):
             "def"
             & core.parser.rules.Literal[parser.Parser](lexer.id)
             .token_value()
-            .named("name")
+            .named("_name")
             & params.Params.parser_rule().named("params")
             & block.Block.ref().named("body")
         ).convert(Func)

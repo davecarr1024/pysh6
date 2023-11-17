@@ -40,7 +40,7 @@ class Scope(MutableMapping[str, "val.Val"]):
         return Scope(dict(vals), self)
 
     def bind(self, obj: "val.Val") -> None:
-        for name, val in list(self.items()):
+        for name, val in list(self.vals().items()):
             if val.can_bind():
                 self[name] = val.bind(obj)
 
