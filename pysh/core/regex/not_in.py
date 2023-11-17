@@ -8,7 +8,7 @@ class NotIn(unary_regex.UnaryRegex):
     values: Sequence[str]
 
     def __str__(self) -> str:
-        return "({self.child} not in {self.values})"
+        return f"({self.child} not in {self.values})"
 
     def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         child_state_and_result = self._call_child(state)

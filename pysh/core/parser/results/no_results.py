@@ -13,7 +13,7 @@ class NoResults(results.Results[_Result]):
         return self
 
     def single(self) -> "single_results.SingleResults[_Result]":
-        raise self._error()
+        raise self._error("unable to convert NoResults to SingleResults")
 
     def optional(self) -> "optional_results.OptionalResults[_Result]":
         return optional_results.OptionalResults[_Result]()

@@ -3,7 +3,7 @@ from typing import Iterator, Mapping, MutableMapping, Optional
 from pysh.pype import error
 
 
-@dataclass
+@dataclass(frozen=True)
 class Scope(MutableMapping[str, "val.Val"]):
     _vals: MutableMapping[str, "val.Val"] = field(default_factory=dict[str, "val.Val"])
     _parent: Optional["Scope"] = None

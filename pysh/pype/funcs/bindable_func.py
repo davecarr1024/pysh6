@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pysh.pype.vals import val
-from pysh.pype.vals.funcs import abstract_func, bound_func
+from pysh.pype.funcs import abstract_func, bound_func
 
 
 @dataclass(

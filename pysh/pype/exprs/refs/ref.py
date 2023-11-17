@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Sequence, Union
+from typing import Sequence
 from pysh import core
 from pysh.pype import parser
 from pysh.pype.vals import scope, val

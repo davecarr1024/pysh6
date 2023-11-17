@@ -29,56 +29,56 @@ class Results(ABC, Generic[_Result]):
     def named(self, name: str = "") -> "named_results.NamedResults[_Result]":
         ...
 
-    def _error(self, msg: Optional[str] = None) -> "error.Error":
-        return error.Error(results=self, msg=msg)
+    def _error(self, msg: str) -> "ValueError":
+        return ValueError(f"results={self},msg={repr(msg)}")
 
-    # @overload
-    # @abstractmethod
-    # def __or__(
-    #     self, rhs: "no_results.NoResults[_RhsResult]"
-    # ) -> "Results[_Result|_RhsResult]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "no_results.NoResults[_RhsResult]"
+    ) -> "Results[_Result|_RhsResult]":
+        ...
 
-    # @overload
-    # @abstractmethod
-    # def __or__(
-    #     self, rhs: "single_results.SingleResults[_RhsResult]"
-    # ) -> "Results[_Result|_RhsResult]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "single_results.SingleResults[_RhsResult]"
+    ) -> "Results[_Result|_RhsResult]":
+        ...
 
-    # @overload
-    # @abstractmethod
-    # def __or__(
-    #     self, rhs: "optional_results.OptionalResults[_RhsResult]"
-    # ) -> "Results[_Result|_RhsResult]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "optional_results.OptionalResults[_RhsResult]"
+    ) -> "Results[_Result|_RhsResult]":
+        ...
 
-    # @overload
-    # @abstractmethod
-    # def __or__(
-    #     self, rhs: "multiple_results.MultipleResults[_RhsResult]"
-    # ) -> "Results[_Result|_RhsResult]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "multiple_results.MultipleResults[_RhsResult]"
+    ) -> "Results[_Result|_RhsResult]":
+        ...
 
-    # @overload
-    # @abstractmethod
-    # def __or__(
-    #     self, rhs: "named_results.NamedResults[_RhsResult]"
-    # ) -> "Results[_Result|_RhsResult]":
-    #     ...
+    @overload
+    @abstractmethod
+    def __or__(
+        self, rhs: "named_results.NamedResults[_RhsResult]"
+    ) -> "Results[_Result|_RhsResult]":
+        ...
 
-    # @abstractmethod
-    # def __or__(
-    #     self,
-    #     rhs: Union[
-    #         "no_results.NoResults[_RhsResult]",
-    #         "single_results.SingleResults[_RhsResult]",
-    #         "optional_results.OptionalResults[_RhsResult]",
-    #         "multiple_results.MultipleResults[_RhsResult]",
-    #         "named_results.NamedResults[_RhsResult]",
-    #     ],
-    # ) -> "Results[_Result|_RhsResult]":
-    #     ...
+    @abstractmethod
+    def __or__(
+        self,
+        rhs: Union[
+            "no_results.NoResults[_RhsResult]",
+            "single_results.SingleResults[_RhsResult]",
+            "optional_results.OptionalResults[_RhsResult]",
+            "multiple_results.MultipleResults[_RhsResult]",
+            "named_results.NamedResults[_RhsResult]",
+        ],
+    ) -> "Results[_Result|_RhsResult]":
+        ...
 
 
 from pysh.core.parser.results import (

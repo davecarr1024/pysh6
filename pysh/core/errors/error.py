@@ -7,7 +7,7 @@ class Error(Exception):
     msg: Optional[str] = None
 
     def _repr_line(self) -> str:
-        return f"Error(msg={repr(self.msg)})"
+        return f"{type(self)}(msg={repr(self.msg)})"
 
     def _repr(self, indent: int) -> str:
         return f'\n{"  "*indent}{self._repr_line()}'

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pysh import core
 from pysh.pype.vals import args, scope, val
-from pysh.pype.vals.funcs import abstract_func
+from pysh.pype.funcs import abstract_func
 
 
 @dataclass(

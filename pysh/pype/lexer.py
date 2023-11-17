@@ -7,6 +7,8 @@ id = core.lexer.Rule.load(
         core.regex.Regex.load(r"([a-z]|[A-Z]|_)([a-z]|[A-Z]|_|\d)*"),
         [
             "class",
+            "def",
+            "return",
         ],
     ),
 )

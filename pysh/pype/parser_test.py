@@ -20,6 +20,11 @@ class ParserTest(TestCase):
                     None,
                 ),
                 (
+                    ";",
+                    None,
+                    pype.vals.builtins.none,
+                ),
+                (
                     "1;",
                     None,
                     pype.vals.builtins.Int.create(1),
@@ -55,7 +60,7 @@ class ParserTest(TestCase):
                     pype.vals.builtins.Int.create(1),
                 ),
                 (
-                    "class c {}; c;",
+                    "class c {} c;",
                     None,
                     pype.vals.classes.Class(_name="c"),
                 ),
@@ -66,12 +71,77 @@ class ParserTest(TestCase):
                 ),
                 (
                     r"""
-                        class c {};
+                        class c {}
                         c.a = 1;
                         c.a;
                     """,
                     None,
                     pype.vals.builtins.Int.create(1),
+                ),
+                (
+                    r"""
+                    a = 1;
+                    {
+                        a = 2;
+                    }
+                    a;
+                    """,
+                    None,
+                    pype.vals.int_(1),
+                ),
+                (
+                    "def f() {} f;",
+                    None,
+                    pype.funcs.Func(name="f"),
+                ),
+                (
+                    "def f(a) {} f;",
+                    None,
+                    pype.funcs.Func(
+                        name="f",
+                        params=pype.exprs.Params(
+                            [
+                                pype.exprs.Param("a"),
+                            ]
+                        ),
+                    ),
+                ),
+                (
+                    "def f(a, b) {} f;",
+                    None,
+                    pype.funcs.Func(
+                        name="f",
+                        params=pype.exprs.Params(
+                            [
+                                pype.exprs.Param("a"),
+                                pype.exprs.Param("b"),
+                            ]
+                        ),
+                    ),
+                ),
+                (
+                    "def f() { return 1; } f;",
+                    None,
+                    pype.funcs.Func(
+                        name="f",
+                        body=pype.statements.Block(
+                            [
+                                pype.statements.Return(
+                                    pype.exprs.literal(pype.vals.int_(1))
+                                )
+                            ]
+                        ),
+                    ),
+                ),
+                (
+                    "def f() { return 1; } f();",
+                    None,
+                    pype.vals.int_(1),
+                ),
+                (
+                    "def f(a) { return a; } f(1);",
+                    None,
+                    pype.vals.int_(1),
                 ),
             ]
         ):

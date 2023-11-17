@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Sequence, Sized
-from pysh.pype import error
+from pysh import core
+from pysh.pype import error, parser
 from pysh.pype.vals import args, scope
 from pysh.pype.exprs import param
 
@@ -26,3 +27,18 @@ class Params(Sized, Iterable[param.Param]):
         if len(self) == 0:
             raise error.Error(msg=f"unable to get tail of empty params {self}")
         return Params(self._params[1:])
+
+    @classmethod
+    def parser_rule(
+        cls,
+    ) -> core.parser.rules.SingleResultsRule[parser.Parser, "Params"]:
+        return (
+            r"\("
+            & (
+                param.Param.parser_rule()
+                & ("," & param.Param.parser_rule()).zero_or_more()
+            )
+            .convert(Params)
+            .zero_or_one()
+            & r"\)"
+        ).convert(lambda params: params or Params())

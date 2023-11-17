@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 from typing import Sequence
 from pysh import core
 from pysh.pype import lexer, parser
-from pysh.pype.vals import scope, val
+from pysh.pype.vals import scope
 from pysh.pype.vals.classes import class_
-from pysh.pype.statements import statement
+from pysh.pype.statements import result, statement
 
 
 @dataclass(frozen=True)
@@ -14,7 +14,7 @@ class Class(statement.Statement):
         default_factory=lambda: list[statement.Statement]()
     )
 
-    def eval(self, scope_: scope.Scope) -> statement.Statement.Result:
+    def eval(self, scope_: scope.Scope) -> result.Result:
         members = scope.Scope()
         for statement_ in self.body:
             statement_.eval(members)
@@ -23,7 +23,7 @@ class Class(statement.Statement):
             members=members,
         )
         scope_[c.name()] = c
-        return statement.Statement.Result()
+        return result.Result()
 
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Class"]:
@@ -38,5 +38,4 @@ class Class(statement.Statement):
             .convert(lambda body: body)
             .named("body")
             & "}"
-            & ";"
         ).convert(Class)

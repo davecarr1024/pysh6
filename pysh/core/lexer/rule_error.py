@@ -3,7 +3,10 @@ from pysh.core import errors
 from pysh.core.lexer import state
 
 
-@dataclass
+@dataclass(
+    kw_only=True,
+    repr=False,
+)
 class RuleError(errors.UnaryError):
     rule: "rule.Rule"
     state: "state.State"

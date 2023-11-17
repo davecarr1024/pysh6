@@ -38,7 +38,7 @@ class OptionalResultsRule(rule.Rule[_State, _Result]):
                 self,
                 state: AdapterState,
             ) -> states.StateAndSingleResults[AdapterState, AdapterResult]:
-                return self._call_child(state).single().convert(self.func)
+                return self._call_child(state).optional().convert(self.func)
 
         return Converter[_State, _ConvertResult, _Result](self, func)
 
