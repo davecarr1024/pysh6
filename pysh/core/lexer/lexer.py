@@ -36,11 +36,13 @@ class Lexer(Sized, Iterable[rule.Rule]):
                 errors_.append(error)
         raise self._error(state, children=errors_)
 
-    def __call__(self, state: state.State) -> result.Result:
+    def __call__(self, state_: str | state.State) -> result.Result:
+        if isinstance(state_, str):
+            state_ = state.State.load(state_)
         tokens_: MutableSequence[tokens.Token] = []
-        while state.chars:
-            state_and_result_ = self._apply_any(state)
-            state = state_and_result_.state
+        while state_.chars:
+            state_and_result_ = self._apply_any(state_)
+            state_ = state_and_result_.state
             for token in state_and_result_.result.tokens:
                 if token.value and not token.rule_name.startswith("~"):
                     tokens_.append(token)
