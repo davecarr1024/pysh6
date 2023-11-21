@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pysh import core
 from pysh.pysh import parser
-from pysh.pysh.vals.classes import class_
+from pysh.pysh.vals.classes import abstract_class
 from pysh.pysh.vals import type, val
 
 
@@ -24,4 +24,4 @@ class Int(val.Val):
         )
 
 
-int_class = class_.Class("int")
+int_class = abstract_class.AbstractClass("int")

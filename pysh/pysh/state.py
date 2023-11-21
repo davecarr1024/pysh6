@@ -3,5 +3,5 @@ from pysh.pysh import vals
 
 
 @dataclass(frozen=True)
-class Context:
+class State:
     scope: vals.Scope

@@ -4,11 +4,11 @@ from pysh.pysh.vals import args, scope, val
 
 @dataclass(frozen=True)
 class Object(val.Val):
-    _class: "class_.Class"
+    _class: "abstract_class.AbstractClass"
     _members: scope.Scope
 
     @property
-    def type(self) -> "class_.Class":
+    def type(self) -> "abstract_class.AbstractClass":
         return self._class
 
     @property
@@ -22,4 +22,4 @@ class Object(val.Val):
         )
 
 
-from . import class_
+from . import abstract_class

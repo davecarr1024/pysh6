@@ -7,7 +7,7 @@ from pysh.pysh.vals import val
 class Type(val.Val):
     @property
     def type(self) -> "Type":
-        return builtin_type
+        return type.type_
 
     @property
     def name(self) -> str:
@@ -31,4 +31,4 @@ class Type(val.Val):
             )
 
 
-from pysh.pysh.vals.builtins import builtin_type
+from pysh.pysh.vals.builtins import type

@@ -7,4 +7,4 @@ class _Type(type_lib.Type):
     ...
 
 
-builtin_type = _Type()
+type_ = _Type()

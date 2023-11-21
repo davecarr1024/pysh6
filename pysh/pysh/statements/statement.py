@@ -2,7 +2,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Sequence, Type
 from pysh import core
-from pysh.pysh import vals
+from pysh.pysh import state
 from pysh.pysh.statements import result
 
 
@@ -33,7 +33,7 @@ class Statement(
         return _scope_getter
 
     @abstractmethod
-    def eval(self, scope: vals.Scope) -> result.Result:
+    def eval(self, state: state.State) -> result.Result:
         ...
 
 

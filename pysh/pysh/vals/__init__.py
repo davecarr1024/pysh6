@@ -4,4 +4,4 @@ from .val import Val
 from .var import Var
 from .arg import Arg
 from .args import Args
-from .builtins import builtin_type, none, none_class, Int, int_class
+from .builtins import type_, none, none_class, Int, int_class

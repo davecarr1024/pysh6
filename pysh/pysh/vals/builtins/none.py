@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from pysh.pysh.vals.classes import class_
+from pysh.pysh.vals.classes import abstract_class
 from pysh.pysh.vals import type, val
 
 
@@ -10,5 +10,5 @@ class _None(val.Val):
         return none_class
 
 
-none_class = class_.Class("none")
+none_class = abstract_class.AbstractClass("none")
 none = _None()

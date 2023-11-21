@@ -34,9 +34,10 @@ class Parser(core.parser.states.State):
             .with_lexer(exprs.Expr.lexer())
             .with_lexer(core.lexer.Lexer([core.lexer.Rule.load("~ws", r"\s+")]))
         ).convert(statements.Block)
-        state = Parser(rule.lexer()(input))
-        block: statements.Block = rule(state).results.value
-        return block.eval(scope or vals.Scope()).return_value or vals.none
+        parser = Parser(rule.lexer()(input))
+        block: statements.Block = rule(parser).results.value
+        state_ = state.State(scope or vals.Scope())
+        return block.eval(state_).return_value or vals.none
 
 
-from pysh.pysh import exprs, statements, vals
+from pysh.pysh import exprs, state, statements, vals

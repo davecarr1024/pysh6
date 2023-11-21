@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Self, Sequence
 from pysh import core
-from pysh.pysh import lexer, parser, vals
+from pysh.pysh import lexer, parser, state, vals
 
 from pysh.pysh.exprs import expr
 
@@ -142,11 +142,11 @@ class Ref(expr.Expr):
     head: _Head
     tails: Sequence[_Tail] = field(default_factory=list)
 
-    def eval(self, scope: vals.Scope) -> vals.Val:
+    def eval(self, state: state.State) -> vals.Val:
         try:
-            obj = self.head.get(scope)
+            obj = self.head.get(state.scope)
             for tail in self.tails:
-                obj = tail.get(scope, obj)
+                obj = tail.get(state.scope, obj)
             return obj
         except core.errors.Error as error:
             raise self._error(children=[error])
