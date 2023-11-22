@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from typing import Iterator, Optional
+from typing import Iterator, Optional, final
 from pysh.pysh.vals import val
 
 
 @dataclass(frozen=True)
 class Type(val.Val):
     @property
+    @final
     def type(self) -> "Type":
         return type.type_
 
@@ -31,4 +32,4 @@ class Type(val.Val):
             )
 
 
-from pysh.pysh.vals.builtins import type
+from .builtins import type

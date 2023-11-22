@@ -43,5 +43,8 @@ class Scope(
     def __delitem__(self, name: str) -> None:
         self._try(lambda: self._vars.__delitem__(name))
 
+    def as_child(self, vars: MutableMapping[str, "var.Var"] = {}) -> "Scope":
+        return Scope(vars, self)
 
-from pysh.pysh.vals import var
+
+from . import var

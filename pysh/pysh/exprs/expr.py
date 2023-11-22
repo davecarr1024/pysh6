@@ -2,7 +2,6 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Sequence, Type
 from pysh import core
-from pysh.pysh import state, vals
 
 _scope_getter = core.parser.states.StateValueGetter[
     "parser.Parser", core.parser.rules.Scope["parser.Parser", "Expr"]
@@ -27,9 +26,10 @@ class Expr(
         return _scope_getter
 
     @abstractmethod
-    def eval(self, state: state.State) -> vals.Val:
+    def eval(self, state: "state.State") -> "val.Val":
         ...
 
 
-from pysh.pysh import parser, vals
+from pysh.pysh.vals import val
+from pysh.pysh import parser, state
 from . import ref

@@ -1,16 +1,16 @@
 from dataclasses import dataclass
+from typing import Callable
 from pysh import core
 from pysh.pysh import parser
-from pysh.pysh.vals.classes import abstract_class
-from pysh.pysh.vals import type, val
+from . import class_, object_
 
 
 @dataclass(frozen=True)
-class Int(val.Val):
+class Int(object_.Object["Int"]):
     value: int
 
     @property
-    def type(self) -> "type.Type":
+    def type(self) -> class_.Class:
         return int_class
 
     @classmethod
@@ -20,8 +20,9 @@ class Int(val.Val):
                 core.lexer.Rule.load("int", r"\d+")
             )
             .token_value()
-            .convert(lambda value: Int(int(value)))
+            .convert(lambda value: int_class.create(int(value)))
         )
 
 
-int_class = abstract_class.AbstractClass("int")
+int_class = class_.Class(Int)
+int_: Callable[[int], Int] = int_class.create

@@ -37,4 +37,5 @@ class Val(
 
 
 from pysh.pysh import parser
-from pysh.pysh.vals import args, builtins, scope, type, var
+from . import args, builtins, scope, var
+from . import type
