@@ -4,4 +4,6 @@ from .assignment import Assignment
 from .block import Block
 from .decl import Decl
 from .empty import Empty
+from .func import Func
+from .literal import Literal
 from .return_ import Return

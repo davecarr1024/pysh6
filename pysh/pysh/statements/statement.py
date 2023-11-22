@@ -28,6 +28,8 @@ class Statement(
             block.Block,
             decl.Decl,
             empty.Empty,
+            func.Func,
+            literal.Literal,
             return_.Return,
         ]
 
@@ -49,4 +51,4 @@ _scope_getter = core.parser.states.StateValueGetter[
 ].load(lambda parser: parser.statement_scope)
 
 from pysh.pysh import parser
-from . import assignment, block, decl, empty, return_
+from . import assignment, block, decl, empty, func, literal, return_

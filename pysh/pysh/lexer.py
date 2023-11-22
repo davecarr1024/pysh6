@@ -10,6 +10,7 @@ id = core.parser.rules.Literal[parser.Parser](
                 r"([a-z]|[A-Z]|_)([a-z]|[A-Z]|_|\d)*",
             ),
             [
+                "def",
                 "return",
             ],
         ),
