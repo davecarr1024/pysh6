@@ -27,7 +27,7 @@ class Block(
         return iter(self._statements)
 
     def eval(self, state: state.State) -> result.Result:
-        scope = vals.Scope({}, state.scope)
+        state = state.as_child()
         for statement in self:
             result_ = self._try(lambda: statement.eval(state))
             if result_.is_return:

@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
+from pysh.pysh import state
 from pysh.pysh.vals import args, scope, val
 
 
@@ -10,9 +11,9 @@ class AbstractObject(val.Val):
     def type(self) -> "abstract_class.AbstractClass":
         ...
 
-    def __call__(self, scope: scope.Scope, args: args.Args) -> val.Val:
+    def __call__(self, state: state.State, args: args.Args) -> val.Val:
         return self._try(
-            lambda: self["__call__"].val(scope, args),
+            lambda: self["__call__"].val(state, args),
             "failed to call object's __call__",
         )
 

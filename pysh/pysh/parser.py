@@ -26,7 +26,7 @@ class Parser(core.parser.states.State):
         )
 
     @staticmethod
-    def eval(input: str, scope_: Optional["scope.Scope"] = None) -> "val.Val":
+    def eval(input: str, state_: Optional["state.State"] = None) -> "val.Val":
         rule = (
             (statement.Statement.ref() & statement.Statement.ref().until_empty())
             .with_lexer(statement.Statement.lexer())
@@ -35,8 +35,9 @@ class Parser(core.parser.states.State):
         ).convert(block.Block)
         parser = Parser(rule.lexer()(input))
         block_: block.Block = rule(parser).results.value
-        state_ = state.State(scope_ or scope.Scope())
-        return block_.eval(state_).return_value or none_.none
+        state_ = state_ if state_ is not None else state.State()
+        result = block_.eval(state_)
+        return result.return_value if result.return_value is not None else none_.none
 
 
 from .exprs import expr

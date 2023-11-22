@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 from pysh.pysh.vals.classes import abstract_object
 
@@ -10,7 +10,7 @@ class Object(
     abstract_object.AbstractObject,
     Generic[_Object],
 ):
-    _class: "class_.Class[_Object]"
+    _class: "class_.Class[_Object]" = field(repr=False)
 
     @property
     def type(self) -> "class_.Class[_Object]":

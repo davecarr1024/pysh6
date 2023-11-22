@@ -11,6 +11,9 @@ class AbstractClass(type.Type):
     def name(self) -> str:
         ...
 
+    def __str__(self) -> str:
+        return self.name
+
     @property
     def parent(self) -> Optional["AbstractClass"]:
         return None
@@ -19,14 +22,15 @@ class AbstractClass(type.Type):
     def create(self, *args, **kwargs) -> "abstract_object.AbstractObject":
         ...
 
-    def __call__(self, scope: "scope.Scope", args: "args.Args") -> "val.Val":
+    def __call__(self, state: "state.State", args: "args.Args") -> "val.Val":
         obj = self.create()
         self._try(
-            lambda: obj["__init__"].val(scope, args),
+            lambda: obj["__init__"].val(state, args),
             "initializing object",
         )
         return obj
 
 
 from . import abstract_object
+from pysh.pysh import state
 from pysh.pysh.vals import args, scope, val

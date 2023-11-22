@@ -11,6 +11,16 @@ class Scope(
     _vars: MutableMapping[str, "var.Var"] = field(default_factory=dict)
     parent: Optional["Scope"] = None
 
+    def __str__(self) -> str:
+        def _str_var(name: str, var: var.Var) -> str:
+            return (
+                f"{name}: {var.type} = {var.val}"
+                if var.initialized
+                else f"{name}: {var.type}"
+            )
+
+        return f'{{{", ".join(_str_var(name,var) for name, var in self.items())}}}'
+
     @property
     def vars(self) -> Mapping[str, "var.Var"]:
         return self._vars
@@ -43,8 +53,21 @@ class Scope(
     def __delitem__(self, name: str) -> None:
         self._try(lambda: self._vars.__delitem__(name))
 
-    def as_child(self, vars: MutableMapping[str, "var.Var"] = {}) -> "Scope":
-        return Scope(vars, self)
+    def __or__(self, rhs: "Scope") -> "Scope":
+        return Scope(dict(self) | dict(rhs))
+
+    def __contains__(self, name: object) -> bool:
+        return isinstance(name, str) and (
+            name in self._vars or (self.parent is not None and name in self.parent)
+        )
+
+    def as_child(
+        self, vars: Optional[MutableMapping[str, "var.Var"]] = None
+    ) -> "Scope":
+        return Scope(
+            vars if vars is not None else {},
+            self,
+        )
 
 
 from . import var

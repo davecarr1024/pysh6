@@ -19,7 +19,7 @@ class Val(
     def members(self) -> "scope.Scope":
         return scope.Scope()
 
-    def __call__(self, scope: "scope.Scope", args: "args.Args") -> "Val":
+    def __call__(self, state: "state.State", args: "args.Args") -> "Val":
         raise self._error(msg="uncallable")
 
     def __len__(self) -> int:
@@ -36,6 +36,6 @@ class Val(
         return builtins.Int.parser_rule()
 
 
-from pysh.pysh import parser
+from pysh.pysh import parser, state
 from . import args, builtins, scope, var
 from . import type

@@ -16,29 +16,35 @@ class Errorable(Generic[_T]):
         msg: Optional[str] = None,
         children: Sequence[error.Error] = [],
     ) -> error.Error:
-        T = TypeVar(
-            "T",
-            bound=Errorable,
-        )
+        T = TypeVar("T", bound=Errorable)
 
         @dataclass(
             kw_only=True,
             repr=False,
         )
         class Error(
-            Generic[T],
             nary_error.NaryError,
+            Generic[T],
         ):
             name: str
             value: T
 
             def _repr_line(self) -> str:
-                return f"{self.name}({self.value},{repr(self.msg)})"
+                return (
+                    f"{self.name}({self.value},{repr(self.msg)})"
+                    if self.msg is not None
+                    else f"{self.name}({self.value})"
+                )
 
-        return Error[_T](
-            name=f"{self.__class__.__name__}Error",
+        return Error(
+            name=self._error_name(),
             value=self,
+            msg=msg,
+            _children=children,
         )
+
+    def _error_name(self) -> str:
+        return f"{self.__class__.__name__}.Error"
 
     def _try(self, func: Callable[[], _R], msg: Optional[str] = None) -> _R:
         try:

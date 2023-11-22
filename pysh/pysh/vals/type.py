@@ -28,7 +28,7 @@ class Type(val.Val):
     def assert_can_assign(self, rhs: "Type") -> None:
         if self not in rhs.ancestors:
             raise self._error(
-                msg=f"can't assign from rhs {rhs}: not in ancestors {rhs.ancestors}"
+                msg=f"can't assign from rhs {rhs}: not in ancestors {list(map(str,rhs.ancestors))}"
             )
 
 

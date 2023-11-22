@@ -9,6 +9,9 @@ from . import class_, object_
 class Int(object_.Object["Int"]):
     value: int
 
+    def __str__(self) -> str:
+        return str(self.value)
+
     @property
     def type(self) -> class_.Class:
         return int_class
@@ -24,5 +27,5 @@ class Int(object_.Object["Int"]):
         )
 
 
-int_class = class_.Class(Int)
+int_class = class_.Class(Int, "int")
 int_: Callable[[int], Int] = int_class.create

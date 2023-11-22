@@ -36,8 +36,8 @@ class Scope(MutableMapping[str, "val.Val"]):
     def __delitem__(self, name: str) -> None:
         del self._vals[name]
 
-    def as_child(self, vals: Mapping[str, "val.Val"] = {}) -> "Scope":
-        return Scope(dict(vals), self)
+    def as_child(self, vals: Optional[Mapping[str, "val.Val"]] = None) -> "Scope":
+        return Scope(dict(vals or {}), self)
 
     def bind(self, obj: "val.Val") -> None:
         for name, val in list(self.vals().items()):

@@ -74,7 +74,7 @@ class ScopeTest(TestCase):
                 else:
                     self.assertEqual(scope[name], expected)
 
-    def test_set(self):
+    def test_set(self) -> None:
         for scope, name, val, expected in list[
             tuple[
                 pysp.Scope,

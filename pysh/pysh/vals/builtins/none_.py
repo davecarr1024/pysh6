@@ -4,6 +4,9 @@ from . import class_, object_
 
 @dataclass(frozen=True)
 class _None(object_.Object["_None"]):
+    def __str__(self) -> str:
+        return "none"
+
     @property
     def type(self) -> class_.Class:
         return none_class
