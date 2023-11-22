@@ -22,7 +22,14 @@ class Statement(
 
     @classmethod
     def types(cls) -> Sequence[Type["Statement"]]:
-        return [cls, block.Block, decl.Decl, empty.Empty, return_.Return]
+        return [
+            cls,
+            assignment.Assignment,
+            block.Block,
+            decl.Decl,
+            empty.Empty,
+            return_.Return,
+        ]
 
     @classmethod
     def scope_getter(
@@ -42,4 +49,4 @@ _scope_getter = core.parser.states.StateValueGetter[
 ].load(lambda parser: parser.statement_scope)
 
 from pysh.pysh import parser
-from . import block, decl, empty, return_
+from . import assignment, block, decl, empty, return_

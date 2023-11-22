@@ -9,5 +9,4 @@ def literal(val: _val.Val) -> Ref:
     return Ref.create(val)
 
 
-def ref_(val: str) -> Ref:
-    return Ref.create(val)
+ref_ = Ref.create
