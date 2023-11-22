@@ -40,6 +40,11 @@ class ParserTest(TestCase):
                     ),
                     pysh.vals.int_(1),
                 ),
+                (
+                    "a: int = 1; return a;",
+                    None,
+                    pysh.vals.int_(1),
+                ),
             ]
         ):
             with self.subTest(input=input, state=state, expected=expected):

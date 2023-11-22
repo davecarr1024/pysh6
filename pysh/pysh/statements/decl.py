@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import cast
 from pysh import core
-from pysh.pysh import parser, state
+from pysh.pysh import lexer, parser, state
 from pysh.pysh.vals import type as type_lib, var
 from pysh.pysh.exprs import expr, ref
 from pysh.pysh.statements import result, statement
@@ -31,7 +31,7 @@ class Decl(statement.Statement):
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Decl"]:
         return (
-            ref.Ref.ref().named("lhs")
+            lexer.id.named("name")
             & ":"
             & ref.Ref.ref().named("type")
             & "="
