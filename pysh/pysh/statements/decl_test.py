@@ -71,6 +71,18 @@ class DeclTest(TestCase):
                         }
                     ),
                 ),
+                (
+                    pysh.statements.Decl(
+                        pysh.exprs.ref_("int"),
+                        "a",
+                    ),
+                    pysh.State().as_child(),
+                    pysh.State().as_child(
+                        {
+                            "a": pysh.vals.Var(pysh.vals.int_class),
+                        }
+                    ),
+                ),
             ]
         ):
             with self.subTest(decl=decl, state=state, expected=expected):

@@ -11,7 +11,7 @@ from pysh.pysh.statements import result, statement
 class Decl(statement.Statement):
     type: ref.Ref
     name: str
-    rhs: Optional[expr.Expr]
+    rhs: Optional[expr.Expr] = None
 
     def _str_line(self) -> str:
         return f"{self.name}: {self.type} = {self.rhs};"

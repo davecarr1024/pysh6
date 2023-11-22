@@ -46,6 +46,11 @@ class ParserTest(TestCase):
                     pysh.vals.int_(1),
                 ),
                 (
+                    "a: int; a: int;",
+                    None,
+                    None,
+                ),
+                (
                     "a: int; return a;",
                     None,
                     None,
