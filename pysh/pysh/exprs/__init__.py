@@ -1,5 +1,7 @@
 from .expr import Expr
 from .ref import Ref
+from .param import Param
+from .params import Params
 
 from pysh.pysh.vals import val as _val
 from pysh.pysh.vals import builtins as _builtins
