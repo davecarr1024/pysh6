@@ -14,6 +14,9 @@ class Result:
     def for_return(return_value: Optional["val.Val"] = None) -> "Result":
         return Result(return_value if return_value is not None else none_.none)
 
+    def return_value_or_none(self) -> "val.Val":
+        return self.return_value if self.return_value is not None else none_.none
+
 
 from pysh.pysh.vals import val
 from pysh.pysh.vals.builtins import none_

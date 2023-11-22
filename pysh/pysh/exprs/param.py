@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from typing import cast
 from pysh import core
 from pysh.pysh import lexer, parser, state
-from pysh.pysh.vals import arg, type, var
+from pysh.pysh.vals import param, type
 from pysh.pysh.exprs import ref
 
 
@@ -16,10 +15,10 @@ class Param(
     def __str__(self) -> str:
         return f"{self.name}: {self.type}"
 
-    def bind(self, state: state.State, arg: arg.Arg) -> var.Var:
+    def bind(self, state: state.State) -> param.Param:
         if not isinstance(type_ := self.type.eval(state), type.Type):
-            raise self._error(msg=f"param type {type_} is not a type")
-        return var.Var(cast(type.Type, type_), arg.val)
+            raise self._error(msg=f"invalid type {type_}")
+        return param.Param(type_, self.name)
 
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Param"]:

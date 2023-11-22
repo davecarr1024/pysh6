@@ -3,7 +3,7 @@ from typing import Iterable, Iterator, Sequence, Sized
 from pysh import core
 from pysh.pysh import parser, state
 from pysh.pysh.exprs import param
-from pysh.pysh.vals import args
+from pysh.pysh.vals import params
 
 
 @dataclass(frozen=True)
@@ -23,14 +23,8 @@ class Params(
     def __iter__(self) -> Iterator[param.Param]:
         return iter(self._params)
 
-    def bind(self, state: state.State, args: args.Args) -> state.State:
-        if len(self) != len(args):
-            raise self._error(
-                msg=f"expected {len(self)} args but got {len(args)} in {args}",
-            )
-        return state.as_child(
-            {param.name: param.bind(state, arg) for param, arg in zip(self, args)}
-        )
+    def bind(self, state: state.State) -> params.Params:
+        return params.Params([param.bind(state) for param in self])
 
     @classmethod
     def parser_rule(
