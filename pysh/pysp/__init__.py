@@ -1,4 +1,3 @@
-from pysh.pysp.error import Error
 from pysh.pysp.parser import Parser
 from pysh.pysp.val import Val
 from pysh.pysp.int_ import Int

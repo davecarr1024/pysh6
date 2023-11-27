@@ -1,6 +1,7 @@
 from typing import Optional
 from unittest import TestCase
-from pysh.core.chars import char, error
+from pysh.core import errors
+from pysh.core.chars import char
 
 
 class CharTest(TestCase):
@@ -23,7 +24,7 @@ class CharTest(TestCase):
         ):
             with self.subTest(value=value, expected=expected):
                 if expected is None:
-                    with self.assertRaises(error.Error):
+                    with self.assertRaises(errors.Error):
                         char.Char(value)
                 else:
                     self.assertEqual(char.Char(value), expected)

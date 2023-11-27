@@ -28,7 +28,7 @@ class OptionalResultsAnd(
 ):
     def __post_init__(self):
         if self._num_children_of_type(optional_results_rule.OptionalResultsRule) != 1:
-            raise errors.Error(msg=f"invalid OptionalResultsAnd {self}")
+            raise self._error(msg="invalid OptionalResultsAnd")
 
     def __call__(
         self, state: _State

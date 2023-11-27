@@ -14,7 +14,7 @@ class OneOrMore(unary_regex.UnaryRegex[regex.Regex]):
             state = child_state_and_result.state
             result = child_state_and_result.result
         except errors.Error as error:
-            raise self._error(state, children=[error])
+            raise self._error(state=state, children=[error])
         while True:
             try:
                 child_state_and_result = self._call_child(state)

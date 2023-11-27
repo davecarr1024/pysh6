@@ -6,7 +6,10 @@ from pysh.pype.vals import scope, val
 
 
 @dataclass(frozen=True)
-class Root(ABC):
+class Root(
+    ABC,
+    core.errors.Errorable["Root"],
+):
     @abstractmethod
     def get(self, scope: scope.Scope) -> val.Val:
         ...

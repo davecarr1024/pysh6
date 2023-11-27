@@ -12,7 +12,10 @@ _scope_getter = core.parser.states.StateValueGetter[
 
 
 @dataclass(frozen=True)
-class Statement(core.parser.Parsable[parser.Parser, "Statement"]):
+class Statement(
+    core.parser.Parsable[parser.Parser, "Statement"],
+    core.errors.Errorable["Statement"],
+):
     @classmethod
     def types(cls) -> Sequence[Type["Statement"]]:
         return [
@@ -38,25 +41,12 @@ class Statement(core.parser.Parsable[parser.Parser, "Statement"]):
     def eval(self, scope: scope.Scope) -> result.Result:
         ...
 
-    def _error(
-        self,
-        *,
-        msg: Optional[str] = None,
-        children: Sequence[core.errors.Error] = [],
-    ) -> "error.Error":
-        return error.Error(
-            statement=self,
-            msg=msg,
-            _children=children,
-        )
-
 
 from pysh.pype.statements import (
     assignment,
     block,
     class_,
     empty,
-    error,
     expr_statement,
     func,
     result,

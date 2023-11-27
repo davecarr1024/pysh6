@@ -4,7 +4,11 @@ from pysh.core import chars, errors, tokens
 
 
 @dataclass(frozen=True)
-class Result(Sized, Iterable[chars.Char]):
+class Result(
+    Sized,
+    Iterable[chars.Char],
+    errors.Errorable["Result"],
+):
     _chars: Sequence[chars.Char] = field(default_factory=list[chars.Char])
 
     def __str__(self) -> str:
@@ -24,7 +28,7 @@ class Result(Sized, Iterable[chars.Char]):
 
     def position(self) -> chars.Position:
         if not self:
-            raise errors.Error(msg=f"position of empty result")
+            raise self._error(msg="position of empty result")
         return self._chars[0].position
 
     def value(self) -> str:

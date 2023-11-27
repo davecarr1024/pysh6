@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Sequence, Type
+from typing import Sequence, Type
 from pysh import core
 from pysh.pype import parser
 
@@ -10,7 +10,10 @@ _scope_getter = core.parser.states.StateValueGetter[
 
 
 @dataclass(frozen=True)
-class Expr(core.parser.Parsable[parser.Parser, "Expr"]):
+class Expr(
+    core.parser.Parsable[parser.Parser, "Expr"],
+    core.errors.Errorable["Expr"],
+):
     @classmethod
     def types(cls) -> Sequence[Type["Expr"]]:
         return [cls, ref.Ref]
@@ -27,19 +30,6 @@ class Expr(core.parser.Parsable[parser.Parser, "Expr"]):
     def eval(self, scope: "scope.Scope") -> "val.Val":
         ...
 
-    def _error(
-        self,
-        *,
-        msg: Optional[str] = None,
-        children: Sequence[core.errors.Error] = [],
-    ) -> "error.Error":
-        return error.Error(
-            expr=self,
-            msg=msg,
-            _children=children,
-        )
 
-
-from pysh.pype.exprs import error
 from pysh.pype.exprs.refs import ref
 from pysh.pype.vals import scope, val

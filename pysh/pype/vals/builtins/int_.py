@@ -15,10 +15,7 @@ class Int(value_object.ValueObject[int]):
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Int"]:
         def convert(value: str) -> Int:
-            try:
-                return Int.create(int(value))
-            except Exception as error:
-                raise core.errors.Error(msg=f"failed to load int from {value}: {error}")
+            return cls._cls_try(lambda: Int.create(int(value)))
 
         return (
             core.parser.rules.Literal[parser.Parser](

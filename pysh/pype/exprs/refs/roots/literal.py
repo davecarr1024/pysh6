@@ -16,7 +16,7 @@ class Literal(root.Root):
         return self.value
 
     def set(self, scope: scope.Scope, val: val.Val) -> None:
-        raise core.errors.Error(msg=f"unable to set literal ref")
+        raise self._error(msg="unable to set literal ref")
 
     @classmethod
     def parser_rule(

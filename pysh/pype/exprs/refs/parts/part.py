@@ -7,7 +7,10 @@ from pysh.pype.vals import scope, val
 
 
 @dataclass(frozen=True)
-class Part(ABC):
+class Part(
+    ABC,
+    core.errors.Errorable["Part"],
+):
     @abstractmethod
     def get(self, scope: scope.Scope, obj: val.Val) -> val.Val:
         ...

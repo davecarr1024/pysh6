@@ -8,7 +8,7 @@ from pysh.core.parser import results, rules, states
 class NamedResultsOrTest(TestCase):
     def test_call(self) -> None:
         def fail(_):
-            raise errors.Error()
+            raise rules.Rule._cls_error()
 
         for lhs, rhs, expected in list[
             tuple[

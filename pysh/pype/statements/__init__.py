@@ -1,4 +1,3 @@
-from pysh.pype.statements.error import Error
 from pysh.pype.statements.statement import Statement
 from pysh.pype.statements.result import Result
 from pysh.pype.statements.assignment import Assignment

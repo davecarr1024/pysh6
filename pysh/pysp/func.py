@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Sequence
 from pysh import core
-from pysh.pysp import error, id, parser, val
+from pysh.pysp import id, parser, val
 
 
 @dataclass(frozen=True)
@@ -11,7 +11,7 @@ class Func(val.Val):
 
     def apply(self, args: Sequence[val.Val], scope_: "scope.Scope") -> val.Val:
         if len(self.params) != len(args):
-            raise error.Error(
+            raise self._error(
                 msg=f"func {self} expected {len(self.params)} args but got {len(args)}"
             )
         return self.body.eval(

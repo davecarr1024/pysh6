@@ -25,8 +25,9 @@ class Ref(expr.Expr):
         ) -> core.parser.rules.SingleResultsRule[parser.Parser, "Ref.Head"]:
             return Ref.Name.parser_rule() | Ref.Literal.parser_rule()
 
-        def _error_name(self) -> str:
-            return f"Ref.Head.{self.__class__.__name__}.Error"
+        @classmethod
+        def _error_name(cls) -> str:
+            return f"Ref.Head.{cls.__name__}.Error"
 
         @staticmethod
         def create(val_: str | val.Val) -> "Ref.Head":
@@ -87,8 +88,9 @@ class Ref(expr.Expr):
         def set(self, state: state.State, obj: val.Val, val: val.Val) -> None:
             ...
 
-        def _error_name(self) -> str:
-            return f"Ref.Tail.{self.__class__.__name__}.Error"
+        @classmethod
+        def _error_name(cls) -> str:
+            return f"Ref.Tail.{cls.__name__}.Error"
 
         @classmethod
         def parser_rule(

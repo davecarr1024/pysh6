@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Callable, Generic, Optional, TypeVar, Union, overload
+from pysh.core import errors
 
 
 _Result = TypeVar("_Result", covariant=True)
@@ -8,7 +9,11 @@ _RhsResult = TypeVar("_RhsResult")
 
 
 @dataclass(frozen=True)
-class Results(ABC, Generic[_Result]):
+class Results(
+    ABC,
+    Generic[_Result],
+    errors.Errorable["Results"],
+):
     @abstractmethod
     def no(self) -> "no_results.NoResults[_Result]":
         ...
@@ -28,9 +33,6 @@ class Results(ABC, Generic[_Result]):
     @abstractmethod
     def named(self, name: str = "") -> "named_results.NamedResults[_Result]":
         ...
-
-    def _error(self, msg: str) -> "error.Error":
-        return error.Error(results=self, msg=msg)
 
     @overload
     @abstractmethod

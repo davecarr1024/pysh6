@@ -16,5 +16,5 @@ class And(nary_regex.NaryRegex):
                 state = child_state_and_result.state
                 result_ += child_state_and_result.result
             except errors.Error as error:
-                raise self._error(state, children=[error])
+                raise self._error(state=state, children=[error])
         return state_and_result.StateAndResult(state, result_)

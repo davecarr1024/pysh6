@@ -1,11 +1,15 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, MutableSequence, Optional, Sequence, Sized
-from pysh.core import chars, errors, regex, tokens
-from pysh.core.lexer import lexer_error, result, rule, state, state_and_result
+from pysh.core import errors, regex, tokens
+from pysh.core.lexer import result, rule, state, state_and_result
 
 
 @dataclass(frozen=True)
-class Lexer(Sized, Iterable[rule.Rule]):
+class Lexer(
+    Sized,
+    Iterable[rule.Rule],
+    errors.Errorable["Lexer"],
+):
     _rules: Sequence[rule.Rule] = field(default_factory=lambda: list[rule.Rule]())
 
     def __str__(self) -> str:
@@ -34,7 +38,7 @@ class Lexer(Sized, Iterable[rule.Rule]):
                 return rule(state)
             except errors.Error as error:
                 errors_.append(error)
-        raise self._error(state, children=errors_)
+        raise self._error(state=state, children=errors_)
 
     def __call__(self, state_: str | state.State) -> result.Result:
         if isinstance(state_, str):
@@ -57,14 +61,3 @@ class Lexer(Sized, Iterable[rule.Rule]):
     @staticmethod
     def literal(*values: str) -> "Lexer":
         return Lexer([rule.Rule.load(value) for value in values])
-
-    def _error(
-        self,
-        state: state.State,
-        *,
-        msg: Optional[str] = None,
-        children: Sequence[errors.Error] = [],
-    ) -> lexer_error.LexerError:
-        return lexer_error.LexerError(
-            lexer=self, state=state, msg=msg, _children=children
-        )

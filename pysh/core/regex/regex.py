@@ -1,12 +1,15 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 import string
-from typing import Optional, Sequence, Type
+from typing import Sequence, Type
 from pysh.core import errors
-from pysh.core.regex import error, state, state_and_result
+from pysh.core.regex import state, state_and_result
 
 
-class Regex(ABC):
+class Regex(
+    ABC,
+    errors.Errorable["Regex"],
+):
     @abstractmethod
     def __call__(self, state: state.State) -> state_and_result.StateAndResult:
         ...
@@ -34,8 +37,8 @@ class Regex(ABC):
     def whitespace() -> "Regex":
         return Regex._or(string.whitespace)
 
-    @staticmethod
-    def load(value: str) -> "Regex":
+    @classmethod
+    def load(cls, value: str) -> "Regex":
         from pysh.core import lexer, parser
         from pysh.core.regex import (
             and_,
@@ -292,18 +295,4 @@ class Regex(ABC):
 
         rule = _Regex.ref().until_empty().convert(to_and).with_lexer(_Regex.lexer())
         state = State(rule.lexer()(lexer.State.load(value)))
-        try:
-            return rule(state).results.value
-        except errors.Error as error_:
-            raise errors.UnaryError(
-                msg=f"failed to load regex {repr(value)}", child=error_
-            )
-
-    def _error(
-        self,
-        state: state.State,
-        *,
-        msg: Optional[str] = None,
-        children: Sequence[errors.Error] = [],
-    ) -> error.Error:
-        return error.Error(regex=self, state=state, msg=msg, _children=children)
+        return cls._cls_try(lambda: rule(state).results.value)

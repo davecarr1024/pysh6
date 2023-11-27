@@ -4,7 +4,7 @@ from pysh.core import chars, errors
 
 
 @dataclass(frozen=True)
-class Token:
+class Token(errors.Errorable["Token"]):
     rule_name: str
     value: str
     position: chars.Position = field(default_factory=chars.Position)
@@ -14,12 +14,14 @@ class Token:
             return self.rule_name
         return f"{self.rule_name}({self.value})"
 
-    @staticmethod
-    def load(rule_name: str, value: Sequence[chars.Char] | chars.Stream) -> "Token":
+    @classmethod
+    def load(
+        cls, rule_name: str, value: Sequence[chars.Char] | chars.Stream
+    ) -> "Token":
         if isinstance(value, chars.Stream):
             value = list(value)
         if not value:
-            raise errors.Error(msg=f"loading token with empty value")
+            raise cls._cls_error(msg=f"loading token with empty value")
         return Token(
             rule_name, "".join(char.value for char in value), value[0].position
         )

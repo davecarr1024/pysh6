@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from pysh.core import errors, regex, tokens
-from pysh.core.lexer import result, rule_error, state, state_and_result
+from pysh.core.lexer import result, state, state_and_result
 
 
 @dataclass(frozen=True)
-class Rule:
+class Rule(errors.Errorable["Rule"]):
     name: str
     regex_: regex.Regex
 
@@ -24,7 +24,7 @@ class Rule:
                 ),
             )
         except errors.Error as error:
-            raise rule_error.RuleError(rule=self, state=state_, child=error)
+            raise self._error(state=state_, children=[error])
 
     @staticmethod
     def load(rule_name: str, regex_: str | regex.Regex | None = None) -> "Rule":

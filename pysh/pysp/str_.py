@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pysh import core
-from pysh.pysp import error, parser, val
+from pysh.pysp import parser, val
 
 
 @dataclass(frozen=True)

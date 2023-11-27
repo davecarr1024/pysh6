@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pysh import core
-from pysh.pysp import error, parser, val
+from pysh.pysp import parser, val
 
 
 @dataclass(frozen=True)
@@ -12,10 +12,7 @@ class Int(val.Val):
         cls,
     ) -> core.parser.rules.SingleResultsRule[parser.Parser, "Int"]:
         def convert(token: core.tokens.Token) -> Int:
-            try:
-                return Int(int(token.value))
-            except Exception as error_:
-                raise error.Error(msg=f"failed to load int val: {error_}")
+            return cls._cls_try(lambda: Int(int(token.value)))
 
         return core.parser.rules.Literal[parser.Parser](
             core.lexer.Rule.load("int", r"\d+")

@@ -1,4 +1,2 @@
-from pysh.core.errors.error import Error
-from pysh.core.errors.nary_error import NaryError
-from pysh.core.errors.unary_error import UnaryError
-from pysh.core.errors.errorable import Errorable
+from .error import Error
+from .errorable import Errorable

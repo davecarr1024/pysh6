@@ -19,7 +19,7 @@ class NamedResults(results.Results[_Result], Mapping[str, _Result]):
 
     def __getitem__(self, name: str) -> _Result:
         if name not in self._values:
-            raise self._error(f"unknown result {name}")
+            raise self._error(msg=f"unknown result {name}")
         return self._values[name]
 
     def no(self) -> "no_results.NoResults[_Result]":

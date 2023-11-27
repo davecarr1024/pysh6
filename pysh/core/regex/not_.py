@@ -38,4 +38,4 @@ class Not(
                 state.tail(),
                 result.Result([state.head()]),
             )
-        raise self._error(state, msg=f"child of not {self.child} applied")
+        raise self._error(state=state, msg=f"child of not {self.child} applied")

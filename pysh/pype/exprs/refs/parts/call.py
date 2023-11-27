@@ -17,7 +17,7 @@ class Call(part.Part):
         return val(scope, self.args.eval(scope))
 
     def set(self, scope: scope.Scope, obj: val.Val, val: val.Val) -> None:
-        raise core.errors.Error(msg=f"unable to set call {self}")
+        raise self._error(msg="unable to set call")
 
     @classmethod
     def parser_rule(cls) -> core.parser.rules.SingleResultsRule[parser.Parser, "Call"]:

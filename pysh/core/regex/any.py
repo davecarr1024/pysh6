@@ -12,4 +12,4 @@ class Any(regex.Regex):
         try:
             return state.tail().and_result(result.Result([state.head()]))
         except errors.Error as error:
-            raise self._error(state, children=[error])
+            raise self._error(state=state, children=[error])

@@ -8,7 +8,10 @@ from pysh import core
     frozen=True,
     kw_only=True,
 )
-class Val(MutableMapping[str, "Val"]):
+class Val(
+    MutableMapping[str, "Val"],
+    core.errors.Errorable["Val"],
+):
     members: "scope.Scope" = field(default_factory=lambda: scope.Scope())
 
     @classmethod
@@ -17,18 +20,6 @@ class Val(MutableMapping[str, "Val"]):
 
     def __call__(self, scope: "scope.Scope", args: "args.Args") -> "Val":
         raise self._error(msg="uncallable val")
-
-    def _error(
-        self,
-        *,
-        msg: Optional[str] = None,
-        children: Sequence[core.errors.Error] = [],
-    ) -> "error.Error":
-        return error.Error(
-            val=self,
-            msg=msg,
-            _children=children,
-        )
 
     def __len__(self) -> int:
         return len(self.members)
@@ -55,5 +46,5 @@ class Val(MutableMapping[str, "Val"]):
 
 
 from pysh.pype import parser
-from pysh.pype.vals import args, error, scope
+from pysh.pype.vals import args, scope
 from pysh.pype.vals.builtins import int_

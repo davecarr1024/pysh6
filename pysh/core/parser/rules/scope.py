@@ -11,6 +11,7 @@ _Result = TypeVar("_Result", covariant=True)
 @dataclass(frozen=True)
 class Scope(
     Mapping[str, "single_results_rule.SingleResultsRule[_State,_Result]"],
+    errors.Errorable["Scope"],
 ):
     _rules: Mapping[
         str, "single_results_rule.SingleResultsRule[_State,_Result]"
@@ -33,7 +34,7 @@ class Scope(
         self, name: str
     ) -> "single_results_rule.SingleResultsRule[_State,_Result]":
         if name not in self._rules:
-            raise errors.Error(msg=f"unknown rule {name}")
+            raise self._error(msg=f"unknown rule {name}")
         return self._rules[name]
 
 

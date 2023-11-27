@@ -1,10 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Iterator, Mapping, MutableMapping, Optional
-from pysh.pype import error
+from pysh import core
 
 
 @dataclass(frozen=True)
-class Scope(MutableMapping[str, "val.Val"]):
+class Scope(
+    MutableMapping[str, "val.Val"],
+    core.errors.Errorable["Scope"],
+):
     _vals: MutableMapping[str, "val.Val"] = field(default_factory=dict[str, "val.Val"])
     _parent: Optional["Scope"] = None
 
@@ -28,7 +31,7 @@ class Scope(MutableMapping[str, "val.Val"]):
         elif self._parent is not None:
             return self._parent[name]
         else:
-            raise error.Error(msg=f"unknown val {name}")
+            raise self._error(msg=f"unknown val {name}")
 
     def __setitem__(self, name: str, val: "val.Val") -> None:
         self._vals[name] = val

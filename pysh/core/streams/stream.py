@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Generic, Iterable, Iterator, Self, Sequence, Sized, TypeVar
+from typing import Generic, Iterable, Iterator, Sequence, Sized, TypeVar
 from pysh.core import errors
 
 
@@ -8,7 +8,12 @@ _Stream = TypeVar("_Stream", bound="Stream")
 
 
 @dataclass(frozen=True)
-class Stream(Generic[_Item, _Stream], Sized, Iterable[_Item]):
+class Stream(
+    Generic[_Item, _Stream],
+    Sized,
+    Iterable[_Item],
+    errors.Errorable["Stream"],
+):
     _items: Sequence[_Item] = field(default_factory=list[_Item])
 
     def __len__(self) -> int:
@@ -19,10 +24,10 @@ class Stream(Generic[_Item, _Stream], Sized, Iterable[_Item]):
 
     def head(self) -> _Item:
         if len(self) == 0:
-            raise errors.Error(msg="empty stream")
+            raise self._error(msg="empty stream")
         return list(self)[0]
 
     def tail(self: _Stream) -> _Stream:
         if len(self) == 0:
-            raise errors.Error(msg="empty stream")
+            raise self._error(msg="empty stream")
         return self.__class__(list(self._items)[1:])

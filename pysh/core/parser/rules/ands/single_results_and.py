@@ -28,7 +28,7 @@ class SingleResultsAnd(
 ):
     def __post_init__(self):
         if self._num_children_of_type(single_results_rule.SingleResultsRule) != 1:
-            raise errors.Error(msg=f"invalid SingleResultsAnd {self}")
+            raise self._error(msg=f"invalid SingleResultsAnd")
 
     def __call__(
         self, state: _State

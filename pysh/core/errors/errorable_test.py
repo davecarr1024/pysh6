@@ -1,6 +1,5 @@
 from typing import Callable, Optional
 from unittest import TestCase
-
 from pysh import core
 
 
@@ -25,7 +24,7 @@ class ErrorableTest(TestCase):
             return i
 
         with self.assertRaises(core.errors.Error):
-            self._Test().try_(f(core.errors.Error(msg="error")))
+            self._Test().try_(f(self._Test._cls_error(msg="error")))
         with self.assertRaises(core.errors.Error):
             self._Test().try_(f(TypeError()))
         self._Test().try_(f())

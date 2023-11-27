@@ -1,13 +1,17 @@
 from dataclasses import dataclass, field
 from typing import Iterable, Iterator, Sequence, Sized
 from pysh import core
-from pysh.pype import error, parser
+from pysh.pype import parser
 from pysh.pype.vals import args, scope
 from pysh.pype.exprs import param
 
 
 @dataclass(frozen=True)
-class Params(Sized, Iterable[param.Param]):
+class Params(
+    Sized,
+    Iterable[param.Param],
+    core.errors.Errorable["Params"],
+):
     _params: Sequence[param.Param] = field(default_factory=list[param.Param])
 
     def __len__(self) -> int:
@@ -18,14 +22,14 @@ class Params(Sized, Iterable[param.Param]):
 
     def bind(self, args: args.Args, scope: scope.Scope) -> scope.Scope:
         if len(self) != len(args):
-            raise error.Error(
+            raise self._error(
                 msg=f"param count mismatch expected {len(self)} got {len(args)}"
             )
         return scope.as_child({param.name: arg.val for param, arg in zip(self, args)})
 
     def tail(self) -> "Params":
         if len(self) == 0:
-            raise error.Error(msg=f"unable to get tail of empty params {self}")
+            raise self._error(msg=f"unable to get tail of empty params")
         return Params(self._params[1:])
 
     @classmethod

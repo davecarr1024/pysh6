@@ -1,6 +1,5 @@
 from pysh.core.regex.and_ import And
 from pysh.core.regex.any import Any
-from pysh.core.regex.error import Error
 from pysh.core.regex.literal import Literal
 from pysh.core.regex.one_or_more import OneOrMore
 from pysh.core.regex.or_ import Or

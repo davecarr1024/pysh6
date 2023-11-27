@@ -48,7 +48,7 @@ class MultipleResults(results.Results[_Result], Sequence[_Result]):
                 return optional_results.OptionalResults[_Result](self[0])
             case _:
                 raise self._error(
-                    "unable to convert MultipleResults to OptionalResults"
+                    msg="unable to convert MultipleResults to OptionalResults"
                 )
 
     def multiple(self) -> "MultipleResults[_Result]":
