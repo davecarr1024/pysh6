@@ -30,7 +30,7 @@ class NamedResults(results.Results[_Result], Mapping[str, _Result]):
             case 1:
                 return single_results.SingleResults[_Result](list(self.values())[0])
             case _:
-                raise self._error("unable to convert NamedResults to SingleResults")
+                raise self._error(msg="unable to convert NamedResults to SingleResults")
 
     def optional(self) -> "optional_results.OptionalResults[_Result]":
         match len(self._values):
@@ -39,7 +39,9 @@ class NamedResults(results.Results[_Result], Mapping[str, _Result]):
             case 1:
                 return optional_results.OptionalResults[_Result](list(self.values())[0])
             case _:
-                raise self._error("unable to convert NamedResults to OptionalResults")
+                raise self._error(
+                    msg="unable to convert NamedResults to OptionalResults"
+                )
 
     def multiple(self) -> "multiple_results.MultipleResults[_Result]":
         return multiple_results.MultipleResults(list(self.values()))

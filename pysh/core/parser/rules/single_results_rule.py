@@ -21,24 +21,9 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
     def convert(
         self, func: Callable[[_Result], _ConvertResult]
     ) -> "SingleResultsRule[_State,_ConvertResult]":
-        AdapterState = TypeVar("AdapterState", bound=states.State)
-        AdapterResult = TypeVar("AdapterResult")
-        AdapterChildResult = TypeVar("AdapterChildResult")
-
-        @dataclass(frozen=True)
-        class Converter(
-            SingleResultsRule[AdapterState, AdapterResult],
-            unary_rule.UnaryRule[AdapterState, AdapterResult, AdapterChildResult],
-        ):
-            func: Callable[[AdapterChildResult], AdapterResult]
-
-            def __call__(
-                self,
-                state: AdapterState,
-            ) -> states.StateAndSingleResults[AdapterState, AdapterResult]:
-                return self._call_child(state).single().convert(self.func)
-
-        return Converter[_State, _ConvertResult, _Result](self, func)
+        return unary_rules.SingleResultsConverter[_State, _ConvertResult, _Result](
+            self, func
+        )
 
     @overload
     def __and__(
@@ -97,7 +82,7 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
                 return ands.SingleResultsAnd[_State, _Result, _Result](
                     [
                         self,
-                        no_results_unary_rule.NoResultsUnaryRule[
+                        unary_rules.NoResultsUnaryRule[
                             _State,
                             _Result,
                             _RhsResult,
@@ -112,7 +97,7 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
                 return ands.SingleResultsAnd[_State, _Result, _Result](
                     [
                         self,
-                        no_results_unary_rule.NoResultsUnaryRule[
+                        unary_rules.NoResultsUnaryRule[
                             _State,
                             _Result,
                             tokens.Token,
@@ -120,7 +105,7 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
                     ]
                 )
             case _:
-                raise self._error("invalid and rhs {rhs}")
+                raise self._error(msg="invalid and rhs {rhs}")
 
     @overload
     def __rand__(self, rhs: str) -> "ands.SingleResultsAnd[_State, _Result, _Result]":
@@ -141,7 +126,7 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
     ) -> "ands.SingleResultsAnd[_State, _Result, _Result]":
         return ands.SingleResultsAnd[_State, _Result, _Result](
             [
-                no_results_unary_rule.NoResultsUnaryRule[_State, _Result, tokens.Token](
+                unary_rules.NoResultsUnaryRule[_State, _Result, tokens.Token](
                     literal.Literal.load(rhs)
                 ),
                 self,
@@ -193,9 +178,9 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
                 return ors.OptionalResultsOr[_State, _Result, _Result](
                     [
                         self,
-                        no_results_unary_rule.NoResultsUnaryRule[
-                            _State, _Result, _RhsResult
-                        ](rhs),
+                        unary_rules.NoResultsUnaryRule[_State, _Result, _RhsResult](
+                            rhs
+                        ),
                     ]
                 )
             case optional_results_rule.OptionalResultsRule():
@@ -207,38 +192,19 @@ class SingleResultsRule(rule.Rule[_State, _Result]):
             case named_results_rule.NamedResultsRule():
                 return ors.NamedResultsOr[_State, _Result, _RhsResult]([self, rhs])
             case _:
-                raise self._error("invalid or rhs {rhs}")
+                raise self._error(msg="invalid or rhs {rhs}")
 
     def with_lexer(self, lexer: lexer_lib.Lexer) -> "SingleResultsRule[_State,_Result]":
-        State = TypeVar("State", bound=states.State)
-        Result = TypeVar("Result")
-
-        @dataclass(frozen=True)
-        class WithLexer(
-            unary_rule.UnaryRule[State, Result, Result],
-            SingleResultsRule[State, Result],
-        ):
-            _lexer: lexer_lib.Lexer
-
-            def lexer(self) -> lexer_lib.Lexer:
-                return self._lexer | self.child.lexer()
-
-            def __call__(
-                self, state: State
-            ) -> states.StateAndSingleResults[State, Result]:
-                return self._call_child(state).single()
-
-        return WithLexer[_State, _Result](child=self, _lexer=lexer)
+        return unary_rules.SingleResultsUnaryRule[_State, _Result](self, _lexer=lexer)
 
 
 from pysh.core.parser.rules import (
     ands,
     ors,
-    unary_rule,
     no_results_rule,
     optional_results_rule,
     multiple_results_rule,
     named_results_rule,
-    no_results_unary_rule,
     literal,
+    unary_rules,
 )

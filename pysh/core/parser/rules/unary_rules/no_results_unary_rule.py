@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 from pysh.core.parser import states
-from pysh.core.parser.rules import no_results_rule, unary_rule
+from pysh.core.parser.rules import no_results_rule
+from pysh.core.parser.rules.unary_rules import unary_rule
 
 
 _State = TypeVar("_State", bound=states.State)

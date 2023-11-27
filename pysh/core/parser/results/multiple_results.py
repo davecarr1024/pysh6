@@ -36,7 +36,9 @@ class MultipleResults(results.Results[_Result], Sequence[_Result]):
             case 1:
                 return single_results.SingleResults[_Result](self[0])
             case _:
-                raise self._error("unable to convert MultipleResults to SingleResults")
+                raise self._error(
+                    msg="unable to convert MultipleResults to SingleResults"
+                )
 
     def optional(self) -> "optional_results.OptionalResults[_Result]":
         match len(self._values):
@@ -59,7 +61,9 @@ class MultipleResults(results.Results[_Result], Sequence[_Result]):
             case 1:
                 return named_results.NamedResults[_Result]({name: self[0]})
             case _:
-                raise self._error("unable to convert MultipleResults to NamedResults")
+                raise self._error(
+                    msg="unable to convert MultipleResults to NamedResults"
+                )
 
     @overload
     def __or__(

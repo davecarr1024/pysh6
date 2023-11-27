@@ -17,14 +17,12 @@ class StateValueGetter(ABC, Generic[_State, _Value]):
     def load(
         cls, get_func: Callable[[_State], _Value]
     ) -> "StateValueGetter[_State,_Value]":
-        GetterState = TypeVar("GetterState", bound=state.State)
-        GetterValue = TypeVar("GetterValue")
+        return _Getter[_State, _Value](get_func)
 
-        @dataclass(frozen=True)
-        class Getter(StateValueGetter[GetterState, GetterValue]):
-            get_func: Callable[[GetterState], GetterValue]
 
-            def get(self, state: GetterState) -> GetterValue:
-                return self.get_func(state)
+@dataclass(frozen=True)
+class _Getter(StateValueGetter[_State, _Value]):
+    get_func: Callable[[_State], _Value]
 
-        return Getter[_State, _Value](get_func)
+    def get(self, state: _State) -> _Value:
+        return self.get_func(state)

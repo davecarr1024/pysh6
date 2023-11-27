@@ -17,7 +17,9 @@ class OptionalResults(results.Results[_Result]):
     def single(self) -> "single_results.SingleResults[_Result]":
         match self.value:
             case None:
-                raise self._error("unable to convert OptionalResults to SingleResults")
+                raise self._error(
+                    msg="unable to convert OptionalResults to SingleResults"
+                )
             case _:
                 return single_results.SingleResults[_Result](self.value)
 

@@ -1,6 +1,6 @@
-from dataclasses import dataclass
-from typing import Generic, TypeVar
-from pysh.core import errors, lexer
+from dataclasses import dataclass, field
+from typing import Generic, Optional, TypeVar
+from pysh.core import lexer
 from pysh.core.parser import states
 from pysh.core.parser.rules import rule
 
@@ -16,17 +16,23 @@ class UnaryRule(
     rule.Rule[_State, _Result],
 ):
     child: rule.Rule[_State, _ChildResult]
+    _lexer: Optional[lexer.Lexer] = field(default=None, kw_only=True)
 
     def __str__(self) -> str:
-        return str(self.child)
+        return (
+            str(self.child)
+            if self._lexer is None
+            else f"{self.child}.with_lexer({self._lexer})"
+        )
 
     def _call_child(
         self, state: _State
     ) -> states.StateAndResults[_State, _ChildResult]:
-        try:
-            return self.child(state)
-        except errors.Error as error:
-            raise self._parse_error(state, children=[error])
+        return self._try(lambda: self.child(state))
 
     def lexer(self) -> lexer.Lexer:
-        return self.child.lexer()
+        return (
+            self.child.lexer() | self._lexer
+            if self._lexer is not None
+            else self.child.lexer()
+        )
